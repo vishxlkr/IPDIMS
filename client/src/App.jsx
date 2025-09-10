@@ -1,53 +1,3 @@
-// import React from "react";
-// import {
-//    BrowserRouter as Router,
-//    Routes,
-//    Route,
-//    Navigate,
-// } from "react-router-dom";
-// import { Toaster } from "react-hot-toast";
-
-// import { AuthProvider, useAuth } from "./context/AuthContext";
-// import AuthPage from "./pages/AuthPage";
-// import Homepage from "./pages/Homepage";
-
-// // Protect private routes
-// function RequireAuth({ children }) {
-//    const { user, token } = useAuth();
-//    if (!token && !user) {
-//       return <Navigate to="/" replace />;
-//    }
-//    return children;
-// }
-
-// export default function App() {
-//    return (
-//       <AuthProvider>
-//          <Router>
-//             <Toaster position="top-right" />
-//             <Routes>
-//                {/* Public auth page */}
-//                <Route path="/" element={<AuthPage />} />
-
-//                {/* Protected homepage */}
-//                <Route
-//                   path="/home"
-//                   element={
-//                      <RequireAuth>
-//                         <Homepage />
-//                      </RequireAuth>
-//                   }
-//                />
-
-//                {/* Redirect unknown routes */}
-//                <Route path="*" element={<Navigate to="/" replace />} />
-//             </Routes>
-//          </Router>
-//       </AuthProvider>
-//    );
-// }
-
-import React from "react";
 import {
    BrowserRouter as Router,
    Routes,
@@ -57,6 +7,7 @@ import {
 import { Toaster } from "react-hot-toast";
 
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import Navbar from "./components/Navbar";
 
 // Pre-login pages
 import Home from "./pages/prelogin/Home";
@@ -67,7 +18,7 @@ import Committee from "./pages/prelogin/Committee";
 import Venue from "./pages/prelogin/Venue";
 import ContactUs from "./pages/prelogin/ContactUs";
 
-// Auth pages
+// Auth page
 import AuthPage from "./pages/AuthPage";
 
 // Author pages
@@ -95,9 +46,15 @@ function RequireAuth({ children, allowedRole }) {
       return <Navigate to="/auth" replace />;
    }
 
-   // optional: role-based check
    if (allowedRole && user.role !== allowedRole) {
-      return <Navigate to="/" replace />;
+      // Redirect to respective dashboard if role mismatch
+      const redirectPath =
+         user.role === "admin"
+            ? "/admin/dashboard"
+            : user.role === "reviewer"
+            ? "/reviewer/dashboard"
+            : "/author/dashboard";
+      return <Navigate to={redirectPath} replace />;
    }
 
    return children;
@@ -108,8 +65,10 @@ export default function App() {
       <AuthProvider>
          <Router>
             <Toaster position="top-right" />
+            <Navbar />{" "}
+            {/* Navbar now dynamically shows links based on user role */}
             <Routes>
-               {/* Public pre-login pages */}
+               {/* ------------------ Pre-login pages ------------------ */}
                <Route path="/" element={<Home />} />
                <Route
                   path="/submission-guidelines"
@@ -121,10 +80,10 @@ export default function App() {
                <Route path="/venue" element={<Venue />} />
                <Route path="/contact-us" element={<ContactUs />} />
 
-               {/* Auth page */}
+               {/* ------------------ Auth page ------------------ */}
                <Route path="/auth" element={<AuthPage />} />
 
-               {/* Author routes */}
+               {/* ------------------ Author routes ------------------ */}
                <Route
                   path="/author/dashboard"
                   element={
@@ -158,7 +117,7 @@ export default function App() {
                   }
                />
 
-               {/* Reviewer routes */}
+               {/* ------------------ Reviewer routes ------------------ */}
                <Route
                   path="/reviewer/dashboard"
                   element={
@@ -184,7 +143,7 @@ export default function App() {
                   }
                />
 
-               {/* Admin routes */}
+               {/* ------------------ Admin routes ------------------ */}
                <Route
                   path="/admin/dashboard"
                   element={
@@ -218,7 +177,7 @@ export default function App() {
                   }
                />
 
-               {/* Redirect unknown routes */}
+               {/* ------------------ Fallback for unknown routes ------------------ */}
                <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
          </Router>

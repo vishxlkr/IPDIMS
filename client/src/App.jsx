@@ -1,3 +1,4 @@
+import React from "react";
 import {
    BrowserRouter as Router,
    Routes,
@@ -8,6 +9,7 @@ import { Toaster } from "react-hot-toast";
 
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
 // Pre-login pages
 import Home from "./pages/prelogin/Home";
@@ -47,7 +49,6 @@ function RequireAuth({ children, allowedRole }) {
    }
 
    if (allowedRole && user.role !== allowedRole) {
-      // Redirect to respective dashboard if role mismatch
       const redirectPath =
          user.role === "admin"
             ? "/admin/dashboard"
@@ -65,121 +66,126 @@ export default function App() {
       <AuthProvider>
          <Router>
             <Toaster position="top-right" />
-            <Navbar />{" "}
-            {/* Navbar now dynamically shows links based on user role */}
-            <Routes>
-               {/* ------------------ Pre-login pages ------------------ */}
-               <Route path="/" element={<Home />} />
-               <Route
-                  path="/submission-guidelines"
-                  element={<SubmissionGuidelines />}
-               />
-               <Route path="/registration" element={<Registration />} />
-               <Route path="/important-dates" element={<ImportantDates />} />
-               <Route path="/committee" element={<Committee />} />
-               <Route path="/venue" element={<Venue />} />
-               <Route path="/contact-us" element={<ContactUs />} />
+            <Navbar />
 
-               {/* ------------------ Auth page ------------------ */}
-               <Route path="/auth" element={<AuthPage />} />
+            <div className="pt-16">
+               {/* Add top padding so content is not hidden behind fixed navbar */}
+               <Routes>
+                  {/* ------------------ Pre-login pages ------------------ */}
+                  <Route path="/" element={<Home />} />
+                  <Route
+                     path="/submission-guidelines"
+                     element={<SubmissionGuidelines />}
+                  />
+                  <Route path="/registration" element={<Registration />} />
+                  <Route path="/important-dates" element={<ImportantDates />} />
+                  <Route path="/committee" element={<Committee />} />
+                  <Route path="/venue" element={<Venue />} />
+                  <Route path="/contact-us" element={<ContactUs />} />
 
-               {/* ------------------ Author routes ------------------ */}
-               <Route
-                  path="/author/dashboard"
-                  element={
-                     <RequireAuth allowedRole="author">
-                        <AuthorDashboard />
-                     </RequireAuth>
-                  }
-               />
-               <Route
-                  path="/author/submissions"
-                  element={
-                     <RequireAuth allowedRole="author">
-                        <MySubmissions />
-                     </RequireAuth>
-                  }
-               />
-               <Route
-                  path="/author/new"
-                  element={
-                     <RequireAuth allowedRole="author">
-                        <NewSubmission />
-                     </RequireAuth>
-                  }
-               />
-               <Route
-                  path="/author/payments"
-                  element={
-                     <RequireAuth allowedRole="author">
-                        <AuthorPayments />
-                     </RequireAuth>
-                  }
-               />
+                  {/* ------------------ Auth page ------------------ */}
+                  <Route path="/auth" element={<AuthPage />} />
 
-               {/* ------------------ Reviewer routes ------------------ */}
-               <Route
-                  path="/reviewer/dashboard"
-                  element={
-                     <RequireAuth allowedRole="reviewer">
-                        <ReviewerDashboard />
-                     </RequireAuth>
-                  }
-               />
-               <Route
-                  path="/reviewer/assigned"
-                  element={
-                     <RequireAuth allowedRole="reviewer">
-                        <AssignedPapers />
-                     </RequireAuth>
-                  }
-               />
-               <Route
-                  path="/reviewer/review"
-                  element={
-                     <RequireAuth allowedRole="reviewer">
-                        <SubmitReview />
-                     </RequireAuth>
-                  }
-               />
+                  {/* ------------------ Author routes ------------------ */}
+                  <Route
+                     path="/author/dashboard"
+                     element={
+                        <RequireAuth allowedRole="author">
+                           <AuthorDashboard />
+                        </RequireAuth>
+                     }
+                  />
+                  <Route
+                     path="/author/submissions"
+                     element={
+                        <RequireAuth allowedRole="author">
+                           <MySubmissions />
+                        </RequireAuth>
+                     }
+                  />
+                  <Route
+                     path="/author/new"
+                     element={
+                        <RequireAuth allowedRole="author">
+                           <NewSubmission />
+                        </RequireAuth>
+                     }
+                  />
+                  <Route
+                     path="/author/payments"
+                     element={
+                        <RequireAuth allowedRole="author">
+                           <AuthorPayments />
+                        </RequireAuth>
+                     }
+                  />
 
-               {/* ------------------ Admin routes ------------------ */}
-               <Route
-                  path="/admin/dashboard"
-                  element={
-                     <RequireAuth allowedRole="admin">
-                        <AdminDashboard />
-                     </RequireAuth>
-                  }
-               />
-               <Route
-                  path="/admin/users"
-                  element={
-                     <RequireAuth allowedRole="admin">
-                        <ManageUsers />
-                     </RequireAuth>
-                  }
-               />
-               <Route
-                  path="/admin/submissions"
-                  element={
-                     <RequireAuth allowedRole="admin">
-                        <ManageSubmissions />
-                     </RequireAuth>
-                  }
-               />
-               <Route
-                  path="/admin/payments"
-                  element={
-                     <RequireAuth allowedRole="admin">
-                        <AdminPayments />
-                     </RequireAuth>
-                  }
-               />
+                  {/* ------------------ Reviewer routes ------------------ */}
+                  <Route
+                     path="/reviewer/dashboard"
+                     element={
+                        <RequireAuth allowedRole="reviewer">
+                           <ReviewerDashboard />
+                        </RequireAuth>
+                     }
+                  />
+                  <Route
+                     path="/reviewer/assigned"
+                     element={
+                        <RequireAuth allowedRole="reviewer">
+                           <AssignedPapers />
+                        </RequireAuth>
+                     }
+                  />
+                  <Route
+                     path="/reviewer/review"
+                     element={
+                        <RequireAuth allowedRole="reviewer">
+                           <SubmitReview />
+                        </RequireAuth>
+                     }
+                  />
 
-               {/* ------------------ Fallback for unknown routes ------------------ */}
-               <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+                  {/* ------------------ Admin routes ------------------ */}
+                  <Route
+                     path="/admin/dashboard"
+                     element={
+                        <RequireAuth allowedRole="admin">
+                           <AdminDashboard />
+                        </RequireAuth>
+                     }
+                  />
+                  <Route
+                     path="/admin/users"
+                     element={
+                        <RequireAuth allowedRole="admin">
+                           <ManageUsers />
+                        </RequireAuth>
+                     }
+                  />
+                  <Route
+                     path="/admin/submissions"
+                     element={
+                        <RequireAuth allowedRole="admin">
+                           <ManageSubmissions />
+                        </RequireAuth>
+                     }
+                  />
+                  <Route
+                     path="/admin/payments"
+                     element={
+                        <RequireAuth allowedRole="admin">
+                           <AdminPayments />
+                        </RequireAuth>
+                     }
+                  />
+
+                  {/* ------------------ Fallback for unknown routes ------------------ */}
+                  <Route path="*" element={<Navigate to="/" replace />} />
+               </Routes>
+            </div>
+
+            <Footer />
          </Router>
       </AuthProvider>
    );

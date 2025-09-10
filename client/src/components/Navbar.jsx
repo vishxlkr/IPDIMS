@@ -1,114 +1,91 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import logo from "../assets/logo.png";
 
 const Navbar = () => {
-   const [isOpen, setIsOpen] = useState(false);
-   const [scrolled, setScrolled] = useState(false);
+   const [menuOpen, setMenuOpen] = useState(false);
 
-   const toggleMenu = () => {
-      setIsOpen(!isOpen);
-   };
-
-   // Listen to scroll event
    useEffect(() => {
-      const handleScroll = () => {
-         if (window.scrollY > 50) {
-            setScrolled(true);
-         } else {
-            setScrolled(false);
-         }
-      };
-      window.addEventListener("scroll", handleScroll);
+      document.body.style.overflow = menuOpen ? "hidden" : "";
+   }, [menuOpen]);
 
-      return () => {
-         window.removeEventListener("scroll", handleScroll);
-      };
-   }, []);
+   const navLinks = [
+      { path: "/", label: "Home" },
+      { path: "/projects", label: "Projects" },
+      { path: "/about", label: "About" },
+      { path: "/contact", label: "Contact" },
+   ];
 
    return (
-      <nav
-         className={`fixed w-full z-50 transition-colors duration-500 ${
-            scrolled ? "bg-black text-white shadow-lg" : "bg-white text-black"
-         }`}
-      >
-         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between h-16 items-center">
-               {/* Logo */}
-               <div className="flex-shrink-0">
-                  <Link
-                     to="/"
-                     className={`text-2xl font-bold transition-colors duration-500 ${
-                        scrolled ? "text-white" : "text-black"
-                     }`}
-                  >
-                     MyApp
-                  </Link>
+      <nav className="fixed top-0 w-full z-40 bg-[rgba(10,10,10,0.8)] backdrop-blur-lg border-b border-white/10 shadow-lg">
+         <div className="max-w-6xl mx-auto px-4">
+            <div className="flex justify-between items-center h-16">
+               {/* Left: Logo + Brand */}
+               <div className="flex items-center space-x-2">
+                  <img src={logo} alt="logo" className="h-8 w-8" />
+                  <NavLink to="/" className="text-xl font-bold text-white">
+                     <span className="text-blue-500">IP</span>DIMS
+                  </NavLink>
                </div>
 
-               {/* Desktop Menu */}
-               <div className="hidden md:flex space-x-6">
-                  {["Home", "About", "Dashboard", "Login", "Register"].map(
-                     (item) => (
-                        <Link
-                           key={item}
-                           to={`/${item.toLowerCase()}`}
-                           className={`hover:text-gray-400 transition-colors duration-300 ${
-                              scrolled ? "text-white" : "text-black"
-                           }`}
-                        >
-                           {item}
-                        </Link>
-                     )
-                  )}
-               </div>
-
-               {/* Mobile Menu Button */}
-               <div className="md:hidden flex items-center">
-                  <button onClick={toggleMenu} className="focus:outline-none">
-                     <svg
-                        className={`h-6 w-6 transition-colors duration-300 ${
-                           scrolled ? "text-white" : "text-black"
-                        }`}
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
+               {/* Center: Nav Links (Desktop only) */}
+               <div className="hidden md:flex items-center space-x-8">
+                  {navLinks.map(({ path, label }) => (
+                     <NavLink
+                        key={path}
+                        to={path}
+                        className={({ isActive }) =>
+                           `transition-colors ${
+                              isActive
+                                 ? "text-white font-semibold"
+                                 : "text-gray-300 hover:text-white"
+                           }`
+                        }
                      >
-                        {isOpen ? (
-                           <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M6 18L18 6M6 6l12 12"
-                           />
-                        ) : (
-                           <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M4 6h16M4 12h16M4 18h16"
-                           />
-                        )}
-                     </svg>
+                        {label}
+                     </NavLink>
+                  ))}
+               </div>
+
+               {/* Right: Login + Hamburger */}
+               <div className="flex items-center space-x-4">
+                  <NavLink
+                     to="/login"
+                     className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+                  >
+                     Login
+                  </NavLink>
+
+                  {/* Mobile Hamburger */}
+                  <button
+                     className="md:hidden text-white text-2xl"
+                     onClick={() => setMenuOpen((prev) => !prev)}
+                  >
+                     {menuOpen ? "✕" : "☰"}
                   </button>
                </div>
             </div>
          </div>
 
-         {/* Mobile Menu */}
-         {isOpen && (
-            <div className="md:hidden bg-blue-500 px-2 pt-2 pb-3 space-y-1">
-               {["Home", "About", "Dashboard", "Login", "Register"].map(
-                  (item) => (
-                     <Link
-                        key={item}
-                        to={`/${item.toLowerCase()}`}
-                        className="block px-3 py-2 rounded hover:bg-blue-600 text-white"
-                     >
-                        {item}
-                     </Link>
-                  )
-               )}
+         {/* Mobile Menu (Tabs only) */}
+         {menuOpen && (
+            <div className="md:hidden absolute top-16 left-0 w-full bg-[rgba(10,10,10,0.95)] backdrop-blur-lg border-b border-white/10 shadow-lg flex flex-col items-center space-y-6 py-6">
+               {navLinks.map(({ path, label }) => (
+                  <NavLink
+                     key={path}
+                     to={path}
+                     onClick={() => setMenuOpen(false)}
+                     className={({ isActive }) =>
+                        `transition-colors text-lg ${
+                           isActive
+                              ? "text-white font-semibold"
+                              : "text-gray-300 hover:text-white"
+                        }`
+                     }
+                  >
+                     {label}
+                  </NavLink>
+               ))}
             </div>
          )}
       </nav>

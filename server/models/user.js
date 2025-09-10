@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema(
          type: String,
          required: [true, "Please add an email"],
          unique: true,
+         trim: true,
          match: [
             /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
             "Please add a valid email",
@@ -30,6 +31,12 @@ const userSchema = new mongoose.Schema(
       },
       otpExpires: {
          type: Date,
+      },
+      // ✅ Add the role field for your system
+      role: {
+         type: String,
+         enum: ["author", "reviewer", "admin"],
+         default: "author", // Default role for new users
       },
    },
    {

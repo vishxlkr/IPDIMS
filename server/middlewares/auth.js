@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import User from "../models/user.js";
+import User from "../models/User.js";
 
 // Middleware to protect routes that require authentication
 export const protect = async (req, res, next) => {
@@ -11,9 +11,9 @@ export const protect = async (req, res, next) => {
    ) {
       try {
          token = req.headers.authorization.split(" ")[1];
-
+         // ✅ The decoded token now includes the user's ID and role
          const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
+         // ✅ Fetch the user and their role from the database
          req.user = await User.findById(decoded.id).select("-password");
 
          if (!req.user) {
@@ -36,4 +36,15 @@ export const protect = async (req, res, next) => {
          .status(401)
          .json({ message: "Not authorized, no token provided" });
    }
+};
+
+// ✅ New middleware to authorize specific roles
+export const authorizeRoles = (...roles) => {
+   return (req, res, next) => {
+      // Check if the authenticated user's role is in the list of allowed roles
+      if (!req.user || !roles.includes(req.user.role)) {
+         return res.status(403).json({ message: "Access Denied" });
+      }
+      next();
+   };
 };

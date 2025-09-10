@@ -4,6 +4,11 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 
+// ✅ Import your new role-based route files
+import authorRoutes from "./routes/authorRoutes.js";
+import reviewerRoutes from "./routes/reviewerRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
+
 // Load environment variables from .env file
 dotenv.config();
 
@@ -25,6 +30,11 @@ app.use(express.json());
 
 // API routes
 app.use("/api/users", userRoutes);
+
+// ✅ Add your new role-based routes
+app.use("/api/author", authorRoutes);
+app.use("/api/reviewer", reviewerRoutes);
+app.use("/api/admin", adminRoutes);
 
 // A simple root route to check if the API is running
 app.get("/", (req, res) => {

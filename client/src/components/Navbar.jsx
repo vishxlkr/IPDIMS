@@ -11,9 +11,12 @@ const Navbar = () => {
 
    const navLinks = [
       { path: "/", label: "Home" },
-      { path: "/projects", label: "Projects" },
-      { path: "/about", label: "About" },
-      { path: "/contact", label: "Contact" },
+      { path: "/submission", label: "Submission" },
+      { path: "/important-dates", label: "Important Dates" },
+      { path: "/registration", label: "Registration" },
+      { path: "/committee", label: "Committee" },
+      { path: "/Venue", label: "Venue & Accomodation " },
+      { path: "/contact", label: "Contact " },
    ];
 
    return (
@@ -51,7 +54,7 @@ const Navbar = () => {
                <div className="flex items-center space-x-4">
                   <NavLink
                      to="/login"
-                     className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+                     className="px-4 py-2 rounded-3xl bg-blue-600 text-white hover:bg-blue-700 transition"
                   >
                      Login
                   </NavLink>

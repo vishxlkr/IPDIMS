@@ -1,7 +1,9 @@
 const Footer = () => {
    return (
-      <footer className="bg-gray-100 mt-10 py-4 text-center text-gray-600 shadow-inner">
-         &copy; IPDIMS 2025. All rights reserved.
+      <footer className="bg-gray-950 text-gray-500 text-center py-4 text-sm mt-8">
+         <div className="container mx-auto px-4">
+            <p className="mb-1">Copyright © 2025 IPDIMS</p>
+         </div>
       </footer>
    );
 };

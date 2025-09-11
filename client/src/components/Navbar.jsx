@@ -16,7 +16,7 @@ const Navbar = () => {
       { path: "/registration", label: "Registration" },
       { path: "/committee", label: "Committee" },
       { path: "/Venue", label: "Venue & Accomodation " },
-      { path: "/contact", label: "Contact " },
+      { path: "/contact-us", label: "Contact " },
    ];
 
    return (

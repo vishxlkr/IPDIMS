@@ -3,7 +3,7 @@ import React from "react";
 
 const Venue = () => {
    return (
-      <div className="max-w-5xl mx-auto py-12 px-6 text-gray-200">
+      <div className="max-w-5xl mx-auto py-12 px-6 bg-black text-white">
          <h1 className="text-3xl md:text-4xl font-bold text-blue-500 mb-10 border-b-2 border-green-500 pb-3">
             Venue & Accommodation
          </h1>

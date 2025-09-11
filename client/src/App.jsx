@@ -68,7 +68,7 @@ export default function App() {
             <Toaster position="top-right" />
             <Navbar />
 
-            <div className="pt-16">
+            <div className="pt-16 bg-black">
                {/* Add top padding so content is not hidden behind fixed navbar */}
                <Routes>
                   {/* ------------------ Pre-login pages ------------------ */}

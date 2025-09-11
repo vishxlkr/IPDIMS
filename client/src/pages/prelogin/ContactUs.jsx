@@ -47,7 +47,7 @@ const ContactUs = () => {
             {contacts.map((person, idx) => (
                <div
                   key={idx}
-                  className="bg-gray-800 p-6 rounded-xl shadow-lg hover:scale-105 transition-transform duration-300"
+                  className="bg-white/10  border-1 p-6 rounded-xl shadow-lg hover:scale-101 transition-transform duration-300"
                >
                   <h2 className="text-xl font-bold text-white mb-2">
                      {person.name}

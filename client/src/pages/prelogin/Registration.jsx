@@ -4,25 +4,25 @@ import registrationDetail from "../../assets/registrationDetail.jpg";
 
 const Registration = () => {
    return (
-      <div className="bg-black text-white min-h-screen font-sans">
-         <div className="container mx-auto px-4 py-8 md:py-16 max-w-5xl">
+      <div className="bg-black text-white min-h-screen py-12 px-6 md:px-16 font-sans">
+         <div className="max-w-5xl mx-auto space-y-12">
             {/* Page Title */}
-            <header className="text-center mb-12">
-               <h2 className="text-3xl md:text-4xl font-bold text-indigo-400">
+            <header className="text-center">
+               <h2 className="text-3xl md:text-4xl font-bold text-indigo-400 mb-6">
                   Registration
                </h2>
             </header>
 
             {/* Registration Details + QR */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-               <div className="bg-gray-800 p-6 rounded-xl shadow-lg flex items-center justify-center hover:scale-105 transition-transform duration-300">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+               <div className="bg-white/10 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-lg p-6 flex items-center justify-center hover:scale-105 transition-transform duration-300">
                   <img
                      src={registrationDetail}
                      alt="Registration Details"
                      className="rounded-lg shadow-md max-h-[500px] object-contain"
                   />
                </div>
-               <div className="bg-gray-800 p-6 rounded-xl shadow-lg flex items-center justify-center hover:scale-105 transition-transform duration-300">
+               <div className="bg-white/10 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-lg p-6 flex items-center justify-center hover:scale-105 transition-transform duration-300">
                   <img
                      src={scanner}
                      alt="UPI Scanner"
@@ -32,7 +32,7 @@ const Registration = () => {
             </div>
 
             {/* Registration Form */}
-            <div className="bg-gray-800 text-gray-100 rounded-xl shadow-lg p-8">
+            <div className="bg-white/10 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-lg p-8">
                <form className="space-y-6">
                   {/* Paper ID */}
                   <div>
@@ -42,7 +42,7 @@ const Registration = () => {
                      <input
                         type="text"
                         placeholder="E.g. 10"
-                        className="w-full border border-gray-600 bg-gray-900 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
+                        className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
                      />
                   </div>
 
@@ -54,7 +54,7 @@ const Registration = () => {
                      <input
                         type="text"
                         placeholder="Enter your paper title"
-                        className="w-full border border-gray-600 bg-gray-900 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
+                        className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
                      />
                   </div>
 
@@ -68,7 +68,7 @@ const Registration = () => {
                            <label className="block font-medium mb-2">
                               Presentation Type
                            </label>
-                           <select className="w-full border border-gray-600 bg-gray-900 rounded-lg px-4 py-2">
+                           <select className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2">
                               <option>Online</option>
                               <option>In-person</option>
                            </select>
@@ -80,7 +80,7 @@ const Registration = () => {
                            <input
                               type="text"
                               placeholder="Enter your name"
-                              className="w-full border border-gray-600 bg-gray-900 rounded-lg px-4 py-2"
+                              className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2"
                            />
                         </div>
                         <div>
@@ -90,7 +90,7 @@ const Registration = () => {
                            <input
                               type="text"
                               placeholder="E.g. Professor, NIT Rourkela"
-                              className="w-full border border-gray-600 bg-gray-900 rounded-lg px-4 py-2"
+                              className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2"
                            />
                         </div>
                         <div>
@@ -100,7 +100,7 @@ const Registration = () => {
                            <input
                               type="email"
                               placeholder="yourmail@example.com"
-                              className="w-full border border-gray-600 bg-gray-900 rounded-lg px-4 py-2"
+                              className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2"
                            />
                         </div>
                         <div>
@@ -110,7 +110,7 @@ const Registration = () => {
                            <input
                               type="text"
                               placeholder="E.g. 9876543210"
-                              className="w-full border border-gray-600 bg-gray-900 rounded-lg px-4 py-2"
+                              className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2"
                            />
                         </div>
                      </div>
@@ -121,7 +121,7 @@ const Registration = () => {
                      <label className="block font-semibold mb-2 text-indigo-300">
                         Registration Category
                      </label>
-                     <select className="w-full border border-gray-600 bg-gray-900 rounded-lg px-4 py-2">
+                     <select className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2">
                         <option>Student</option>
                         <option>Academician/ R&D Lab</option>
                         <option>Industrialist</option>
@@ -135,7 +135,7 @@ const Registration = () => {
                      <label className="block font-semibold mb-2 text-indigo-300">
                         Type of Registration
                      </label>
-                     <select className="w-full border border-gray-600 bg-gray-900 rounded-lg px-4 py-2">
+                     <select className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2">
                         <option>Early Bird</option>
                         <option>Late</option>
                      </select>
@@ -154,7 +154,7 @@ const Registration = () => {
                            <input
                               type="text"
                               placeholder="E.g. 6000"
-                              className="w-full border border-gray-600 bg-gray-900 rounded-lg px-4 py-2"
+                              className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2"
                            />
                         </div>
                         <div>
@@ -163,7 +163,7 @@ const Registration = () => {
                            </label>
                            <input
                               type="date"
-                              className="w-full border border-gray-600 bg-gray-900 rounded-lg px-4 py-2"
+                              className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2"
                            />
                         </div>
                         <div className="md:col-span-2">
@@ -173,7 +173,7 @@ const Registration = () => {
                            <input
                               type="text"
                               placeholder="Enter transaction ID"
-                              className="w-full border border-gray-600 bg-gray-900 rounded-lg px-4 py-2"
+                              className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2"
                            />
                         </div>
                         <div className="md:col-span-2">
@@ -182,7 +182,7 @@ const Registration = () => {
                            </label>
                            <input
                               type="file"
-                              className="w-full border border-gray-600 bg-gray-900 rounded-lg px-4 py-2"
+                              className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2"
                            />
                         </div>
                      </div>
@@ -228,7 +228,7 @@ const Registration = () => {
                      </label>
                      <textarea
                         placeholder="E.g. Any special requirements..."
-                        className="w-full border border-gray-600 bg-gray-900 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
+                        className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
                         rows="4"
                      />
                   </div>

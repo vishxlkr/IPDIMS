@@ -27,7 +27,7 @@ const Navbar = () => {
                <div className="flex items-center space-x-2">
                   <img src={logo} alt="logo" className="h-8 w-8" />
                   <NavLink to="/" className="text-xl font-bold text-white">
-                     <span className="text-blue-500">IP</span>DIMS
+                     <span className="text-blue-500"></span>IPDIMS
                   </NavLink>
                </div>
 

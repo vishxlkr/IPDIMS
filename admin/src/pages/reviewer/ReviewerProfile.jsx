@@ -135,7 +135,7 @@ const ReviewerProfile = () => {
             {/* Profile Card */}
             <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
                {/* Header Section */}
-               <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+               <div className="bg-linear-to-r from-blue-600 to-blue-700 p-6">
                   <div className="flex items-center justify-between">
                      <div className="flex items-center gap-4">
                         <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center">

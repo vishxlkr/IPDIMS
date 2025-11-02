@@ -1,8 +1,13 @@
 import mongoose from "mongoose";
 
 const connectDB = async () => {
-   mongoose.connection.on("connected", () => console.log("database connected"));
-   await mongoose.connect(`${process.env.MONGODB_URI}/ipdims`);
+   try {
+      mongoose.set("strictQuery", false);
+      await mongoose.connect(process.env.MONGODB_URI);
+      console.log("✅ Database connected successfully");
+   } catch (err) {
+      console.error("❌ Database connection error:", err.message);
+   }
 };
 
 export default connectDB;

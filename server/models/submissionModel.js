@@ -20,7 +20,7 @@ const submissionSchema = new mongoose.Schema(
       authorAffiliation: { type: String, default: "" },
 
       // 📎 Attachment (single main file)
-      attachment: { type: String, default: "", required: true },
+      attachment: { type: String, default: "" },
 
       // 👨‍🏫 Reviewer (assigned later by admin)
       reviewer: {

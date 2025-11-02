@@ -14,6 +14,7 @@ import {
    getUserSubmissions,
    newSubmission,
 } from "../controllers/submissionController.js";
+// import upload from "../middlewares/multer.js";
 
 const userRouter = express.Router();
 
@@ -47,7 +48,7 @@ userRouter.get("/profile", authUser, getProfile);
 userRouter.post(
    "/update-profile",
    authUser,
-   upload.single("image"),
+   upload.single("attachment"),
    updateProfile
 );
 

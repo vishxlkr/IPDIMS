@@ -10,6 +10,8 @@ export const newSubmission = async (req, res) => {
       const file = req.file; // uploaded file
       const userId = req.user.id; // comes from auth middleware
 
+      console.log("🧾 Received new submission request");
+
       // ✅ Validate required fields
       if (!title || !description || !keywords) {
          return res.json({
@@ -24,14 +26,40 @@ export const newSubmission = async (req, res) => {
          return res.json({ success: false, message: "User not found" });
       }
 
-      // ✅ Upload file to Cloudinary (v2)
+      // ✅ Upload file to Cloudinary (supports image/pdf)
       let fileUrl = "";
+
       if (file) {
-         const uploadResult = await cloudinary.uploader.upload(file.path, {
-            resource_type: "auto",
-            folder: "submissions",
+         try {
+            console.log(
+               "📁 Uploading to Cloudinary:",
+               file.originalname,
+               file.mimetype
+            );
+
+            // For PDF files, Cloudinary needs resource_type = "raw"
+            const resourceType =
+               file.mimetype === "application/pdf" ? "raw" : "auto";
+
+            const uploadResult = await cloudinary.uploader.upload(file.path, {
+               resource_type: resourceType,
+               folder: "submissions",
+            });
+
+            fileUrl = uploadResult.secure_url;
+            console.log("✅ Cloudinary upload success:", fileUrl);
+         } catch (err) {
+            console.error("❌ Cloudinary upload failed:", err);
+         }
+      } else {
+         console.warn("⚠️ No file uploaded in request");
+      }
+
+      if (!fileUrl) {
+         return res.json({
+            success: false,
+            message: "File upload failed. Please try again.",
          });
-         fileUrl = uploadResult.secure_url;
       }
 
       // ✅ Create submission data
@@ -50,6 +78,8 @@ export const newSubmission = async (req, res) => {
       // ✅ Save to MongoDB
       const newSubmissionDoc = new submissionModel(submissionData);
       await newSubmissionDoc.save();
+
+      console.log("✅ Submission saved successfully");
 
       // ✅ Send email notification to admin
       const adminEmail = process.env.ADMIN_EMAIL; // from .env
@@ -74,11 +104,16 @@ Thanks,
 Your Application
       `;
 
-      await sendEmail({
-         email: adminEmail,
-         subject: emailSubject,
-         message: emailMessage,
-      });
+      try {
+         await sendEmail({
+            email: adminEmail,
+            subject: emailSubject,
+            message: emailMessage,
+         });
+         console.log("📧 Admin notified via email");
+      } catch (emailErr) {
+         console.error("⚠️ Failed to send email to admin:", emailErr.message);
+      }
 
       res.json({
          success: true,
@@ -86,7 +121,7 @@ Your Application
          submission: newSubmissionDoc,
       });
    } catch (error) {
-      console.error("Error in addSubmission:", error);
+      console.error("❌ Error in addSubmission:", error);
       res.json({ success: false, message: error.message });
    }
 };

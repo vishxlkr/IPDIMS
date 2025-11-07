@@ -42,8 +42,10 @@ export const newSubmission = async (req, res) => {
                file.mimetype === "application/pdf" ? "raw" : "auto";
 
             const uploadResult = await cloudinary.uploader.upload(file.path, {
-               resource_type: resourceType,
+               resource_type: "auto",
                folder: "submissions",
+               use_filename: true,
+               unique_filename: false,
             });
 
             fileUrl = uploadResult.secure_url;
@@ -150,3 +152,15 @@ export const getUserSubmissions = async (req, res) => {
       res.status(500).json({ success: false, message: "Server error" });
    }
 };
+
+
+
+
+
+
+
+
+
+
+
+git quick

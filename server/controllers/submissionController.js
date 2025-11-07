@@ -152,18 +152,3 @@ export const getUserSubmissions = async (req, res) => {
       res.status(500).json({ success: false, message: "Server error" });
    }
 };
-
-
-
-
-
-
-
-
-
-
-git quick
-git quickgit quickgit quickgit quickgit quickgit quickgit quick
-git quickgit quickgit quickgit quickgit quick
-git quickgit quickgit quickgit quickgit quickgit quickgit quick
-git quickgit quickgit quickgit quickgit quickgit quickgit quickgit quickgit quickgit quickgit quickgit quickgit quick

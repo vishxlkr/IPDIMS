@@ -162,7 +162,7 @@ const AdminRegistrations = () => {
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-fadeIn">
                   {/* Modal Header */}
-                  <div className="flex justify-between items-center px-6 py-4 border-b bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-t-2xl">
+                  <div className="flex justify-between items-center px-6 py-4 border-b bg-linear-to-r from-indigo-600 to-purple-600 text-white rounded-t-2xl">
                      <h2 className="text-xl font-bold">Registration Details</h2>
                      <button
                         onClick={() => setShowModal(false)}

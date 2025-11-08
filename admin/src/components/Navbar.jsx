@@ -1,7 +1,8 @@
 import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { AdminContext } from "../context/AdminContext";
 import { ReviewerContext } from "../context/ReviewerContext";
-import { useNavigate } from "react-router-dom";
+import { LogOut } from "lucide-react";
 
 const Navbar = () => {
    const { aToken, setAToken } = useContext(AdminContext);
@@ -17,44 +18,30 @@ const Navbar = () => {
          setRToken("");
          localStorage.removeItem("rToken");
       }
-      navigate("/");
+      navigate("/login");
    };
 
    return (
-      <>
-         {/* ✅ Fixed Navbar */}
-         <div
-            className="
-               fixed top-0 left-0 w-full
-               flex justify-between items-center
-               px-6 py-3 
-               bg-[rgba(10,10,10,0.8)] backdrop-blur-lg
-               text-white z-50
-               border-b border-white/10
-            "
+      <nav className="fixed top-0 left-0 right-0 h-16 bg-[#0b0f19] border-b border-gray-800 px-6 flex items-center justify-between z-50">
+         <h1
+            className="text-xl font-bold text-white cursor-pointer hover:text-blue-400 transition"
+            onClick={() => navigate("/")}
          >
-            <h1
-               className="text-xl font-bold tracking-wide cursor-pointer hover:text-blue-400 transition"
-               onClick={() => navigate("/")}
-            >
-               IPDIMS
-            </h1>
+            IPDIMS
+         </h1>
 
-            <span className="px-3 py-1 bg-gray-700/60 rounded-full text-xs sm:text-sm font-medium">
+         <div className="flex items-center gap-4">
+            <span className="px-3 py-1 bg-gray-700/60 rounded-full text-sm font-medium text-white">
                {aToken ? "Admin" : rToken ? "Reviewer" : "Guest"}
             </span>
-
             <button
                onClick={logout}
-               className="bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-full text-sm font-semibold transition"
+               className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-semibold text-white transition"
             >
-               Logout
+               <LogOut size={16} /> Logout
             </button>
          </div>
-
-         {/* ✅ Spacer (auto pushes entire page down by navbar height) */}
-         <div className="h-16"></div>
-      </>
+      </nav>
    );
 };
 

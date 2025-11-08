@@ -6,7 +6,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { AdminContext } from "./context/AdminContext";
 import { ReviewerContext } from "./context/ReviewerContext";
 
-import Navbar from "./components/Navbar"; // ✅ Navbar added
+import Navbar from "./components/Navbar";
+import Sidebar from "./components/Sidebar";
 import DashboardLayout from "./components/DashboardLayout";
 import Login from "./pages/Login";
 
@@ -28,20 +29,20 @@ const App = () => {
 
    const isAdmin = Boolean(aToken);
    const isReviewer = Boolean(rToken);
+   const isAuthenticated = isAdmin || isReviewer;
 
    return (
       <>
-         {/* ✅ Navbar fixed at top */}
-         <Navbar />
+         {isAuthenticated && <Navbar />}
+         {isAuthenticated && <Sidebar />}
 
-         {/* Toast Notification */}
          <ToastContainer />
 
          <Routes>
             {/* Login Route */}
             <Route
                path="/login"
-               element={isAdmin || isReviewer ? <Navigate to="/" /> : <Login />}
+               element={isAuthenticated ? <Navigate to="/" /> : <Login />}
             />
 
             {/* Admin Routes */}
@@ -85,7 +86,7 @@ const App = () => {
             <Route
                path="*"
                element={
-                  isAdmin || isReviewer ? (
+                  isAuthenticated ? (
                      <Navigate to="/" />
                   ) : (
                      <Navigate to="/login" />

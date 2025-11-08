@@ -6,20 +6,21 @@ import "react-toastify/dist/ReactToastify.css";
 import { AdminContext } from "./context/AdminContext";
 import { ReviewerContext } from "./context/ReviewerContext";
 
-import Login from "./pages/Login";
+import Navbar from "./components/Navbar"; // ✅ Navbar added
 import DashboardLayout from "./components/DashboardLayout";
+import Login from "./pages/Login";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminSubmissions from "./pages/admin/AdminSubmissions";
 import ManageReviewers from "./pages/admin/ManageReviewers";
 import AdminAuthors from "./pages/admin/AdminAuthors";
+import AdminRegistrations from "./pages/admin/AdminRegistration";
 
 // Reviewer Pages
 import ReviewerDashboard from "./pages/reviewer/ReviewerDashboard";
 import ReviewerSubmissions from "./pages/reviewer/ReviewerSubmissions";
 import ReviewerProfile from "./pages/reviewer/ReviewerProfile";
-import Navbar from "./components/Navbar";
 
 const App = () => {
    const { aToken } = useContext(AdminContext);
@@ -30,8 +31,12 @@ const App = () => {
 
    return (
       <>
+         {/* ✅ Navbar fixed at top */}
          <Navbar />
+
+         {/* Toast Notification */}
          <ToastContainer />
+
          <Routes>
             {/* Login Route */}
             <Route
@@ -50,7 +55,10 @@ const App = () => {
                   />
                   <Route path="admin/reviewers" element={<ManageReviewers />} />
                   <Route path="admin/authors" element={<AdminAuthors />} />
-                  <Route path="admin/authors" element={<AdminAuthors />} />
+                  <Route
+                     path="admin/all-registration"
+                     element={<AdminRegistrations />}
+                  />
                </Route>
             )}
 
@@ -73,7 +81,7 @@ const App = () => {
                </Route>
             )}
 
-            {/* Fallback */}
+            {/* Fallback Route */}
             <Route
                path="*"
                element={

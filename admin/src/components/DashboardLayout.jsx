@@ -1,74 +1,70 @@
+// ✅ DashboardLayout.jsx
 import React, { useContext } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { AdminContext } from "../context/AdminContext";
 import { ReviewerContext } from "../context/ReviewerContext";
 import { Home, FileText, Users, User } from "lucide-react";
 
-const DashboardLayout = () => {
+const DashboardLayout = ({ withNavbar = false }) => {
    const { aToken } = useContext(AdminContext);
    const { rToken } = useContext(ReviewerContext);
 
    const linkClasses = ({ isActive }) =>
-      `flex items-center gap-3 py-3.5 px-3 md:px-6 cursor-pointer rounded transition ${
-         isActive
-            ? "bg-[#f2f3ff] border-r-4 border-blue-600"
-            : "hover:bg-gray-100"
-      }`;
+      `flex items-center gap-3 py-3 px-4 rounded-lg transition
+       ${
+          isActive
+             ? "bg-indigo-600 text-white"
+             : "text-gray-300 hover:bg-gray-700"
+       }
+      `;
 
    return (
       <div className="flex min-h-screen">
-         {/* Sidebar */}
-         <aside className="w-64 bg-white border-r p-6 flex flex-col gap-4">
-            <h2 className="text-xl font-bold mb-6">Dashboard</h2>
-
-            {/* Admin Sidebar */}
+         {/* ✅ FIXED SIDEBAR (Now pushed down after navbar) */}
+         <aside
+            className="
+            w-64 bg-gray-900 border-r p-6 flex flex-col gap-4
+            fixed left-0 top-16 bottom-0
+            overflow-y-auto
+         "
+         >
             {aToken ? (
                <>
                   <NavLink to="/admin/dashboard" className={linkClasses}>
-                     <Home size={20} />
-                     <p className="hidden md:block">Dashboard</p>
+                     <Home size={20} /> <p>Dashboard</p>
                   </NavLink>
-
                   <NavLink to="/admin/submissions" className={linkClasses}>
-                     <FileText size={20} />
-                     <p className="hidden md:block">All Submissions</p>
+                     <FileText size={20} /> <p>All Submissions</p>
                   </NavLink>
-
                   <NavLink to="/admin/reviewers" className={linkClasses}>
-                     <Users size={20} />
-                     <p className="hidden md:block">Manage Reviewers</p>
+                     <Users size={20} /> <p>Manage Reviewers</p>
                   </NavLink>
-
                   <NavLink to="/admin/authors" className={linkClasses}>
-                     <User size={20} />
-                     <p className="hidden md:block">Authors</p>
+                     <User size={20} /> <p>Authors</p>
+                  </NavLink>
+                  <NavLink to="/admin/all-registration" className={linkClasses}>
+                     <User size={20} /> <p>All Registration</p>
                   </NavLink>
                </>
             ) : rToken ? (
-               /* Reviewer Sidebar */
                <>
                   <NavLink to="/reviewer/dashboard" className={linkClasses}>
-                     <Home size={20} />
-                     <p className="hidden md:block">Dashboard</p>
+                     <Home size={20} /> <p>Dashboard</p>
                   </NavLink>
-
                   <NavLink to="/reviewer/submissions" className={linkClasses}>
-                     <FileText size={20} />
-                     <p className="hidden md:block">Assigned Submissions</p>
+                     <FileText size={20} /> <p>Assigned Submissions</p>
                   </NavLink>
-
                   <NavLink to="/reviewer/profile" className={linkClasses}>
-                     <User size={20} />
-                     <p className="hidden md:block">My Profile</p>
+                     <User size={20} /> <p>My Profile</p>
                   </NavLink>
                </>
             ) : (
-               <p className="text-gray-500">No access token found.</p>
+               <p>No Access</p>
             )}
          </aside>
 
-         {/* Main Content */}
-         <main className="flex-1 bg-gray-100 p-8">
+         {/* ✅ content automatically respects sidebar + navbar */}
+         <main className="flex-1 bg-gray-100 p-8 ml-64 mt-16 overflow-auto">
             <Outlet />
          </main>
       </div>

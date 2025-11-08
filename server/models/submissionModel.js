@@ -44,15 +44,16 @@ const submissionSchema = new mongoose.Schema(
 
       // 💳 Payment Screenshot (image link)
       paymentScreenshot: { type: String, default: "" },
+      paymentStatus: {
+         type: Boolean,
+         default: "false",
+      },
 
       // 🎫 Event Dropdown
       eventName: {
          type: String,
 
-         eventName: {
-            type: String,
-            default: `IPDIMS ${new Date().getFullYear()}`,
-         },
+         default: `IPDIMS ${new Date().getFullYear()}`,
       },
    },
    { timestamps: true }

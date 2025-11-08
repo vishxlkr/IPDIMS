@@ -5,6 +5,7 @@ import userModel from "../models/userModel.js";
 import submissionModel from "../models/submissionModel.js";
 import reviewerModel from "../models/reviewerModel.js";
 import validator from "validator";
+import sendEmail from "../config/email.js";
 
 //1. api for the admin login
 
@@ -208,7 +209,8 @@ export const getAllSubmissions = async (req, res) => {
       const submissions = await submissionModel
          .find()
          .sort({ createdAt: -1 }) // newest first
-         .populate("author", "name email affiliation"); // optional, if author is referenced
+         .populate("author", "name email affiliation") // optional, if author is referenced
+         .populate("reviewer", "name email");
 
       res.status(200).json({
          success: true,
@@ -294,6 +296,37 @@ export const assignSubmission = async (req, res) => {
          .populate("author", "name email organization")
          .populate("reviewer", "name email organization");
 
+      // ✅ Send email notification to reviewer
+      try {
+         const subject = "New Paper Assigned For Review";
+         const message = `
+Hello ${reviewer.name},
+
+You have been assigned a new paper for review.
+
+Paper Details:
+📄 Title: ${submission.title}
+👤 Author: ${submission.authorName}
+📧 Author Email: ${submission.authorEmail}
+👉 Download Paper: ${submission.attachment}
+
+Please log in to your reviewer dashboard to review the paper.
+
+Regards,
+Team IPDIMS
+         `;
+
+         await sendEmail({
+            email: reviewer.email,
+            subject,
+            message,
+         });
+
+         console.log("📧 Reviewer notified:", reviewer.email);
+      } catch (emailErr) {
+         console.error("❌ Failed to send reviewer email:", emailErr.message);
+      }
+
       res.status(200).json({
          success: true,
          message: "Submission assigned successfully",
@@ -335,14 +368,45 @@ export const changeSubmissionStatus = async (req, res) => {
 
       submission.status = status;
       await submission.save();
+      console.log("✅ Status updated to:", status);
+
+      // ✅ Send Email to user
+      const userEmail = submission.authorEmail || submission.author.email;
+      const userName = submission.authorName || submission.author.name;
+
+      const subject = `Your Paper Status Updated - ${status}`;
+      const message = `
+Hello ${userName},
+Your paper submission status has been updated.
+
+📄 Paper Title: ${submission.title}
+📌 New Status: ${status}
+
+You may log in to your dashboard to see more details.
+
+Regards,  
+Team IPDIMS
+`;
+
+      try {
+         await sendEmail({
+            email: userEmail,
+            subject,
+            message,
+         });
+
+         console.log("📧 Email sent to:", userEmail);
+      } catch (emailErr) {
+         console.error("❌ Email sending failed:", emailErr.message);
+      }
 
       res.status(200).json({
          success: true,
-         message: "Status updated successfully",
+         message: "Status updated successfully & user notified",
          submission,
       });
    } catch (error) {
-      console.error("Error updating submission status:", error);
+      console.error("❌ Error updating submission status:", error);
       res.status(500).json({
          success: false,
          message: "Failed to update status",

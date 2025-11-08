@@ -129,15 +129,23 @@ const MySubmissions = () => {
                                  {new Date(sub.createdAt).toLocaleDateString()}
                               </td>
                               <td className="py-3 px-6">
-                                 {sub.status === "Approved" ||
-                                 sub.status === "approved" ? (
+                                 {sub.status.toLowerCase() === "accepted" ? (
                                     <div className="flex items-center gap-2 text-green-400 font-medium">
-                                       <CheckCircle size={18} /> Approved
+                                       <CheckCircle size={18} /> Accepted
                                     </div>
-                                 ) : sub.status === "Rejected" ||
-                                   sub.status === "rejected" ? (
+                                 ) : sub.status.toLowerCase() === "rejected" ? (
                                     <div className="flex items-center gap-2 text-red-400 font-medium">
                                        <XCircle size={18} /> Rejected
+                                    </div>
+                                 ) : sub.status.toLowerCase() ===
+                                   "under review" ? (
+                                    <div className="flex items-center gap-2 text-blue-400 font-medium">
+                                       <Clock size={18} /> Under Review
+                                    </div>
+                                 ) : sub.status.toLowerCase() ===
+                                   "revision requested" ? (
+                                    <div className="flex items-center gap-2 text-orange-400 font-medium">
+                                       <Clock size={18} /> Revision Requested
                                     </div>
                                  ) : (
                                     <div className="flex items-center gap-2 text-yellow-400 font-medium">
@@ -145,6 +153,7 @@ const MySubmissions = () => {
                                     </div>
                                  )}
                               </td>
+
                               <td className="py-3 px-6 text-center">
                                  <button
                                     onClick={(e) => {
@@ -298,7 +307,7 @@ const MySubmissions = () => {
                                     (keyword, idx) => (
                                        <span
                                           key={idx}
-                                          className="bg-blue-600 bg-opacity-20 text-blue-400 px-3 py-1 rounded-lg text-sm font-medium border border-blue-500 border-opacity-30"
+                                          className="bg-blue-600 bg-opacity-20 text-white-400 px-3 py-1 rounded-lg text-sm font-medium border border-blue-500 border-opacity-30"
                                        >
                                           {keyword}
                                        </span>

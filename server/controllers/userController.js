@@ -353,3 +353,80 @@ export const updateProfile = async (req, res) => {
       res.json({ success: false, message: error.message });
    }
 };
+
+// ⭐ CONTROLLER: User Registration for Conference
+export const addRegistration = async (req, res) => {
+   try {
+      const {
+         paperTitle,
+         presenterType,
+         name,
+         designation,
+         email,
+         mobile,
+         registrationCategory,
+         registrationType,
+         amountPaid,
+         paymentDate,
+         transactionRefNo,
+         accommodationRequired,
+         foodPreference,
+         additionalNotes,
+      } = req.body;
+
+      const file = req.file; // Payment proof (jpg/jpeg/pdf)
+
+      if (!file)
+         return res.status(400).json({
+            success: false,
+            message: "Payment proof is required",
+         });
+
+      // ✅ Auto generate paperId (sequential globally, not per user)
+      const lastEntry = await registrationModel.findOne().sort({ paperId: -1 });
+      const nextPaperId = lastEntry ? lastEntry.paperId + 1 : 1;
+
+      // ✅ Upload proof file to Cloudinary
+      const uploadResult = await cloudinary.uploader.upload(file.path, {
+         folder: "payment_proofs",
+         resource_type: "raw", // support pdf also
+         use_filename: true,
+         unique_filename: false,
+      });
+
+      const newRegistration = new registrationModel({
+         paperId: nextPaperId,
+         paperTitle,
+         presenterType,
+         name,
+         designation,
+         email,
+         mobile,
+         registrationCategory,
+         registrationType,
+         amountPaid,
+         paymentDate,
+         transactionRefNo,
+         paymentProof: uploadResult.secure_url,
+         accommodationRequired,
+         foodPreference,
+         additionalNotes,
+         userId: req.user.id, // logged-in user
+      });
+
+      await newRegistration.save();
+
+      res.status(200).json({
+         success: true,
+         message: "Registration completed successfully",
+         registration: newRegistration,
+      });
+   } catch (error) {
+      console.error("❌ Registration Error:", error);
+      res.status(500).json({
+         success: false,
+         message: "Server error",
+         error: error.message,
+      });
+   }
+};

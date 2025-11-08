@@ -8,6 +8,7 @@ import {
    resetPassword,
    getProfile,
    updateProfile,
+   addRegistration,
 } from "../controllers/userController.js"; // Move submissionController functions here
 import authUser from "../middlewares/authUser.js";
 import {
@@ -50,6 +51,14 @@ userRouter.post(
    authUser,
    upload.single("attachment"),
    updateProfile
+);
+
+// routes for registration and payment
+userRouter.post(
+   "/registration",
+   authUser,
+   upload.single("paymentProof"),
+   addRegistration
 );
 
 export default userRouter;

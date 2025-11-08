@@ -485,22 +485,35 @@ const AdminSubmissions = () => {
                                           </select>
                                        </td>
                                        <td className="px-6 py-4">
-                                          {submission.reviewer ? (
-                                             <div className="text-sm text-gray-700">
-                                                {submission.reviewer.name}
-                                             </div>
-                                          ) : (
+                                          <div className="flex items-center justify-between w-full">
+                                             {/* Left side: reviewer name or not assigned */}
+                                             {submission.reviewer ? (
+                                                <span className="flex items-center gap-2 text-sm font-medium text-gray-800">
+                                                   <User className="w-4 h-4 text-purple-600" />
+                                                   {submission.reviewer.name ||
+                                                      "Unknown"}
+                                                </span>
+                                             ) : (
+                                                <span className="text-sm italic text-gray-500">
+                                                   Not Assigned
+                                                </span>
+                                             )}
+
+                                             {/* Assign/Change button */}
                                              <button
                                                 onClick={() =>
                                                    openAssignModal(submission)
                                                 }
-                                                className="flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-medium"
+                                                className="text-blue-600 hover:text-blue-700 text-xs font-medium flex items-center gap-1"
                                              >
                                                 <UserPlus className="w-4 h-4" />
-                                                Assign
+                                                {submission.reviewer
+                                                   ? "Change"
+                                                   : "Assign"}
                                              </button>
-                                          )}
+                                          </div>
                                        </td>
+
                                        <td className="px-6 py-4">
                                           <div className="flex items-center gap-2">
                                              <button

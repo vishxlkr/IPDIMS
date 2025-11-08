@@ -152,7 +152,7 @@ const AddSubmission = () => {
                      <input
                         type="file"
                         onChange={(e) => setAttachment(e.target.files[0])}
-                        accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.rtf,.zip,.jpg,.png"
+                        accept=".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.zip,.txt,.rtf,.jpg,.png"
                         className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2"
                      />
                      {attachment && (

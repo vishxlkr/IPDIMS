@@ -26,7 +26,6 @@ export const newSubmission = async (req, res) => {
          return res.json({ success: false, message: "User not found" });
       }
 
-      // ✅ Upload file to Cloudinary (supports image/pdf)
       let fileUrl = "";
 
       if (file) {
@@ -42,10 +41,12 @@ export const newSubmission = async (req, res) => {
                file.mimetype === "application/pdf" ? "raw" : "auto";
 
             const uploadResult = await cloudinary.uploader.upload(file.path, {
-               resource_type: "auto",
+               resource_type: "raw", // ✅ required for pdf, docx, pptx, zip...
                folder: "submissions",
-               use_filename: true,
-               unique_filename: false,
+               use_filename: true, // ✅ keep original filename
+               unique_filename: false, // ✅ avoid random name
+               overwrite: true,
+               format: file.originalname.split(".").pop(), // ✅ preserve extension
             });
 
             fileUrl = uploadResult.secure_url;

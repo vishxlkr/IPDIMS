@@ -15,7 +15,7 @@ import Footer from "./components/Footer";
 // Pre-login pages
 import Home from "./pages/prelogin/Home";
 import Submission from "./pages/prelogin/Submission";
-import Registration from "./pages/prelogin/Registration";
+import Registration from "./pages/postlogin/Registration";
 import ImportantDates from "./pages/prelogin/ImportantDates";
 import Committee from "./pages/prelogin/Committee";
 import Venue from "./pages/prelogin/Venue";

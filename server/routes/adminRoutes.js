@@ -7,6 +7,7 @@ import {
    assignSubmission,
    changeSubmissionStatus,
    deleteSubmission,
+   getAllRegistrations,
    getAllReviewers,
    getAllSubmissions,
    getAllUsers,
@@ -53,5 +54,8 @@ adminRouter.delete("/submission/:id", authAdmin, deleteSubmission);
 adminRouter.get("/users", authAdmin, getAllUsers);
 adminRouter.get("/user/:id", authAdmin, getUserById);
 adminRouter.get("/user/:id/submissions", authAdmin, getUserSubmissions);
+
+// all registrations
+adminRouter.get("/registrations", authAdmin, getAllRegistrations);
 
 export default adminRouter;

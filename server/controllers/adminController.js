@@ -6,6 +6,7 @@ import submissionModel from "../models/submissionModel.js";
 import reviewerModel from "../models/reviewerModel.js";
 import validator from "validator";
 import sendEmail from "../config/email.js";
+import registrationModel from "../models/registrationModel.js";
 
 //1. api for the admin login
 
@@ -514,6 +515,28 @@ export const getUserSubmissions = async (req, res) => {
          success: false,
          message: "Server error while fetching user submissions",
          error: error.message,
+      });
+   }
+};
+
+// api to get all registrations
+
+export const getAllRegistrations = async (req, res) => {
+   try {
+      const registrations = await registrationModel
+         .find()
+         .sort({ createdAt: -1 })
+         .populate("userId", "name email"); // to show user details if needed
+
+      res.status(200).json({
+         success: true,
+         registrations,
+      });
+   } catch (error) {
+      console.error("❌ Error fetching registrations:", error);
+      res.status(500).json({
+         success: false,
+         message: "Server error while fetching registrations",
       });
    }
 };

@@ -317,7 +317,7 @@ const Registration = () => {
 
       try {
          const res = await axios.post(
-            `${backendUrl}/api/user/register-paper`,
+            `${backendUrl}/api/user/registration`,
             data,
             {
                headers: {

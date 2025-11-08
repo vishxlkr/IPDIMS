@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import userModel from "../models/userModel.js";
+import registrationModel from "../models/registrationModel.js";
 import sendEmail from "../config/email.js";
 import { v2 as cloudinary } from "cloudinary";
 
@@ -389,9 +390,7 @@ export const addRegistration = async (req, res) => {
       // ✅ Upload proof file to Cloudinary
       const uploadResult = await cloudinary.uploader.upload(file.path, {
          folder: "payment_proofs",
-         resource_type: "raw", // support pdf also
-         use_filename: true,
-         unique_filename: false,
+         resource_type: "auto",
       });
 
       const newRegistration = new registrationModel({

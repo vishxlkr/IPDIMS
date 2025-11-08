@@ -50,6 +50,7 @@ const App = () => {
                   />
                   <Route path="admin/reviewers" element={<ManageReviewers />} />
                   <Route path="admin/authors" element={<AdminAuthors />} />
+                  <Route path="admin/authors" element={<AdminAuthors />} />
                </Route>
             )}
 

@@ -400,7 +400,7 @@ const Registration = () => {
                         onChange={handleChange}
                         placeholder="Enter your paper title"
                         required
-                        className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2"
+                        className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2 placeholder:text-gray-500"
                      />
                   </div>
 

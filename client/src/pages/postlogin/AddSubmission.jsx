@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import { AppContext } from "../../context/AppContext";
@@ -22,6 +22,8 @@ const AddSubmission = () => {
    const [authorAffiliation, setAuthorAffiliation] = useState("");
    const [eventName, setEventName] = useState("IPDIMS 2025");
    const [attachment, setAttachment] = useState(null);
+
+   const fileInputRef = useRef(null);
 
    useEffect(() => {
       if (!token || !userData) {
@@ -68,6 +70,10 @@ const AddSubmission = () => {
             setAuthorAffiliation(userData?.organization || "");
             setEventName("IPDIMS 2025");
             setAttachment(null);
+
+            if (fileInputRef.current) {
+               fileInputRef.current.value = "";
+            }
          } else {
             toast.error(
                res.data.message || "Submission failed. Please try again."
@@ -117,7 +123,7 @@ const AddSubmission = () => {
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         placeholder="Enter Title"
-                        className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
+                        className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 outline-none  placeholder:text-gray-500"
                         required
                      />
 
@@ -129,7 +135,7 @@ const AddSubmission = () => {
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         placeholder="Enter description here (Word limit: 250)"
-                        className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
+                        className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 outline-none  placeholder:text-gray-500"
                      />
 
                      <label className="block mt-4 mb-2 font-semibold text-indigo-300">
@@ -140,20 +146,21 @@ const AddSubmission = () => {
                         value={keywords}
                         onChange={(e) => setKeywords(e.target.value)}
                         placeholder="Enter comma separated keywords"
-                        className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 outline-none"
+                        className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 outline-none  placeholder:text-gray-500"
                      />
                   </div>
 
                   {/* Attachment */}
                   <div>
                      <h4 className="text-lg font-bold text-indigo-300 mb-4">
-                        Attachments (optional)
+                        Attachments
                      </h4>
                      <input
+                        ref={fileInputRef}
                         type="file"
                         onChange={(e) => setAttachment(e.target.files[0])}
                         accept=".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.zip,.txt,.rtf,.jpg,.png"
-                        className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2"
+                        className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2 "
                      />
                      {attachment && (
                         <p className="mt-2 text-sm text-gray-400">
@@ -170,7 +177,7 @@ const AddSubmission = () => {
                      <select
                         value={eventName}
                         onChange={(e) => setEventName(e.target.value)}
-                        className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2"
+                        className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2 "
                      >
                         {eventOptions.map((event) => (
                            <option key={event} value={event}>

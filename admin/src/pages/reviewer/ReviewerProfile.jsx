@@ -121,8 +121,9 @@ const ReviewerProfile = () => {
    }
 
    return (
-      <div className="min-h-screen bg-gray-50 p-6">
-         <div className="max-w-4xl mx-auto">
+      <div className="min-h-screen bg-gray-50 p-6 -m-8">
+         <div className="max-w-7xl mx-auto">
+            {/* Header - Consistent with Dashboard and Submissions */}
             <div className="mb-8">
                <h1 className="text-4xl font-bold text-gray-800">
                   Reviewer Profile
@@ -132,13 +133,13 @@ const ReviewerProfile = () => {
                </p>
             </div>
 
-            {/* Profile Card */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
-               {/* Header Section */}
-               <div className="bg-linear-to-r from-blue-600 to-blue-700 p-6">
+            {/* Profile Header Card */}
+            <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 mb-8">
+               {/* Gradient Header */}
+               <div className="bg-linear-to-r from-blue-600 to-yellow-700 p-6">
                   <div className="flex items-center justify-between">
                      <div className="flex items-center gap-4">
-                        <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center">
+                        <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-md">
                            {profile.image ? (
                               <img
                                  src={profile.image}
@@ -159,10 +160,11 @@ const ReviewerProfile = () => {
                            </p>
                         </div>
                      </div>
+
                      {!isEditing ? (
                         <button
                            onClick={() => setIsEditing(true)}
-                           className="bg-white text-blue-600 px-5 py-2.5 rounded-lg font-medium hover:bg-blue-50 transition-all flex items-center gap-2"
+                           className="bg-white text-blue-600 px-5 py-2.5 rounded-lg font-medium hover:bg-blue-50 transition-colors flex items-center gap-2"
                         >
                            <Edit2 size={18} />
                            Edit Profile
@@ -171,14 +173,14 @@ const ReviewerProfile = () => {
                         <div className="flex gap-2">
                            <button
                               onClick={handleUpdateProfile}
-                              className="bg-white text-green-600 px-5 py-2.5 rounded-lg font-medium hover:bg-green-50 transition-all flex items-center gap-2"
+                              className="bg-white text-green-600 px-5 py-2.5 rounded-lg font-medium hover:bg-green-50 transition-colors flex items-center gap-2"
                            >
                               <Save size={18} />
                               Save
                            </button>
                            <button
                               onClick={handleCancelEdit}
-                              className="bg-white text-red-600 px-5 py-2.5 rounded-lg font-medium hover:bg-red-50 transition-all flex items-center gap-2"
+                              className="bg-white text-red-600 px-5 py-2.5 rounded-lg font-medium hover:bg-red-50 transition-colors flex items-center gap-2"
                            >
                               <X size={18} />
                               Cancel
@@ -188,13 +190,13 @@ const ReviewerProfile = () => {
                   </div>
                </div>
 
-               {/* Profile Information */}
-               <div className="p-6 space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+               {/* Profile Information Grid */}
+               <div className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
                      {/* Name Field */}
-                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors">
                         <div className="flex items-center gap-2 mb-3">
-                           <User className="text-blue-600" size={18} />
+                           <User className="w-5 h-5 text-blue-600" />
                            <p className="text-xs text-gray-500 font-semibold uppercase">
                               Full Name
                            </p>
@@ -205,38 +207,38 @@ const ReviewerProfile = () => {
                               name="name"
                               value={formData.name}
                               onChange={handleInputChange}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                               placeholder="Enter your name"
                            />
                         ) : (
-                           <p className="text-gray-900 font-medium">
+                           <p className="text-gray-900 font-semibold">
                               {profile.name}
                            </p>
                         )}
                      </div>
 
-                     {/* Email Field (Non-editable) */}
-                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                     {/* Email Field */}
+                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors">
                         <div className="flex items-center gap-2 mb-3">
-                           <Mail className="text-blue-600" size={18} />
+                           <Mail className="w-5 h-5 text-blue-600" />
                            <p className="text-xs text-gray-500 font-semibold uppercase">
                               Email Address
                            </p>
                         </div>
-                        <p className="text-gray-900 font-medium break-all">
+                        <p className="text-gray-900 font-semibold break-all">
                            {profile.email}
                         </p>
                         {isEditing && (
-                           <p className="text-xs text-gray-500 mt-1">
+                           <p className="text-xs text-gray-400 mt-2">
                               Email cannot be changed
                            </p>
                         )}
                      </div>
 
                      {/* Phone Field */}
-                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors">
                         <div className="flex items-center gap-2 mb-3">
-                           <Phone className="text-blue-600" size={18} />
+                           <Phone className="w-5 h-5 text-blue-600" />
                            <p className="text-xs text-gray-500 font-semibold uppercase">
                               Phone Number
                            </p>
@@ -247,20 +249,20 @@ const ReviewerProfile = () => {
                               name="phone"
                               value={formData.phone}
                               onChange={handleInputChange}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                               placeholder="Enter phone number"
                            />
                         ) : (
-                           <p className="text-gray-900 font-medium">
+                           <p className="text-gray-900 font-semibold">
                               {profile.phone || "Not provided"}
                            </p>
                         )}
                      </div>
 
                      {/* Affiliation Field */}
-                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors">
                         <div className="flex items-center gap-2 mb-3">
-                           <Building className="text-blue-600" size={18} />
+                           <Building className="w-5 h-5 text-blue-600" />
                            <p className="text-xs text-gray-500 font-semibold uppercase">
                               Affiliation/Organization
                            </p>
@@ -271,11 +273,11 @@ const ReviewerProfile = () => {
                               name="affiliation"
                               value={formData.affiliation}
                               onChange={handleInputChange}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                               placeholder="Enter your organization"
                            />
                         ) : (
-                           <p className="text-gray-900 font-medium">
+                           <p className="text-gray-900 font-semibold">
                               {profile.affiliation ||
                                  profile.organization ||
                                  "Not provided"}
@@ -283,31 +285,31 @@ const ReviewerProfile = () => {
                         )}
                      </div>
 
-                     {/* Designation (Non-editable) */}
+                     {/* Designation */}
                      {profile.designation && (
-                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors">
                            <div className="flex items-center gap-2 mb-3">
-                              <BookOpen className="text-blue-600" size={18} />
+                              <BookOpen className="w-5 h-5 text-blue-600" />
                               <p className="text-xs text-gray-500 font-semibold uppercase">
                                  Designation
                               </p>
                            </div>
-                           <p className="text-gray-900 font-medium">
+                           <p className="text-gray-900 font-semibold">
                               {profile.designation}
                            </p>
                         </div>
                      )}
 
-                     {/* Gender (Non-editable) */}
+                     {/* Gender */}
                      {profile.gender && (
-                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors">
                            <div className="flex items-center gap-2 mb-3">
-                              <User className="text-blue-600" size={18} />
+                              <User className="w-5 h-5 text-blue-600" />
                               <p className="text-xs text-gray-500 font-semibold uppercase">
                                  Gender
                               </p>
                            </div>
-                           <p className="text-gray-900 font-medium">
+                           <p className="text-gray-900 font-semibold">
                               {profile.gender}
                            </p>
                         </div>
@@ -317,9 +319,9 @@ const ReviewerProfile = () => {
                   {/* Specialization */}
                   {profile.specialization &&
                      profile.specialization.length > 0 && (
-                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors mb-6">
                            <div className="flex items-center gap-2 mb-3">
-                              <BookOpen className="text-blue-600" size={18} />
+                              <BookOpen className="w-5 h-5 text-blue-600" />
                               <p className="text-xs text-gray-500 font-semibold uppercase">
                                  Specialization
                               </p>
@@ -328,7 +330,7 @@ const ReviewerProfile = () => {
                               {profile.specialization.map((spec, idx) => (
                                  <span
                                     key={idx}
-                                    className="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg text-sm font-medium"
+                                    className="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium"
                                  >
                                     {spec}
                                  </span>
@@ -339,9 +341,9 @@ const ReviewerProfile = () => {
 
                   {/* Bio */}
                   {profile.bio && (
-                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors mb-6">
                         <div className="flex items-center gap-2 mb-3">
-                           <User className="text-blue-600" size={18} />
+                           <User className="w-5 h-5 text-blue-600" />
                            <p className="text-xs text-gray-500 font-semibold uppercase">
                               Bio
                            </p>
@@ -354,9 +356,9 @@ const ReviewerProfile = () => {
 
                   {/* Address */}
                   {profile.address && (
-                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors mb-6">
                         <div className="flex items-center gap-2 mb-3">
-                           <Building className="text-blue-600" size={18} />
+                           <Building className="w-5 h-5 text-blue-600" />
                            <p className="text-xs text-gray-500 font-semibold uppercase">
                               Address
                            </p>
@@ -366,72 +368,76 @@ const ReviewerProfile = () => {
                         </p>
                      </div>
                   )}
-
-                  {/* Account Information */}
-                  <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                     <div className="flex items-center gap-2 mb-3">
-                        <Calendar className="text-blue-600" size={18} />
-                        <p className="text-xs text-blue-600 font-semibold uppercase">
-                           Account Information
-                        </p>
-                     </div>
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                           <p className="text-xs text-gray-500 mb-1">
-                              Member Since
-                           </p>
-                           <p className="text-gray-900 font-medium">
-                              {new Date(profile.createdAt).toLocaleDateString(
-                                 "en-US",
-                                 {
-                                    year: "numeric",
-                                    month: "long",
-                                    day: "numeric",
-                                 }
-                              )}
-                           </p>
-                        </div>
-                        <div>
-                           <p className="text-xs text-gray-500 mb-1">
-                              Account Status
-                           </p>
-                           <p className="text-gray-900 font-medium">
-                              <span
-                                 className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                    profile.isActive
-                                       ? "bg-green-100 text-green-800"
-                                       : "bg-red-100 text-red-800"
-                                 }`}
-                              >
-                                 {profile.isActive ? "Active" : "Inactive"}
-                              </span>
-                           </p>
-                        </div>
-                     </div>
-                  </div>
-
-                  {/* Assigned Submissions Count */}
-                  {profile.assignedSubmissions && (
-                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                        <div className="flex items-center gap-2 mb-3">
-                           <BookOpen className="text-blue-600" size={18} />
-                           <p className="text-xs text-gray-500 font-semibold uppercase">
-                              Total Assigned Submissions
-                           </p>
-                        </div>
-                        <p className="text-3xl font-bold text-gray-900">
-                           {Array.isArray(profile.assignedSubmissions)
-                              ? profile.assignedSubmissions.length
-                              : 0}
-                        </p>
-                     </div>
-                  )}
                </div>
             </div>
 
-            {/* Additional Information Note */}
+            {/* Stats Cards Grid - Similar to Dashboard */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+               {/* Account Information Card */}
+               <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+                  <div className="flex items-center gap-3 mb-4">
+                     <Calendar className="w-6 h-6 text-blue-600" />
+                     <h3 className="text-lg font-semibold text-gray-800">
+                        Account Information
+                     </h3>
+                  </div>
+                  <div className="space-y-4">
+                     <div>
+                        <p className="text-xs text-gray-500 font-semibold uppercase mb-1">
+                           Member Since
+                        </p>
+                        <p className="text-gray-900 font-semibold">
+                           {new Date(profile.createdAt).toLocaleDateString(
+                              "en-US",
+                              {
+                                 year: "numeric",
+                                 month: "long",
+                                 day: "numeric",
+                              }
+                           )}
+                        </p>
+                     </div>
+                     <div>
+                        <p className="text-xs text-gray-500 font-semibold uppercase mb-1">
+                           Account Status
+                        </p>
+                        <span
+                           className={`px-3 py-1 rounded-full text-xs font-semibold inline-block ${
+                              profile.isActive
+                                 ? "bg-green-100 text-green-800"
+                                 : "bg-red-100 text-red-800"
+                           }`}
+                        >
+                           {profile.isActive ? "Active" : "Inactive"}
+                        </span>
+                     </div>
+                  </div>
+               </div>
+
+               {/* Assigned Submissions Card */}
+               {profile.assignedSubmissions && (
+                  <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+                     <div className="flex items-center gap-3 mb-4">
+                        <BookOpen className="w-6 h-6 text-blue-600" />
+                        <h3 className="text-lg font-semibold text-gray-800">
+                           Assigned Submissions
+                        </h3>
+                     </div>
+                     <p className="text-4xl font-bold text-gray-800">
+                        {Array.isArray(profile.assignedSubmissions)
+                           ? profile.assignedSubmissions.length
+                           : 0}
+                     </p>
+                     <p className="text-sm text-gray-600 mt-2">
+                        Total submissions assigned for review
+                     </p>
+                  </div>
+               )}
+            </div>
+
+            {/* Edit Information Note */}
             {isEditing && (
-               <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+               <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
                   <p className="text-sm text-yellow-800">
                      <strong>Note:</strong> Only Name, Phone, and Affiliation
                      can be edited. For changes to other fields, please contact

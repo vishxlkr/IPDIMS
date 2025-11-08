@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { toast } from "react-toastify";
+import React, { useState } from "react";
 import {
    Eye,
    Search,
@@ -18,10 +16,57 @@ import {
    Send,
 } from "lucide-react";
 
-const ReviewerSubmissions = () => {
-   const [submissions, setSubmissions] = useState([]);
-   const [filteredSubmissions, setFilteredSubmissions] = useState([]);
-   const [loading, setLoading] = useState(true);
+export default function ReviewerSubmissions() {
+   const [submissions] = useState([
+      {
+         _id: "1",
+         title: "Machine Learning Applications in Healthcare",
+         user: {
+            name: "Dr. Alice Johnson",
+            email: "alice@university.edu",
+            affiliation: "Stanford University",
+         },
+         status: "Under Review",
+         createdAt: "2024-10-15",
+         description:
+            "This paper explores the applications of machine learning in healthcare diagnostics.",
+         keywords: ["Machine Learning", "Healthcare", "AI"],
+         attachment: "#",
+         feedback: null,
+      },
+      {
+         _id: "2",
+         title: "Quantum Computing Fundamentals",
+         user: {
+            name: "Prof. Bob Smith",
+            email: "bob@university.edu",
+            affiliation: "MIT",
+         },
+         status: "Accepted",
+         createdAt: "2024-10-10",
+         description: "A comprehensive review of quantum computing principles.",
+         keywords: ["Quantum", "Computing", "Physics"],
+         attachment: "#",
+         feedback: { text: "Excellent work!" },
+      },
+      {
+         _id: "3",
+         title: "Climate Change Impact Analysis",
+         user: {
+            name: "Dr. Carol Davis",
+            email: "carol@university.edu",
+            affiliation: "Oxford University",
+         },
+         status: "Revision Requested",
+         createdAt: "2024-10-08",
+         description: "Analysis of climate change impacts on global economies.",
+         keywords: ["Climate", "Environment", "Economics"],
+         attachment: "#",
+         feedback: null,
+      },
+   ]);
+
+   const [filteredSubmissions, setFilteredSubmissions] = useState(submissions);
    const [searchTerm, setSearchTerm] = useState("");
    const [statusFilter, setStatusFilter] = useState("All");
    const [selectedSubmission, setSelectedSubmission] = useState(null);
@@ -30,42 +75,6 @@ const ReviewerSubmissions = () => {
    const [feedbackText, setFeedbackText] = useState("");
    const [decision, setDecision] = useState("Under Review");
    const [rating, setRating] = useState("");
-
-   const backendUrl = "http://localhost:4000";
-   const rtoken = localStorage.getItem("rToken");
-
-   useEffect(() => {
-      fetchSubmissions();
-   }, []);
-
-   useEffect(() => {
-      filterSubmissions();
-   }, [searchTerm, statusFilter, submissions]);
-
-   const fetchSubmissions = async () => {
-      try {
-         setLoading(true);
-         const { data } = await axios.get(
-            `${backendUrl}/api/reviewer/submissions`,
-            {
-               headers: { rtoken },
-            }
-         );
-
-         if (data.success) {
-            setSubmissions(data.submissions || []);
-         } else {
-            toast.error(data.message || "Failed to fetch submissions");
-         }
-      } catch (error) {
-         console.error("Error fetching submissions:", error);
-         toast.error(
-            error.response?.data?.message || "Error fetching submissions"
-         );
-      } finally {
-         setLoading(false);
-      }
-   };
 
    const filterSubmissions = () => {
       let filtered = submissions;
@@ -78,91 +87,55 @@ const ReviewerSubmissions = () => {
          filtered = filtered.filter(
             (sub) =>
                sub.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-               sub.user?.name
-                  ?.toLowerCase()
-                  .includes(searchTerm.toLowerCase()) ||
-               sub.author?.name
-                  ?.toLowerCase()
-                  .includes(searchTerm.toLowerCase())
+               sub.user?.name?.toLowerCase().includes(searchTerm.toLowerCase())
          );
       }
 
       setFilteredSubmissions(filtered);
    };
 
-   const handleViewDetails = async (submissionId) => {
-      try {
-         const { data } = await axios.get(
-            `${backendUrl}/api/reviewer/submissions/${submissionId}`,
-            {
-               headers: { rtoken },
-            }
-         );
+   React.useEffect(() => {
+      filterSubmissions();
+   }, [searchTerm, statusFilter]);
 
-         if (data.success) {
-            setSelectedSubmission(data.submission);
-            setShowDetailsModal(true);
-         }
-      } catch (error) {
-         console.error("Error fetching submission details:", error);
-         toast.error("Failed to load submission details");
-      }
+   const handleViewDetails = (submission) => {
+      setSelectedSubmission(submission);
+      setShowDetailsModal(true);
    };
 
    const openReviewModal = (submission) => {
       setSelectedSubmission(submission);
       setFeedbackText(submission.feedback?.text || "");
       setDecision(submission.status || "Under Review");
-      setRating(submission.feedback?.rating || "");
+      setRating("");
       setShowReviewModal(true);
    };
 
-   const handleSubmitReview = async () => {
+   const handleSubmitReview = () => {
       if (!feedbackText.trim()) {
-         toast.error("Please provide feedback");
+         alert("Please provide feedback");
          return;
       }
-
-      try {
-         const { data } = await axios.post(
-            `${backendUrl}/api/reviewer/submissions/${selectedSubmission._id}/review`,
-            {
-               feedbackText,
-               rating: rating || null,
-               decision,
-            },
-            { headers: { rtoken } }
-         );
-
-         if (data.success) {
-            toast.success("Review submitted successfully!");
-            setShowReviewModal(false);
-            setFeedbackText("");
-            setDecision("Under Review");
-            setRating("");
-            fetchSubmissions();
-         } else {
-            toast.error(data.message || "Failed to submit review");
-         }
-      } catch (error) {
-         console.error("Error submitting review:", error);
-         toast.error(
-            error.response?.data?.message || "Failed to submit review"
-         );
-      }
+      setShowReviewModal(false);
+      setFeedbackText("");
+      setDecision("Under Review");
+      setRating("");
    };
 
-   if (loading) {
-      return (
-         <div className="flex items-center justify-center min-h-screen bg-gray-50">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
-         </div>
-      );
-   }
+   const getStatusStyles = (status) => {
+      const styles = {
+         Accepted: "bg-green-100 text-green-800",
+         Rejected: "bg-red-100 text-red-800",
+         "Under Review": "bg-blue-100 text-blue-800",
+         "Revision Requested": "bg-orange-100 text-orange-800",
+      };
+      return styles[status] || "bg-yellow-100 text-yellow-800";
+   };
 
    return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 p-6 -m-8">
          <div className="max-w-7xl mx-auto">
+            {/* Header - Consistent with other pages */}
             <div className="mb-8">
                <h1 className="text-4xl font-bold text-gray-800">
                   Assigned Submissions
@@ -172,9 +145,10 @@ const ReviewerSubmissions = () => {
                </p>
             </div>
 
-            {/* Search and Filter */}
+            {/* Search and Filter Section */}
             <div className="bg-white rounded-xl shadow-md p-6 mb-6 border border-gray-100">
                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Search Input */}
                   <div className="relative">
                      <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                      <input
@@ -186,6 +160,7 @@ const ReviewerSubmissions = () => {
                      />
                   </div>
 
+                  {/* Status Filter */}
                   <div className="relative">
                      <Filter className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                      <select
@@ -242,30 +217,17 @@ const ReviewerSubmissions = () => {
                                  </td>
                                  <td className="px-6 py-4">
                                     <div className="text-sm text-gray-900">
-                                       {submission.user?.name ||
-                                          submission.author?.name ||
-                                          "N/A"}
+                                       {submission.user?.name || "N/A"}
                                     </div>
                                     <div className="text-xs text-gray-500">
-                                       {submission.user?.email ||
-                                          submission.author?.email}
+                                       {submission.user?.email}
                                     </div>
                                  </td>
                                  <td className="px-6 py-4">
                                     <span
-                                       className={`px-3 py-1.5 text-xs font-semibold rounded-full ${
-                                          submission.status === "Accepted"
-                                             ? "bg-green-100 text-green-800"
-                                             : submission.status === "Rejected"
-                                             ? "bg-red-100 text-red-800"
-                                             : submission.status ===
-                                               "Under Review"
-                                             ? "bg-blue-100 text-blue-800"
-                                             : submission.status ===
-                                               "Revision Requested"
-                                             ? "bg-orange-100 text-orange-800"
-                                             : "bg-yellow-100 text-yellow-800"
-                                       }`}
+                                       className={`px-3 py-1.5 text-xs font-semibold rounded-full ${getStatusStyles(
+                                          submission.status
+                                       )}`}
                                     >
                                        {submission.status}
                                     </span>
@@ -279,7 +241,7 @@ const ReviewerSubmissions = () => {
                                     <div className="flex items-center gap-2">
                                        <button
                                           onClick={() =>
-                                             handleViewDetails(submission._id)
+                                             handleViewDetails(submission)
                                           }
                                           className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                           title="View Details"
@@ -319,6 +281,7 @@ const ReviewerSubmissions = () => {
          {showDetailsModal && selectedSubmission && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+                  {/* Modal Header */}
                   <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between z-10">
                      <h2 className="text-2xl font-bold text-gray-800">
                         Submission Details
@@ -331,21 +294,14 @@ const ReviewerSubmissions = () => {
                      </button>
                   </div>
 
+                  {/* Modal Content */}
                   <div className="p-6 space-y-6">
+                     {/* Status and Date */}
                      <div className="flex items-center justify-between">
                         <span
-                           className={`px-4 py-2 rounded-full text-sm font-semibold ${
-                              selectedSubmission.status === "Accepted"
-                                 ? "bg-green-100 text-green-800"
-                                 : selectedSubmission.status === "Rejected"
-                                 ? "bg-red-100 text-red-800"
-                                 : selectedSubmission.status === "Under Review"
-                                 ? "bg-blue-100 text-blue-800"
-                                 : selectedSubmission.status ===
-                                   "Revision Requested"
-                                 ? "bg-orange-100 text-orange-800"
-                                 : "bg-yellow-100 text-yellow-800"
-                           }`}
+                           className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusStyles(
+                              selectedSubmission.status
+                           )}`}
                         >
                            {selectedSubmission.status}
                         </span>
@@ -361,67 +317,64 @@ const ReviewerSubmissions = () => {
                         </div>
                      </div>
 
+                     {/* Title */}
                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                        <h3 className="text-lg font-bold text-gray-900 mb-2">
+                        <h3 className="text-lg font-bold text-gray-900">
                            {selectedSubmission.title || "Untitled"}
                         </h3>
                      </div>
 
+                     {/* Author Info Grid */}
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors">
                            <div className="flex items-center gap-2 mb-2">
                               <User className="text-blue-600" size={18} />
-                              <p className="text-xs text-gray-500 font-semibold">
-                                 AUTHOR NAME
+                              <p className="text-xs text-gray-500 font-semibold uppercase">
+                                 Author Name
                               </p>
                            </div>
-                           <p className="text-gray-900 font-medium">
-                              {selectedSubmission.user?.name ||
-                                 selectedSubmission.author?.name ||
-                                 "N/A"}
+                           <p className="text-gray-900 font-semibold">
+                              {selectedSubmission.user?.name || "N/A"}
                            </p>
                         </div>
 
-                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors">
                            <div className="flex items-center gap-2 mb-2">
                               <Mail className="text-blue-600" size={18} />
-                              <p className="text-xs text-gray-500 font-semibold">
-                                 AUTHOR EMAIL
+                              <p className="text-xs text-gray-500 font-semibold uppercase">
+                                 Author Email
                               </p>
                            </div>
-                           <p className="text-gray-900 font-medium break-all">
-                              {selectedSubmission.user?.email ||
-                                 selectedSubmission.author?.email ||
-                                 "N/A"}
+                           <p className="text-gray-900 font-semibold break-all">
+                              {selectedSubmission.user?.email || "N/A"}
                            </p>
                         </div>
 
-                        {(selectedSubmission.user?.affiliation ||
-                           selectedSubmission.author?.organization) && (
-                           <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 md:col-span-2">
+                        {selectedSubmission.user?.affiliation && (
+                           <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors md:col-span-2">
                               <div className="flex items-center gap-2 mb-2">
                                  <Building
                                     className="text-blue-600"
                                     size={18}
                                  />
-                                 <p className="text-xs text-gray-500 font-semibold">
-                                    AFFILIATION
+                                 <p className="text-xs text-gray-500 font-semibold uppercase">
+                                    Affiliation
                                  </p>
                               </div>
-                              <p className="text-gray-900 font-medium">
-                                 {selectedSubmission.user?.affiliation ||
-                                    selectedSubmission.author?.organization}
+                              <p className="text-gray-900 font-semibold">
+                                 {selectedSubmission.user?.affiliation}
                               </p>
                            </div>
                         )}
                      </div>
 
+                     {/* Description */}
                      {selectedSubmission.description && (
-                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors">
                            <div className="flex items-center gap-2 mb-3">
                               <AlignLeft className="text-blue-600" size={18} />
-                              <p className="text-xs text-gray-500 font-semibold">
-                                 DESCRIPTION
+                              <p className="text-xs text-gray-500 font-semibold uppercase">
+                                 Description
                               </p>
                            </div>
                            <p className="text-gray-900 leading-relaxed whitespace-pre-wrap">
@@ -430,13 +383,14 @@ const ReviewerSubmissions = () => {
                         </div>
                      )}
 
+                     {/* Keywords */}
                      {selectedSubmission.keywords &&
                         selectedSubmission.keywords.length > 0 && (
-                           <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                           <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors">
                               <div className="flex items-center gap-2 mb-3">
                                  <Tag className="text-blue-600" size={18} />
-                                 <p className="text-xs text-gray-500 font-semibold">
-                                    KEYWORDS
+                                 <p className="text-xs text-gray-500 font-semibold uppercase">
+                                    Keywords
                                  </p>
                               </div>
                               <div className="flex flex-wrap gap-2">
@@ -454,8 +408,9 @@ const ReviewerSubmissions = () => {
                            </div>
                         )}
 
+                     {/* Attachment */}
                      {selectedSubmission.attachment && (
-                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors">
                            <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                  <FileText
@@ -466,7 +421,7 @@ const ReviewerSubmissions = () => {
                                     <p className="text-xs text-gray-500 font-semibold mb-1">
                                        ATTACHMENT
                                     </p>
-                                    <p className="text-gray-900 font-medium text-sm">
+                                    <p className="text-gray-900 font-semibold text-sm">
                                        Paper Submission
                                     </p>
                                  </div>
@@ -475,7 +430,7 @@ const ReviewerSubmissions = () => {
                                  href={selectedSubmission.attachment}
                                  target="_blank"
                                  rel="noopener noreferrer"
-                                 className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-all"
+                                 className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
                               >
                                  <Download size={18} />
                                  Download
@@ -484,15 +439,16 @@ const ReviewerSubmissions = () => {
                         </div>
                      )}
 
+                     {/* Existing Feedback */}
                      {selectedSubmission.feedback && (
-                        <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                        <div className="bg-blue-50 rounded-xl p-4 border border-blue-200 hover:border-blue-300 transition-colors">
                            <div className="flex items-center gap-2 mb-3">
                               <MessageSquare
                                  className="text-blue-600"
                                  size={18}
                               />
-                              <p className="text-xs text-blue-600 font-semibold">
-                                 YOUR FEEDBACK
+                              <p className="text-xs text-blue-600 font-semibold uppercase">
+                                 Your Feedback
                               </p>
                            </div>
                            <p className="text-gray-900 leading-relaxed whitespace-pre-wrap">
@@ -503,20 +459,21 @@ const ReviewerSubmissions = () => {
                      )}
                   </div>
 
+                  {/* Modal Footer */}
                   <div className="sticky bottom-0 bg-white border-t border-gray-200 p-6 flex justify-end gap-3">
                      <button
                         onClick={() => {
                            setShowDetailsModal(false);
                            openReviewModal(selectedSubmission);
                         }}
-                        className="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-all flex items-center gap-2"
+                        className="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
                      >
                         <MessageSquare size={18} />
                         Submit Review
                      </button>
                      <button
                         onClick={() => setShowDetailsModal(false)}
-                        className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-medium transition-all"
+                        className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium transition-colors"
                      >
                         Close
                      </button>
@@ -529,6 +486,7 @@ const ReviewerSubmissions = () => {
          {showReviewModal && selectedSubmission && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                  {/* Modal Header */}
                   <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between z-10">
                      <h2 className="text-2xl font-bold text-gray-800">
                         Submit Review
@@ -546,24 +504,27 @@ const ReviewerSubmissions = () => {
                      </button>
                   </div>
 
-                  <div className="p-6 space-y-4">
+                  {/* Modal Content */}
+                  <div className="p-6 space-y-6">
+                     {/* Submission Title */}
                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        <label className="block text-sm font-semibold text-gray-700 mb-3">
                            Submission Title
                         </label>
-                        <p className="text-gray-900 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                        <p className="text-gray-900 bg-gray-50 p-4 rounded-lg border border-gray-200 font-medium">
                            {selectedSubmission.title}
                         </p>
                      </div>
 
+                     {/* Decision Dropdown */}
                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                           Decision *
+                        <label className="block text-sm font-semibold text-gray-700 mb-3">
+                           Decision <span className="text-red-500">*</span>
                         </label>
                         <select
                            value={decision}
                            onChange={(e) => setDecision(e.target.value)}
-                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-medium"
                         >
                            <option value="Under Review">Under Review</option>
                            <option value="Accepted">Accept</option>
@@ -574,14 +535,16 @@ const ReviewerSubmissions = () => {
                         </select>
                      </div>
 
+                     {/* Rating Dropdown */}
                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                           Rating (Optional)
+                        <label className="block text-sm font-semibold text-gray-700 mb-3">
+                           Rating{" "}
+                           <span className="text-gray-400">(Optional)</span>
                         </label>
                         <select
                            value={rating}
                            onChange={(e) => setRating(e.target.value)}
-                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-medium"
                         >
                            <option value="">-- Select Rating --</option>
                            <option value="1">1 - Poor</option>
@@ -592,20 +555,22 @@ const ReviewerSubmissions = () => {
                         </select>
                      </div>
 
+                     {/* Feedback Textarea */}
                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                           Feedback *
+                        <label className="block text-sm font-semibold text-gray-700 mb-3">
+                           Feedback <span className="text-red-500">*</span>
                         </label>
                         <textarea
                            value={feedbackText}
                            onChange={(e) => setFeedbackText(e.target.value)}
                            placeholder="Provide detailed feedback for the author..."
-                           rows={8}
-                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                           rows={10}
+                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-medium"
                         />
                      </div>
                   </div>
 
+                  {/* Modal Footer */}
                   <div className="sticky bottom-0 bg-white border-t border-gray-200 p-6 flex justify-end gap-3">
                      <button
                         onClick={() => {
@@ -614,14 +579,14 @@ const ReviewerSubmissions = () => {
                            setDecision("Under Review");
                            setRating("");
                         }}
-                        className="px-5 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-medium transition-all"
+                        className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium transition-colors"
                      >
                         Cancel
                      </button>
                      <button
                         onClick={handleSubmitReview}
                         disabled={!feedbackText.trim()}
-                        className="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        className="px-5 py-2.5 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors disabled:cursor-not-allowed flex items-center gap-2"
                      >
                         <Send size={18} />
                         Submit Review
@@ -632,6 +597,4 @@ const ReviewerSubmissions = () => {
          )}
       </div>
    );
-};
-
-export default ReviewerSubmissions;
+}

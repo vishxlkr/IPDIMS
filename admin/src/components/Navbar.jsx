@@ -10,6 +10,7 @@ const Navbar = () => {
    const navigate = useNavigate();
 
    const logout = () => {
+      const clientUrl = import.meta.env.VITE_CLIENT_URL;
       if (aToken) {
          setAToken("");
          localStorage.removeItem("aToken");
@@ -18,7 +19,8 @@ const Navbar = () => {
          setRToken("");
          localStorage.removeItem("rToken");
       }
-      navigate("/login");
+
+      window.location.assign(clientUrl); // ✅ Opens different project / port
    };
 
    return (

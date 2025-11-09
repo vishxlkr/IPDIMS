@@ -321,30 +321,119 @@ const ReviewerSubmissions = () => {
                      </button>
                   </div>
 
-                  <div className="p-6 space-y-4">
-                     <h3 className="text-xl font-semibold text-gray-900">
-                        {selectedSubmission.title}
-                     </h3>
-                     <p className="text-gray-700">
-                        {selectedSubmission.description}
-                     </p>
+                  <div className="p-6 space-y-6">
+                     {/* Paper Details */}
+                     <div className="space-y-2">
+                        <h3 className="text-2xl font-bold text-gray-900">
+                           {selectedSubmission.title}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                           Paper ID: {selectedSubmission.paperId}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                           Event: {selectedSubmission.eventName}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                           Submitted on:{" "}
+                           {new Date(
+                              selectedSubmission.createdAt
+                           ).toLocaleString()}
+                        </p>
+                     </div>
 
+                     {/* Author Details */}
+                     <div className="bg-gray-50 p-4 rounded-xl border">
+                        <h4 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                           <User size={18} /> Author Information
+                        </h4>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2 text-sm">
+                           <p>
+                              <span className="font-semibold">Name:</span>{" "}
+                              {selectedSubmission.authorName}
+                           </p>
+                           <p>
+                              <span className="font-semibold">Email:</span>{" "}
+                              {selectedSubmission.authorEmail}
+                           </p>
+                           <p>
+                              <span className="font-semibold">
+                                 Affiliation:
+                              </span>{" "}
+                              {selectedSubmission.authorAffiliation ||
+                                 "Not Provided"}
+                           </p>
+                        </div>
+                     </div>
+
+                     {/* Keywords */}
+                     {selectedSubmission.keywords?.length > 0 && (
+                        <div className="bg-gray-50 p-4 rounded-xl border">
+                           <h4 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                              <Tag size={18} /> Keywords
+                           </h4>
+                           <div className="flex gap-2 flex-wrap mt-2">
+                              {selectedSubmission.keywords.map((kw, idx) => (
+                                 <span
+                                    key={idx}
+                                    className="px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                                 >
+                                    {kw}
+                                 </span>
+                              ))}
+                           </div>
+                        </div>
+                     )}
+
+                     {/* Abstract / Description */}
+                     <div className="bg-white p-4 rounded-xl border">
+                        <h4 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                           <AlignLeft size={18} /> Description
+                        </h4>
+                        <p className="mt-2 text-gray-700 text-sm leading-relaxed">
+                           {selectedSubmission.description}
+                        </p>
+                     </div>
+
+                     {/* Manuscript Attachment */}
+                     {selectedSubmission.attachment && (
+                        <div className="bg-gray-50 p-4 rounded-xl border">
+                           <h4 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                              <FileText size={18} /> Manuscript File
+                           </h4>
+
+                           <a
+                              href={`${backendUrl}/${selectedSubmission.attachment}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-2 inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+                           >
+                              <Download size={16} /> Download Manuscript
+                           </a>
+                        </div>
+                     )}
+
+                     {/* Previous Reviewer Feedback */}
                      {feedbacks.length > 0 && (
-                        <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
-                           <h4 className="text-lg font-semibold text-gray-800 mb-2">
-                              Previous Feedbacks
+                        <div className="bg-gray-50 p-4 rounded-xl border">
+                           <h4 className="text-lg font-semibold text-gray-900">
+                              Previous Feedback
                            </h4>
                            {feedbacks.map((fb, idx) => (
                               <div
                                  key={idx}
-                                 className="p-3 mb-2 bg-white rounded-lg border border-gray-100 shadow-sm"
+                                 className="bg-white p-3 rounded-lg border shadow-sm mb-2"
                               >
-                                 <div className="text-sm text-gray-700 mb-1">
-                                    {fb.message}
-                                 </div>
-                                 <div className="text-xs text-gray-500">
+                                 <p className="text-sm text-gray-700">
+                                    {fb.comment}
+                                 </p>
+                                 <p className="text-xs text-gray-500 mt-1">
+                                    Recommendation:{" "}
+                                    <strong>{fb.recommendation}</strong>
+                                 </p>
+                                 <p className="text-xs text-gray-400">
                                     {new Date(fb.createdAt).toLocaleString()}
-                                 </div>
+                                 </p>
                               </div>
                            ))}
                         </div>

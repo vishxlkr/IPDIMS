@@ -33,6 +33,7 @@ export default function App() {
          <ToastContainer />
 
          <Navbar />
+         {/* <Sidebar /> */}
          <Routes>
             {/* ------------------ Pre-login pages ------------------ */}
             <Route path="/" element={<Home />} />
@@ -53,6 +54,7 @@ export default function App() {
 
             {/* profile */}
             <Route path="/dashboard" element={<DashboardLayout />}>
+               <Route index element={<Navigate to="profile" replace />} />
                <Route path="profile" element={<MyProfile2 />} />
                <Route path="submissions" element={<MySubmissions />} />
             </Route>

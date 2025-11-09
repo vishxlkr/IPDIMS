@@ -82,32 +82,40 @@ const Navbar = () => {
                   ) : (
                      <div
                         className="relative cursor-pointer"
-                        onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                        onMouseEnter={() => setProfileMenuOpen(true)}
+                        onMouseLeave={() => setProfileMenuOpen(false)}
                      >
                         <img
                            src={userData.image || "/default-avatar.png"}
                            alt="user"
                            className="w-8 h-8 rounded-full object-cover"
                         />
-                        {profileMenuOpen && (
-                           <div className="absolute right-0 mt-2 w-36 bg-stone-100 rounded shadow-lg flex flex-col p-2 z-50">
-                              <p
-                                 onClick={() => {
-                                    navigate("/dashboard");
-                                    setProfileMenuOpen(false);
-                                 }}
-                                 className="hover:text-black cursor-pointer py-1 px-2"
-                              >
-                                 Dashboard
-                              </p>
-                              <p
-                                 onClick={handleLogout}
-                                 className="hover:text-black cursor-pointer py-1 px-2"
-                              >
-                                 Logout
-                              </p>
-                           </div>
-                        )}
+
+                        {/* Dropdown Menu */}
+                        <div
+                           className={`absolute right-0 mt-2 w-40 bg-white text-black rounded-md shadow-lg flex flex-col z-50 transition-all duration-200 ${
+                              profileMenuOpen
+                                 ? "opacity-100 visible"
+                                 : "opacity-0 invisible"
+                           }`}
+                        >
+                           <button
+                              onClick={() => {
+                                 navigate("/dashboard");
+                                 setProfileMenuOpen(false);
+                              }}
+                              className="hover:bg-gray-100 text-left px-4 py-2"
+                           >
+                              Dashboard
+                           </button>
+
+                           <button
+                              onClick={handleLogout}
+                              className="hover:bg-gray-100 text-left px-4 py-2"
+                           >
+                              Logout
+                           </button>
+                        </div>
                      </div>
                   )}
 

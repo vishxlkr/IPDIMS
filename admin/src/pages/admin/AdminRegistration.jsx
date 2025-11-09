@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
-import { Eye, Download } from "lucide-react";
+import { Eye, Download, Trash2, X } from "lucide-react";
 import { toast } from "react-toastify";
 import { AdminContext } from "../../context/AdminContext";
 
@@ -10,7 +10,6 @@ const AdminRegistrations = () => {
    const [showModal, setShowModal] = useState(false);
    const [selectedRegistration, setSelectedRegistration] = useState(null);
 
-   // const backendUrl = "http://localhost:4000";
    const { backendUrl } = useContext(AdminContext);
    const atoken = localStorage.getItem("aToken");
 
@@ -40,6 +39,30 @@ const AdminRegistrations = () => {
    useEffect(() => {
       fetchRegistrations();
    }, []);
+
+   // ✅ Delete Registration
+   const handleDeleteRegistration = async (id) => {
+      if (!window.confirm("Are you sure you want to delete this registration?"))
+         return;
+
+      try {
+         const { data } = await axios.delete(
+            `${backendUrl}/api/admin/registrations/${id}`,
+            { headers: { atoken } }
+         );
+
+         if (data.success) {
+            toast.success("Registration deleted successfully ✅");
+            fetchRegistrations(); // refresh table
+         } else {
+            toast.error(data.message || "Failed to delete registration");
+         }
+      } catch (error) {
+         toast.error(
+            error.response?.data?.message || "Error deleting registration"
+         );
+      }
+   };
 
    if (loading) {
       return (
@@ -104,6 +127,7 @@ const AdminRegistrations = () => {
                                  <td className="px-6 py-4 text-gray-900">
                                     {reg.paperTitle}
                                  </td>
+
                                  <td className="px-6 py-4">
                                     <div className="text-gray-900 font-medium">
                                        {reg.name}
@@ -112,6 +136,7 @@ const AdminRegistrations = () => {
                                        {reg.email}
                                     </div>
                                  </td>
+
                                  <td className="px-6 py-4 text-gray-700">
                                     {reg.registrationCategory}
                                  </td>
@@ -130,16 +155,28 @@ const AdminRegistrations = () => {
                                     </a>
                                  </td>
 
+                                 {/* ✅ ACTION BUTTONS */}
                                  <td className="px-6 py-4">
-                                    <button
-                                       onClick={() => {
-                                          setSelectedRegistration(reg);
-                                          setShowModal(true);
-                                       }}
-                                       className="flex items-center gap-1 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-medium"
-                                    >
-                                       <Eye size={14} /> View
-                                    </button>
+                                    <div className="flex items-center gap-2">
+                                       <button
+                                          onClick={() => {
+                                             setSelectedRegistration(reg);
+                                             setShowModal(true);
+                                          }}
+                                          className="flex items-center gap-1 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-medium"
+                                       >
+                                          <Eye size={14} /> View
+                                       </button>
+
+                                       <button
+                                          onClick={() =>
+                                             handleDeleteRegistration(reg._id)
+                                          }
+                                          className="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-xs font-medium"
+                                       >
+                                          <Trash2 size={14} />
+                                       </button>
+                                    </div>
                                  </td>
                               </tr>
                            ))
@@ -159,25 +196,22 @@ const AdminRegistrations = () => {
             </div>
          </div>
 
-         {/* VIEW DETAILS MODAL */}
+         {/* ✅ VIEW DETAILS MODAL */}
          {showModal && selectedRegistration && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-               <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-fadeIn">
-                  {/* Modal Header */}
-                  <div className="flex justify-between items-center px-6 py-4 border-b bg-linear-to-r from-indigo-600 to-purple-600 text-white rounded-t-2xl">
+               <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                  <div className="flex justify-between items-center px-6 py-4 border-b bg-indigo-600 text-white rounded-t-2xl">
                      <h2 className="text-xl font-bold">Registration Details</h2>
                      <button
                         onClick={() => setShowModal(false)}
                         className="text-white hover:bg-white/20 rounded-full p-2"
                      >
-                        ✖
+                        <X size={18} />
                      </button>
                   </div>
 
-                  {/* Modal Body */}
                   <div className="px-8 py-6 space-y-6">
-                     {/* Paper ID + Title */}
-                     <div className="bg-gray-50 border rounded-xl p-4 shadow-sm hover:shadow-md transition">
+                     <div className="bg-gray-50 border rounded-xl p-4">
                         <p className="text-xs font-semibold text-gray-500">
                            PAPER ID
                         </p>
@@ -189,23 +223,13 @@ const AdminRegistrations = () => {
                         </p>
                      </div>
 
-                     {/* Registration Info Grid */}
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="bg-gray-50 rounded-xl p-4 border">
                            <p className="text-xs text-gray-500 font-semibold">
-                              PRESENTER NAME
+                              PRESENTER
                            </p>
                            <p className="text-gray-900 font-medium">
                               {selectedRegistration.name}
-                           </p>
-                        </div>
-
-                        <div className="bg-gray-50 rounded-xl p-4 border">
-                           <p className="text-xs text-gray-500 font-semibold">
-                              DESIGNATION
-                           </p>
-                           <p className="text-gray-900 font-medium">
-                              {selectedRegistration.designation}
                            </p>
                         </div>
 
@@ -215,36 +239,6 @@ const AdminRegistrations = () => {
                            </p>
                            <p className="text-gray-900 font-medium">
                               {selectedRegistration.email}
-                           </p>
-                        </div>
-
-                        <div className="bg-gray-50 rounded-xl p-4 border">
-                           <p className="text-xs text-gray-500 font-semibold">
-                              MOBILE
-                           </p>
-                           <p className="text-gray-900 font-medium">
-                              {selectedRegistration.mobile}
-                           </p>
-                        </div>
-                     </div>
-
-                     {/* Registration Category + Payment */}
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-gray-50 rounded-xl p-4 border">
-                           <p className="text-xs text-gray-500 font-semibold">
-                              CATEGORY
-                           </p>
-                           <p className="text-indigo-600 font-semibold">
-                              {selectedRegistration.registrationCategory}
-                           </p>
-                        </div>
-
-                        <div className="bg-gray-50 rounded-xl p-4 border">
-                           <p className="text-xs text-gray-500 font-semibold">
-                              REGISTRATION TYPE
-                           </p>
-                           <p className="text-indigo-600 font-semibold">
-                              {selectedRegistration.registrationType}
                            </p>
                         </div>
 
@@ -267,7 +261,6 @@ const AdminRegistrations = () => {
                         </div>
                      </div>
 
-                     {/* Transaction + File */}
                      <div className="bg-gray-50 rounded-xl p-4 border">
                         <p className="text-xs text-gray-500 font-semibold">
                            TRANSACTION REF NO
@@ -285,40 +278,8 @@ const AdminRegistrations = () => {
                            View / Download File
                         </a>
                      </div>
-
-                     {/* Food + Accommodation */}
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-gray-50 rounded-xl p-4 border">
-                           <p className="text-xs text-gray-500 font-semibold">
-                              ACCOMMODATION REQUIRED
-                           </p>
-                           <p className="text-gray-900 font-medium">
-                              {selectedRegistration.accommodationRequired}
-                           </p>
-                        </div>
-                        <div className="bg-gray-50 rounded-xl p-4 border">
-                           <p className="text-xs text-gray-500 font-semibold">
-                              FOOD PREFERENCE
-                           </p>
-                           <p className="text-gray-900 font-medium">
-                              {selectedRegistration.foodPreference}
-                           </p>
-                        </div>
-                     </div>
-
-                     {selectedRegistration.additionalNotes && (
-                        <div className="bg-gray-50 rounded-xl p-4 border">
-                           <p className="text-xs text-gray-500 font-semibold">
-                              ADDITIONAL NOTES
-                           </p>
-                           <p className="text-gray-900 font-medium">
-                              {selectedRegistration.additionalNotes}
-                           </p>
-                        </div>
-                     )}
                   </div>
 
-                  {/* Footer */}
                   <div className="px-6 py-4 border-t bg-gray-100 rounded-b-2xl text-right">
                      <button
                         onClick={() => setShowModal(false)}

@@ -49,7 +49,7 @@ userRouter.get("/profile", authUser, getProfile);
 userRouter.post(
    "/update-profile",
    authUser,
-   upload.single("attachment"),
+   upload.single("image"),
    updateProfile
 );
 

@@ -6,7 +6,6 @@ const DashboardLayout = () => {
       <div className="flex min-h-screen">
          {/* Sidebar */}
          <aside className="w-64 bg-gray-900 text-white p-6 flex flex-col gap-4">
-            <h2 className="text-xl font-bold mb-6">Dashboard</h2>
             <NavLink
                to="/dashboard/profile"
                className={({ isActive }) =>

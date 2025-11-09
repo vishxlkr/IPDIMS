@@ -507,7 +507,7 @@ export const getUserSubmissions = async (req, res) => {
 
       // Find submissions where 'user' field matches userId
       const submissions = await submissionModel
-         .find({ user: userId })
+         .find({ author: userId })
          .sort({ createdAt: -1 }) // newest first
          .populate("reviewer", "name email organization"); // optional: populate reviewer info
 
@@ -529,6 +529,31 @@ export const getUserSubmissions = async (req, res) => {
    }
 };
 
+// ✅ Get all submissions of a specific user (AUTHOR)
+// export const getUserSubmissions = async (req, res) => {
+//    try {
+//       const userId = req.params.id;
+
+//       const submissions = await submissionModel
+//          .find({ author: userId }) // match author field
+//          .sort({ createdAt: -1 }) // newest first
+//          .populate("reviewer", "name email organization") // show reviewer details
+//          .populate("author", "name email organization"); // show user details
+
+//       res.status(200).json({
+//          success: true,
+//          submissions,
+//       });
+//    } catch (error) {
+//       console.error("❌ Error fetching user submissions:", error);
+//       res.status(500).json({
+//          success: false,
+//          message: "Server error while fetching user submissions",
+//          error: error.message,
+//       });
+//    }
+// };
+
 // api to get all registrations
 
 export const getAllRegistrations = async (req, res) => {
@@ -547,6 +572,37 @@ export const getAllRegistrations = async (req, res) => {
       res.status(500).json({
          success: false,
          message: "Server error while fetching registrations",
+      });
+   }
+};
+
+// ✅ Get registration of a specific user (Admin only)
+export const getRegistrationByUser = async (req, res) => {
+   try {
+      const { userId } = req.params;
+
+      const registration = await registrationModel
+         .findOne({ userId })
+         .populate("userId", "name email organization")
+         .lean();
+
+      if (!registration) {
+         return res.status(404).json({
+            success: false,
+            message: "No registration found for this user",
+         });
+      }
+
+      res.status(200).json({
+         success: true,
+         registration,
+      });
+   } catch (error) {
+      console.error("❌ Error fetching user registration:", error);
+      return res.status(500).json({
+         success: false,
+         message: "Server error while fetching registration",
+         error: error.message,
       });
    }
 };
@@ -666,6 +722,59 @@ Team IPDIMS
       res.status(500).json({
          success: false,
          message: "Failed to notify author",
+         error: error.message,
+      });
+   }
+};
+
+// ✅ api to Delete Author (Admin only)
+export const deleteAuthor = async (req, res) => {
+   try {
+      const { id } = req.params;
+
+      const user = await userModel.findById(id);
+      if (!user)
+         return res
+            .status(404)
+            .json({ success: false, message: "Author not found" });
+
+      await submissionModel.deleteMany({ author: id }); // delete related submissions
+      await userModel.findByIdAndDelete(id);
+
+      res.status(200).json({
+         success: true,
+         message: "Author deleted successfully",
+      });
+   } catch (error) {
+      console.error("Delete author error:", error);
+      res.status(500).json({ success: false, message: "Server error" });
+   }
+};
+
+// ✅ Delete a registration by ID
+export const deleteRegistration = async (req, res) => {
+   try {
+      const { id } = req.params;
+
+      const registration = await registrationModel.findById(id);
+      if (!registration) {
+         return res.status(404).json({
+            success: false,
+            message: "Registration not found",
+         });
+      }
+
+      await registrationModel.findByIdAndDelete(id);
+
+      res.status(200).json({
+         success: true,
+         message: "Registration deleted successfully",
+      });
+   } catch (error) {
+      console.error("❌ Delete Registration Error:", error);
+      res.status(500).json({
+         success: false,
+         message: "Server error while deleting registration",
          error: error.message,
       });
    }

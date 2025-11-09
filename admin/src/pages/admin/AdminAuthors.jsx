@@ -10,6 +10,7 @@ import {
    Building,
    FileText,
    Calendar,
+   Trash2,
 } from "lucide-react";
 import { AdminContext } from "../../context/AdminContext";
 
@@ -22,7 +23,6 @@ const AdminAuthors = () => {
    const [showDetailsModal, setShowDetailsModal] = useState(false);
    const [authorSubmissions, setAuthorSubmissions] = useState([]);
 
-   // const backendUrl = "http://localhost:4000";
    const atoken = localStorage.getItem("aToken");
    const { backendUrl } = useContext(AdminContext);
 
@@ -109,6 +109,27 @@ const AdminAuthors = () => {
       }
    };
 
+   const handleDeleteAuthor = async (authorId) => {
+      if (!window.confirm("Are you sure you want to delete this author?"))
+         return;
+
+      try {
+         const { data } = await axios.delete(
+            `${backendUrl}/api/admin/user/${authorId}`,
+            { headers: { atoken } }
+         );
+
+         if (data.success) {
+            toast.success("Author deleted successfully ✅");
+            fetchAuthors();
+         } else {
+            toast.error(data.message || "Failed to delete author");
+         }
+      } catch (error) {
+         toast.error(error.response?.data?.message || "Error deleting author");
+      }
+   };
+
    if (loading) {
       return (
          <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -141,13 +162,6 @@ const AdminAuthors = () => {
                         className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                      />
                   </div>
-                  <span className="text-gray-700 font-semibold">
-                     Total:{" "}
-                     <span className="text-blue-600">
-                        {filteredAuthors.length}
-                     </span>{" "}
-                     authors
-                  </span>
                </div>
             </div>
 
@@ -156,9 +170,6 @@ const AdminAuthors = () => {
                   <table className="min-w-full divide-y divide-gray-200">
                      <thead className="bg-gray-50">
                         <tr>
-                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                              #
-                           </th>
                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                               Name
                            </th>
@@ -176,16 +187,14 @@ const AdminAuthors = () => {
                            </th>
                         </tr>
                      </thead>
+
                      <tbody className="bg-white divide-y divide-gray-200">
                         {filteredAuthors.length > 0 ? (
-                           filteredAuthors.map((author, index) => (
+                           filteredAuthors.map((author) => (
                               <tr
                                  key={author._id}
                                  className="hover:bg-gray-50 transition-colors"
                               >
-                                 <td className="px-6 py-4 text-sm text-gray-600">
-                                    {index + 1}
-                                 </td>
                                  <td className="px-6 py-4">
                                     <div className="flex items-center gap-3">
                                        {author.image ? (
@@ -204,31 +213,42 @@ const AdminAuthors = () => {
                                        </div>
                                     </div>
                                  </td>
-                                 <td className="px-6 py-4">
-                                    <div className="text-sm text-gray-900">
-                                       {author.email}
-                                    </div>
+
+                                 <td className="px-6 py-4 text-sm text-gray-900">
+                                    {author.email}
                                  </td>
-                                 <td className="px-6 py-4">
-                                    <div className="text-sm text-gray-700">
-                                       {author.organization || "N/A"}
-                                    </div>
+
+                                 <td className="px-6 py-4 text-sm text-gray-600">
+                                    {author.organization || "N/A"}
                                  </td>
+
                                  <td className="px-6 py-4 text-sm text-gray-600">
                                     {new Date(
                                        author.createdAt
                                     ).toLocaleDateString()}
                                  </td>
+
                                  <td className="px-6 py-4">
-                                    <button
-                                       onClick={() =>
-                                          handleViewDetails(author._id)
-                                       }
-                                       className="flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-medium px-3 py-1.5 hover:bg-blue-50 rounded-lg transition-colors"
-                                    >
-                                       <Eye size={16} />
-                                       View
-                                    </button>
+                                    <div className="flex items-center gap-3">
+                                       <button
+                                          onClick={() =>
+                                             handleViewDetails(author._id)
+                                          }
+                                          className="flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-medium px-3 py-1.5 hover:bg-blue-50 rounded-lg transition-colors"
+                                       >
+                                          <Eye size={16} />
+                                          View
+                                       </button>
+
+                                       <button
+                                          onClick={() =>
+                                             handleDeleteAuthor(author._id)
+                                          }
+                                          className="flex items-center gap-1 text-red-600 hover:text-red-700 text-sm font-medium px-3 py-1.5 hover:bg-red-50 rounded-lg transition-colors"
+                                       >
+                                          <Trash2 className="w-5 h-5" />
+                                       </button>
+                                    </div>
                                  </td>
                               </tr>
                            ))
@@ -248,7 +268,7 @@ const AdminAuthors = () => {
             </div>
          </div>
 
-         {/* Author Details Modal */}
+         {/* ---- DETAILS MODAL ---- */}
          {showDetailsModal && selectedAuthor && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
@@ -268,241 +288,71 @@ const AdminAuthors = () => {
                   </div>
 
                   <div className="p-6 space-y-6">
-                     {/* Author Info */}
                      <div className="flex items-center gap-4">
-                        {selectedAuthor.image ? (
-                           <img
-                              src={selectedAuthor.image}
-                              alt={selectedAuthor.name}
-                              className="w-24 h-24 rounded-full object-cover border-4 border-gray-200"
-                           />
-                        ) : (
-                           <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center">
-                              <User className="w-12 h-12 text-blue-600" />
-                           </div>
-                        )}
                         <div>
                            <h3 className="text-2xl font-bold text-gray-900">
-                              {selectedAuthor.name || "N/A"}
+                              {selectedAuthor.name}
                            </h3>
                            <p className="text-gray-600">
                               {selectedAuthor.email}
                            </p>
-                           <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
-                              <Calendar size={16} />
-                              Joined{" "}
-                              {new Date(
-                                 selectedAuthor.createdAt
-                              ).toLocaleDateString("en-US", {
-                                 year: "numeric",
-                                 month: "long",
-                                 day: "numeric",
-                              })}
-                           </div>
                         </div>
                      </div>
 
-                     {/* Author Details Grid */}
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                           <div className="flex items-center gap-2 mb-2">
-                              <Mail className="text-blue-600" size={18} />
-                              <p className="text-xs text-gray-500 font-semibold">
-                                 EMAIL
-                              </p>
-                           </div>
-                           <p className="text-gray-900 font-medium break-all">
-                              {selectedAuthor.email}
-                           </p>
+                           <Mail className="text-blue-600 mb-1" size={18} />
+                           <p className="font-medium">{selectedAuthor.email}</p>
                         </div>
 
-                        {selectedAuthor.phone && (
-                           <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                              <div className="flex items-center gap-2 mb-2">
-                                 <User className="text-blue-600" size={18} />
-                                 <p className="text-xs text-gray-500 font-semibold">
-                                    PHONE
-                                 </p>
-                              </div>
-                              <p className="text-gray-900 font-medium">
-                                 {selectedAuthor.phone}
-                              </p>
-                           </div>
-                        )}
-
                         {selectedAuthor.organization && (
-                           <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 md:col-span-2">
-                              <div className="flex items-center gap-2 mb-2">
-                                 <Building
-                                    className="text-blue-600"
-                                    size={18}
-                                 />
-                                 <p className="text-xs text-gray-500 font-semibold">
-                                    ORGANIZATION
-                                 </p>
-                              </div>
-                              <p className="text-gray-900 font-medium">
+                           <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                              <Building
+                                 className="text-blue-600 mb-1"
+                                 size={18}
+                              />
+                              <p className="font-medium">
                                  {selectedAuthor.organization}
                               </p>
                            </div>
                         )}
-
-                        {selectedAuthor.address && (
-                           <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 md:col-span-2">
-                              <div className="flex items-center gap-2 mb-2">
-                                 <Building
-                                    className="text-blue-600"
-                                    size={18}
-                                 />
-                                 <p className="text-xs text-gray-500 font-semibold">
-                                    ADDRESS
-                                 </p>
-                              </div>
-                              <p className="text-gray-900 font-medium">
-                                 {selectedAuthor.address}
-                              </p>
-                           </div>
-                        )}
                      </div>
 
-                     {/* Submissions Section */}
-                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                        <div className="flex items-center justify-between mb-4">
-                           <div className="flex items-center gap-2">
-                              <FileText className="text-purple-600" size={20} />
-                              <h3 className="text-lg font-bold text-gray-800">
-                                 Submissions
-                              </h3>
-                           </div>
-                           <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-semibold">
-                              {authorSubmissions.length} Total
-                           </span>
-                        </div>
+                     {/* Submissions will show here */}
+                     <div className="border border-gray-200 rounded-xl p-4">
+                        <h3 className="text-lg font-bold text-gray-700 mb-3">
+                           Submissions
+                        </h3>
 
                         {authorSubmissions.length > 0 ? (
-                           <div className="space-y-3">
-                              {authorSubmissions.map((submission) => (
-                                 <div
-                                    key={submission._id}
-                                    className="bg-white rounded-lg p-4 border border-gray-200 hover:shadow-md transition-all"
-                                 >
-                                    <div className="flex items-start justify-between">
-                                       <div className="flex-1">
-                                          <h4 className="font-semibold text-gray-900 mb-1">
-                                             {submission.title || "Untitled"}
-                                          </h4>
-                                          {submission.eventName && (
-                                             <p className="text-sm text-gray-600 mb-2">
-                                                Event: {submission.eventName}
-                                             </p>
-                                          )}
-                                          <div className="flex items-center gap-2 text-xs text-gray-500">
-                                             <Calendar size={14} />
-                                             {new Date(
-                                                submission.createdAt
-                                             ).toLocaleDateString()}
-                                          </div>
-                                       </div>
-                                       <span
-                                          className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
-                                             submission.status === "Accepted"
-                                                ? "bg-green-100 text-green-800"
-                                                : submission.status ===
-                                                  "Rejected"
-                                                ? "bg-red-100 text-red-800"
-                                                : submission.status ===
-                                                  "Under Review"
-                                                ? "bg-blue-100 text-blue-800"
-                                                : "bg-yellow-100 text-yellow-800"
-                                          }`}
-                                       >
-                                          {submission.status}
-                                       </span>
-                                    </div>
-                                    {submission.reviewer && (
-                                       <div className="mt-3 pt-3 border-t border-gray-200">
-                                          <p className="text-xs text-gray-500">
-                                             Reviewer:{" "}
-                                             <span className="font-medium text-gray-700">
-                                                {submission.reviewer.name}
-                                             </span>
-                                          </p>
-                                       </div>
-                                    )}
+                           authorSubmissions.map((sub) => (
+                              <div
+                                 key={sub._id}
+                                 className="border p-4 rounded-lg bg-white mt-2"
+                              >
+                                 <div className="flex justify-between">
+                                    <h4 className="font-semibold">
+                                       {sub.title}
+                                    </h4>
+
+                                    <span
+                                       className={`px-3 py-1 text-xs rounded-full font-semibold ${
+                                          sub.status === "Accepted"
+                                             ? "bg-green-100 text-green-700"
+                                             : sub.status === "Rejected"
+                                             ? "bg-red-100 text-red-700"
+                                             : "bg-blue-100 text-blue-700"
+                                       }`}
+                                    >
+                                       {sub.status}
+                                    </span>
                                  </div>
-                              ))}
-                           </div>
+                              </div>
+                           ))
                         ) : (
-                           <div className="text-center py-8 text-gray-500">
-                              <FileText className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                              <p>No submissions yet</p>
-                           </div>
+                           <p className="text-gray-500">No submissions yet</p>
                         )}
                      </div>
-
-                     {/* Statistics */}
-                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-center">
-                           <p className="text-2xl font-bold text-yellow-700">
-                              {
-                                 authorSubmissions.filter(
-                                    (s) => s.status === "Pending"
-                                 ).length
-                              }
-                           </p>
-                           <p className="text-xs text-yellow-600 font-semibold mt-1">
-                              Pending
-                           </p>
-                        </div>
-                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
-                           <p className="text-2xl font-bold text-blue-700">
-                              {
-                                 authorSubmissions.filter(
-                                    (s) => s.status === "Under Review"
-                                 ).length
-                              }
-                           </p>
-                           <p className="text-xs text-blue-600 font-semibold mt-1">
-                              Under Review
-                           </p>
-                        </div>
-                        <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
-                           <p className="text-2xl font-bold text-green-700">
-                              {
-                                 authorSubmissions.filter(
-                                    (s) => s.status === "Accepted"
-                                 ).length
-                              }
-                           </p>
-                           <p className="text-xs text-green-600 font-semibold mt-1">
-                              Accepted
-                           </p>
-                        </div>
-                        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
-                           <p className="text-2xl font-bold text-red-700">
-                              {
-                                 authorSubmissions.filter(
-                                    (s) => s.status === "Rejected"
-                                 ).length
-                              }
-                           </p>
-                           <p className="text-xs text-red-600 font-semibold mt-1">
-                              Rejected
-                           </p>
-                        </div>
-                     </div>
-                  </div>
-
-                  <div className="sticky bottom-0 bg-white border-t border-gray-200 p-6 flex justify-end">
-                     <button
-                        onClick={() => {
-                           setShowDetailsModal(false);
-                           setAuthorSubmissions([]);
-                        }}
-                        className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-medium transition-all"
-                     >
-                        Close
-                     </button>
                   </div>
                </div>
             </div>

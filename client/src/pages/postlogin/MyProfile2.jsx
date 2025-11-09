@@ -936,22 +936,402 @@
 // };
 
 // export default ProfilePage;
+// import React, { useState, useContext, useEffect } from "react";
+// import { AppContext } from "../../context/AppContext";
+// import axios from "axios";
+// import { toast } from "react-toastify";
+// import {
+//    Edit2,
+//    Save,
+//    X,
+//    Mail,
+//    Phone,
+//    Briefcase,
+//    Link2,
+//    Building,
+//    MapPin,
+//    User,
+// } from "lucide-react";
+
+// const ProfilePage = () => {
+//    const { token, userData, backendUrl, getUserData, loading } =
+//       useContext(AppContext);
+
+//    const [isEditing, setIsEditing] = useState(false);
+//    const [isSaving, setIsSaving] = useState(false);
+//    const [formData, setFormData] = useState({
+//       name: "",
+//       phone: "",
+//       gender: "",
+//       designation: "",
+//       personalUrl: "",
+//       organization: "",
+//       address: "",
+//       bio: "",
+//       image: "",
+//    });
+//    const [imageFile, setImageFile] = useState(null);
+
+//    useEffect(() => {
+//       if (userData) {
+//          setFormData({
+//             name: userData.name || "",
+//             phone: userData.phone || "",
+//             gender: userData.gender || "",
+//             designation: userData.designation || "",
+//             personalUrl: userData.personalUrl || "",
+//             organization: userData.organization || "",
+//             address: userData.address || "",
+//             bio: userData.bio || "",
+//             image: userData.image || "",
+//          });
+//       }
+//    }, [userData]);
+
+//    const handleChange = (e) => {
+//       const { name, value } = e.target;
+//       setFormData({ ...formData, [name]: value });
+//    };
+
+//    const handleImageChange = (e) => {
+//       const file = e.target.files[0];
+//       if (!file) return;
+
+//       setImageFile(file);
+//       const reader = new FileReader();
+//       reader.onloadend = () => {
+//          setFormData({ ...formData, image: reader.result });
+//       };
+//       reader.readAsDataURL(file);
+//    };
+
+//    const handleSubmit = async (e) => {
+//       e.preventDefault();
+//       setIsSaving(true);
+
+//       try {
+//          const payload = new FormData();
+
+//          Object.keys(formData).forEach((key) => {
+//             if (key !== "image") payload.append(key, formData[key]);
+//          });
+
+//          if (imageFile) payload.append("image", imageFile);
+
+//          const { data } = await axios.post(
+//             `${backendUrl}/api/user/update-profile`,
+//             payload,
+//             {
+//                headers: {
+//                   Authorization: `Bearer ${token}`,
+//                   "Content-Type": "multipart/form-data",
+//                },
+//             }
+//          );
+
+//          if (data.success) {
+//             toast.success("Profile updated successfully!");
+//             setIsEditing(false);
+//             setImageFile(null);
+//             getUserData();
+//          } else toast.error(data.message);
+//       } catch (error) {
+//          toast.error(error.response?.data?.message || "Update failed.");
+//       } finally {
+//          setIsSaving(false);
+//       }
+//    };
+
+//    const handleCancel = () => {
+//       setIsEditing(false);
+//       setImageFile(null);
+//       setFormData({
+//          name: userData.name || "",
+//          phone: userData.phone || "",
+//          gender: userData.gender || "",
+//          designation: userData.designation || "",
+//          personalUrl: userData.personalUrl || "",
+//          organization: userData.organization || "",
+//          address: userData.address || "",
+//          bio: userData.bio || "",
+//          image: userData.image || "",
+//       });
+//    };
+
+//    if (loading)
+//       return (
+//          <div className="flex items-center justify-center min-h-screen bg-slate-900">
+//             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+//          </div>
+//       );
+
+//    return (
+//       <div className="min-h-screen bg-gray-50 p-4 lg:p-6 -m-8">
+//          <div className="max-w-7xl mx-auto">
+//             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+//                {/* LEFT SECTION */}
+//                <div className="bg-slate-800 rounded-2xl p-6 shadow-xl border border-slate-700 flex flex-col items-center">
+//                   {/* Profile Image */}
+//                   <div className="relative mb-6 w-40 h-40 rounded-xl overflow-hidden border-4 border-blue-600 shadow-xl">
+//                      <img
+//                         src={
+//                            formData.image || "https://via.placeholder.com/150"
+//                         }
+//                         alt="Profile"
+//                         className="w-full h-full object-cover"
+//                      />
+//                      {isEditing && (
+//                         <label className="absolute bottom-2 right-2 bg-blue-600 text-white p-2 rounded-lg cursor-pointer hover:bg-blue-700 shadow-md transition-all hover:scale-110">
+//                            <Edit2 size={18} />
+//                            <input
+//                               type="file"
+//                               accept="image/*"
+//                               onChange={handleImageChange}
+//                               className="hidden"
+//                            />
+//                         </label>
+//                      )}
+//                   </div>
+
+//                   {/* Email */}
+//                   <div className="w-full bg-slate-900 rounded-xl p-4 border border-slate-700">
+//                      <div className="flex items-center gap-3">
+//                         <Mail className="text-blue-400 shrink-0" size={20} />
+//                         <div>
+//                            <p className="text-xs text-gray-400 mb-1">Email</p>
+//                            <p className="text-white text-sm">
+//                               {userData?.email}
+//                            </p>
+//                         </div>
+//                      </div>
+//                   </div>
+//                </div>
+
+//                {/* RIGHT SECTION */}
+//                <div className="lg:col-span-2 bg-slate-800 rounded-2xl p-6 shadow-xl border border-slate-700 flex flex-col justify-between">
+//                   <form
+//                      onSubmit={handleSubmit}
+//                      className="flex flex-col h-full"
+//                   >
+//                      {/* NAME */}
+//                      <div className="mb-6">
+//                         {isEditing ? (
+//                            <input
+//                               type="text"
+//                               name="name"
+//                               value={formData.name}
+//                               onChange={handleChange}
+//                               className="text-3xl font-bold w-full bg-slate-900 text-white border border-slate-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500"
+//                            />
+//                         ) : (
+//                            <h1 className="text-3xl font-bold text-white">
+//                               {formData.name}
+//                            </h1>
+//                         )}
+//                      </div>
+
+//                      {/* DETAILS GRID */}
+//                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 grow">
+//                         {[
+//                            {
+//                               icon: (
+//                                  <Phone className="text-blue-400" size={18} />
+//                               ),
+//                               label: "PHONE",
+//                               name: "phone",
+//                            },
+//                            {
+//                               icon: (
+//                                  <User className="text-purple-400" size={18} />
+//                               ),
+//                               label: "GENDER",
+//                               name: "gender",
+//                               type: "select",
+//                            },
+//                            {
+//                               icon: (
+//                                  <Briefcase
+//                                     className="text-green-400"
+//                                     size={18}
+//                                  />
+//                               ),
+//                               label: "DESIGNATION",
+//                               name: "designation",
+//                            },
+//                            {
+//                               icon: (
+//                                  <Building
+//                                     className="text-orange-400"
+//                                     size={18}
+//                                  />
+//                               ),
+//                               label: "ORGANIZATION",
+//                               name: "organization",
+//                            },
+//                            {
+//                               icon: (
+//                                  <Link2 className="text-cyan-400" size={18} />
+//                               ),
+//                               label: "PERSONAL URL",
+//                               name: "personalUrl",
+//                            },
+//                            {
+//                               icon: (
+//                                  <MapPin className="text-pink-400" size={18} />
+//                               ),
+//                               label: "ADDRESS",
+//                               name: "address",
+//                            },
+//                         ].map((field) => (
+//                            <div
+//                               key={field.name}
+//                               className="bg-slate-900 rounded-xl p-4 border border-slate-700"
+//                            >
+//                               <div className="flex items-start gap-3">
+//                                  <div className="bg-slate-800 p-2 rounded-lg">
+//                                     {field.icon}
+//                                  </div>
+//                                  <div className="flex-1 min-w-0">
+//                                     <p className="text-xs text-gray-400 mb-1.5 font-medium">
+//                                        {field.label}
+//                                     </p>
+
+//                                     {isEditing ? (
+//                                        field.type === "select" ? (
+//                                           <select
+//                                              name={field.name}
+//                                              value={formData[field.name]}
+//                                              onChange={handleChange}
+//                                              className="w-full bg-slate-800 text-white border border-slate-600 rounded-lg px-3 py-2 text-sm"
+//                                           >
+//                                              <option value="">
+//                                                 Not Selected
+//                                              </option>
+//                                              <option value="Male">Male</option>
+//                                              <option value="Female">
+//                                                 Female
+//                                              </option>
+//                                              <option value="Other">
+//                                                 Other
+//                                              </option>
+//                                           </select>
+//                                        ) : (
+//                                           <input
+//                                              type="text"
+//                                              name={field.name}
+//                                              value={formData[field.name]}
+//                                              onChange={handleChange}
+//                                              className="w-full bg-slate-800 text-white border border-slate-600 rounded-lg px-3 py-2 text-sm"
+//                                           />
+//                                        )
+//                                     ) : (
+//                                        <p className="text-white font-medium break-all">
+//                                           {field.name === "personalUrl" &&
+//                                           formData.personalUrl ? (
+//                                              <a
+//                                                 href={formData.personalUrl}
+//                                                 target="_blank"
+//                                                 rel="noopener noreferrer"
+//                                                 className="text-cyan-400 hover:underline"
+//                                              >
+//                                                 {formData.personalUrl}
+//                                              </a>
+//                                           ) : (
+//                                              formData[field.name] ||
+//                                              "Not provided"
+//                                           )}
+//                                        </p>
+//                                     )}
+//                                  </div>
+//                               </div>
+//                            </div>
+//                         ))}
+//                      </div>
+
+//                      {/* BIO SECTION */}
+//                      <div className="bg-slate-900 rounded-xl p-4 border border-slate-700 mt-6">
+//                         <p className="text-xs text-gray-400 mb-2 font-medium">
+//                            BIO
+//                         </p>
+//                         {isEditing ? (
+//                            <textarea
+//                               name="bio"
+//                               value={formData.bio}
+//                               onChange={handleChange}
+//                               rows="3"
+//                               className="w-full bg-slate-800 text-white border border-slate-600 rounded-lg px-3 py-2 text-sm resize-none"
+//                            />
+//                         ) : (
+//                            <p className="text-white text-sm leading-relaxed whitespace-pre-wrap">
+//                               {formData.bio || "No bio provided"}
+//                            </p>
+//                         )}
+//                      </div>
+
+//                      {/* ACTION BUTTONS */}
+//                      <div className="flex justify-end gap-3 mt-6">
+//                         {!isEditing ? (
+//                            <button
+//                               onClick={() => setIsEditing(true)}
+//                               type="button"
+//                               className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow-lg"
+//                            >
+//                               <Edit2 size={18} /> Edit Profile
+//                            </button>
+//                         ) : (
+//                            <>
+//                               <button
+//                                  type="button"
+//                                  onClick={handleCancel}
+//                                  disabled={isSaving}
+//                                  className="flex items-center gap-2 px-5 py-2.5 bg-slate-700 text-white rounded-xl"
+//                               >
+//                                  <X size={18} /> Cancel
+//                               </button>
+//                               <button
+//                                  type="submit"
+//                                  disabled={isSaving}
+//                                  className="flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white rounded-xl"
+//                               >
+//                                  {isSaving ? (
+//                                     <>
+//                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+//                                        Saving...
+//                                     </>
+//                                  ) : (
+//                                     <>
+//                                        <Save size={18} /> Save Changes
+//                                     </>
+//                                  )}
+//                               </button>
+//                            </>
+//                         )}
+//                      </div>
+//                   </form>
+//                </div>
+//             </div>
+//          </div>
+//       </div>
+//    );
+// };
+
+// export default ProfilePage;
 
 import React, { useState, useContext, useEffect } from "react";
 import { AppContext } from "../../context/AppContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
+   User,
+   Mail,
+   Phone,
    Edit2,
    Save,
    X,
-   Mail,
-   Phone,
    Briefcase,
-   Link2,
    Building,
+   Link2,
    MapPin,
-   User,
 } from "lucide-react";
 
 const ProfilePage = () => {
@@ -971,14 +1351,15 @@ const ProfilePage = () => {
       bio: "",
       image: "",
    });
+
    const [imageFile, setImageFile] = useState(null);
 
    useEffect(() => {
-      if (userData) {
+      if (userData)
          setFormData({
             name: userData.name || "",
             phone: userData.phone || "",
-            gender: userData.gender || "Not Selected",
+            gender: userData.gender || "",
             designation: userData.designation || "",
             personalUrl: userData.personalUrl || "",
             organization: userData.organization || "",
@@ -986,7 +1367,6 @@ const ProfilePage = () => {
             bio: userData.bio || "",
             image: userData.image || "",
          });
-      }
    }, [userData]);
 
    const handleChange = (e) => {
@@ -996,26 +1376,24 @@ const ProfilePage = () => {
 
    const handleImageChange = (e) => {
       const file = e.target.files[0];
-      if (file) {
-         setImageFile(file);
-         const reader = new FileReader();
-         reader.onloadend = () => {
-            setFormData({ ...formData, image: reader.result });
-         };
-         reader.readAsDataURL(file);
-      }
+      if (!file) return;
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () =>
+         setFormData({ ...formData, image: reader.result });
+      reader.readAsDataURL(file);
    };
 
    const handleSubmit = async (e) => {
       e.preventDefault();
       setIsSaving(true);
+
       try {
          const payload = new FormData();
-         for (let key in formData) {
-            if (formData[key] && key !== "image") {
-               payload.append(key, formData[key]);
-            }
-         }
+         Object.keys(formData).forEach((key) => {
+            if (key !== "image") payload.append(key, formData[key]);
+         });
+
          if (imageFile) payload.append("image", imageFile);
 
          const { data } = await axios.post(
@@ -1031,12 +1409,14 @@ const ProfilePage = () => {
 
          if (data.success) {
             toast.success("Profile updated successfully!");
+            getUserData();
             setIsEditing(false);
             setImageFile(null);
-            getUserData();
-         } else toast.error(data.message);
-      } catch (error) {
-         toast.error(error.response?.data?.message || error.message);
+         } else {
+            toast.error(data.message);
+         }
+      } catch (e) {
+         toast.error(e.response?.data?.message || "Update failed.");
       } finally {
          setIsSaving(false);
       }
@@ -1045,46 +1425,103 @@ const ProfilePage = () => {
    const handleCancel = () => {
       setIsEditing(false);
       setImageFile(null);
-      if (userData) {
-         setFormData({
-            name: userData.name || "",
-            phone: userData.phone || "",
-            gender: userData.gender || "Not Selected",
-            designation: userData.designation || "",
-            personalUrl: userData.personalUrl || "",
-            organization: userData.organization || "",
-            address: userData.address || "",
-            bio: userData.bio || "",
-            image: userData.image || "",
-         });
-      }
+      setFormData({
+         name: userData.name || "",
+         phone: userData.phone || "",
+         gender: userData.gender || "",
+         designation: userData.designation || "",
+         personalUrl: userData.personalUrl || "",
+         organization: userData.organization || "",
+         address: userData.address || "",
+         bio: userData.bio || "",
+         image: userData.image || "",
+      });
    };
 
    if (loading)
       return (
-         <div className="flex items-center justify-center min-h-screen bg-slate-900">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+         <div className="flex items-center justify-center min-h-screen">
+            <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-600"></div>
          </div>
       );
 
    return (
-      <div className="min-h-screen bg-slate-900 p-4 lg:p-6">
+      <div className="min-h-screen bg-gray-50 p-6 -m-8">
          <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
-               {/* LEFT SECTION */}
-               <div className="bg-slate-800 rounded-2xl p-6 shadow-xl border border-slate-700 flex flex-col items-center">
-                  {/* Profile Image */}
-                  <div className="relative mb-6 w-90 h-90 rounded overflow-hidden border-4 border-blue-600 shadow-xl">
-                     <img
-                        src={
-                           formData.image || "https://via.placeholder.com/150"
-                        }
-                        alt="Profile"
-                        className="w-full h-full object-cover"
-                     />
-                     {isEditing && (
-                        <label className="absolute bottom-2 right-2 bg-blue-600 text-white p-2 rounded-lg cursor-pointer hover:bg-blue-700 shadow-md transition-all hover:scale-110">
-                           <Edit2 size={18} />
+            <h1 className="text-4xl font-bold text-gray-900 mb-8">
+               My Profile
+            </h1>
+
+            {/* Card */}
+            <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
+               {/* Gradient Header like Reviewer UI */}
+               <div className="bg-linear-to-r from-blue-600 to-yellow-700 p-6">
+                  <div className="flex items-center justify-between">
+                     <div className="flex items-center gap-4">
+                        {/* Profile Image */}
+                        <div className="w-24 h-24 rounded-full overflow-hidden bg-white shadow-lg">
+                           <img
+                              src={
+                                 formData.image ||
+                                 "https://via.placeholder.com/150"
+                              }
+                              alt="Profile"
+                              className="w-full h-full object-cover"
+                           />
+                        </div>
+
+                        <div>
+                           <h2 className="text-2xl font-bold text-white">
+                              {formData.name}
+                           </h2>
+                           <p className="text-blue-100">
+                              {formData.designation || "User"}
+                           </p>
+                        </div>
+                     </div>
+
+                     {!isEditing ? (
+                        <button
+                           onClick={() => setIsEditing(true)}
+                           className="bg-white text-blue-600 px-5 py-2.5 rounded-lg font-medium hover:bg-blue-50 transition-colors flex gap-2"
+                        >
+                           <Edit2 size={18} /> Edit Profile
+                        </button>
+                     ) : (
+                        <div className="flex gap-2">
+                           <button
+                              type="button"
+                              onClick={handleCancel}
+                              className="bg-red-500 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-red-600 transition-colors flex gap-2"
+                           >
+                              <X size={18} /> Cancel
+                           </button>
+
+                           <button
+                              type="submit"
+                              form="profileForm"
+                              disabled={isSaving}
+                              className="bg-green-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-green-700 transition-colors flex gap-2"
+                           >
+                              <Save size={18} />
+                              {isSaving ? "Saving..." : "Save"}
+                           </button>
+                        </div>
+                     )}
+                  </div>
+               </div>
+
+               {/* FORM BODY */}
+               <form
+                  id="profileForm"
+                  onSubmit={handleSubmit}
+                  className="p-6 space-y-6"
+               >
+                  {/* Image Upload */}
+                  {isEditing && (
+                     <div className="flex justify-center">
+                        <label className="bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-blue-700">
+                           Change Image
                            <input
                               type="file"
                               accept="image/*"
@@ -1092,235 +1529,134 @@ const ProfilePage = () => {
                               className="hidden"
                            />
                         </label>
+                     </div>
+                  )}
+
+                  {/* INFO GRID */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                     {/* NAME */}
+                     <ProfileField
+                        icon={<User size={20} className="text-blue-600" />}
+                        label="Full Name"
+                        editing={isEditing}
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                     />
+
+                     {/* EMAIL */}
+                     <StaticField
+                        icon={<Mail size={20} className="text-blue-600" />}
+                        label="Email"
+                        value={userData.email}
+                     />
+
+                     {/* PHONE */}
+                     <ProfileField
+                        icon={<Phone size={20} className="text-blue-600" />}
+                        label="Phone Number"
+                        editing={isEditing}
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                     />
+
+                     <ProfileField
+                        icon={<Briefcase size={20} className="text-blue-600" />}
+                        label="Designation"
+                        editing={isEditing}
+                        name="designation"
+                        value={formData.designation}
+                        onChange={handleChange}
+                     />
+
+                     <ProfileField
+                        icon={<Building size={20} className="text-blue-600" />}
+                        label="Organization"
+                        editing={isEditing}
+                        name="organization"
+                        value={formData.organization}
+                        onChange={handleChange}
+                     />
+
+                     <ProfileField
+                        icon={<Link2 size={20} className="text-blue-600" />}
+                        label="Personal URL"
+                        editing={isEditing}
+                        name="personalUrl"
+                        value={formData.personalUrl}
+                        onChange={handleChange}
+                     />
+
+                     <ProfileField
+                        icon={<MapPin size={20} className="text-blue-600" />}
+                        label="Address"
+                        editing={isEditing}
+                        name="address"
+                        value={formData.address}
+                        onChange={handleChange}
+                     />
+                  </div>
+
+                  {/* BIO */}
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                     <p className="text-xs text-gray-600 font-semibold">Bio</p>
+                     {isEditing ? (
+                        <textarea
+                           name="bio"
+                           value={formData.bio}
+                           onChange={handleChange}
+                           rows="3"
+                           className="mt-1 w-full bg-white border border-gray-300 rounded-lg p-3 text-sm"
+                        />
+                     ) : (
+                        <p className="text-gray-800 mt-1 whitespace-pre-wrap">
+                           {formData.bio || "No bio added"}
+                        </p>
                      )}
                   </div>
-
-                  {/* Email */}
-                  <div className="w-full bg-slate-900 rounded-xl p-4 border border-slate-700">
-                     <div className="flex items-center gap-3">
-                        <Mail className="text-blue-400 shrink-0" size={20} />
-                        <div>
-                           <p className="text-xs text-gray-400 mb-1">Email</p>
-                           <p className="text-white text-sm ">
-                              {userData?.email || "Not provided"}
-                           </p>
-                        </div>
-                     </div>
-                  </div>
-               </div>
-
-               {/* RIGHT SECTION */}
-               <div className="lg:col-span-2 bg-slate-800 rounded-2xl p-6 shadow-xl border border-slate-700 flex flex-col justify-between">
-                  <form
-                     onSubmit={handleSubmit}
-                     className="flex flex-col h-full"
-                  >
-                     {/* NAME */}
-                     <div className="mb-6">
-                        {isEditing ? (
-                           <input
-                              type="text"
-                              name="name"
-                              value={formData.name}
-                              onChange={handleChange}
-                              placeholder="Your Name"
-                              className="text-3xl font-bold w-full bg-slate-900 text-white border border-slate-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                           />
-                        ) : (
-                           <h1 className="text-3xl font-bold text-white">
-                              {formData.name || "Your Name"}
-                           </h1>
-                        )}
-                     </div>
-
-                     {/* DETAILS GRID */}
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 grow">
-                        {/* Reusable field function */}
-                        {[
-                           {
-                              icon: (
-                                 <Phone className="text-blue-400" size={18} />
-                              ),
-                              label: "PHONE",
-                              name: "phone",
-                              value: formData.phone,
-                              placeholder: "Phone number",
-                           },
-                           {
-                              icon: (
-                                 <User className="text-purple-400" size={18} />
-                              ),
-                              label: "GENDER",
-                              name: "gender",
-                              type: "select",
-                           },
-                           {
-                              icon: (
-                                 <Briefcase
-                                    className="text-green-400"
-                                    size={18}
-                                 />
-                              ),
-                              label: "DESIGNATION",
-                              name: "designation",
-                              placeholder: "Your designation",
-                           },
-                           {
-                              icon: (
-                                 <Building
-                                    className="text-orange-400"
-                                    size={18}
-                                 />
-                              ),
-                              label: "ORGANIZATION",
-                              name: "organization",
-                              placeholder: "Your organization",
-                           },
-                           {
-                              icon: (
-                                 <Link2 className="text-cyan-400" size={18} />
-                              ),
-                              label: "PERSONAL URL",
-                              name: "personalUrl",
-                              placeholder: "Your website",
-                           },
-                           {
-                              icon: (
-                                 <MapPin className="text-pink-400" size={18} />
-                              ),
-                              label: "ADDRESS",
-                              name: "address",
-                              placeholder: "Your address",
-                           },
-                        ].map((field) => (
-                           <div
-                              key={field.name}
-                              className="bg-slate-900 rounded-xl p-4 border border-slate-700"
-                           >
-                              <div className="flex items-start gap-3">
-                                 <div className="bg-slate-800 p-2 rounded-lg">
-                                    {field.icon}
-                                 </div>
-                                 <div className="flex-1 min-w-0">
-                                    <p className="text-xs text-gray-400 mb-1.5 font-medium">
-                                       {field.label}
-                                    </p>
-                                    {isEditing ? (
-                                       field.type === "select" ? (
-                                          <select
-                                             name={field.name}
-                                             value={formData.gender}
-                                             onChange={handleChange}
-                                             className="w-full bg-slate-800 text-white border border-slate-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
-                                          >
-                                             <option>Not Selected</option>
-                                             <option>Male</option>
-                                             <option>Female</option>
-                                             <option>Other</option>
-                                          </select>
-                                       ) : (
-                                          <input
-                                             type="text"
-                                             name={field.name}
-                                             value={formData[field.name]}
-                                             onChange={handleChange}
-                                             placeholder={field.placeholder}
-                                             className="w-full bg-slate-800 text-white border border-slate-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
-                                          />
-                                       )
-                                    ) : (
-                                       <p className="text-white font-medium break-all">
-                                          {field.name === "personalUrl" &&
-                                          formData.personalUrl ? (
-                                             <a
-                                                href={formData.personalUrl}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-cyan-400 hover:underline"
-                                             >
-                                                {formData.personalUrl}
-                                             </a>
-                                          ) : (
-                                             formData[field.name] ||
-                                             "Not provided"
-                                          )}
-                                       </p>
-                                    )}
-                                 </div>
-                              </div>
-                           </div>
-                        ))}
-                     </div>
-
-                     {/* BIO SECTION */}
-                     <div className="bg-slate-900 rounded-xl p-4 border border-slate-700 mt-6">
-                        <p className="text-xs text-gray-400 mb-2 font-medium">
-                           BIO
-                        </p>
-                        {isEditing ? (
-                           <textarea
-                              name="bio"
-                              placeholder="Tell us about yourself..."
-                              value={formData.bio}
-                              onChange={handleChange}
-                              rows="3"
-                              className="w-full bg-slate-800 text-white border border-slate-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 resize-none"
-                           />
-                        ) : (
-                           <p className="text-white text-sm leading-relaxed whitespace-pre-wrap">
-                              {formData.bio || "No bio provided"}
-                           </p>
-                        )}
-                     </div>
-
-                     {/* ACTION BUTTONS */}
-                     <div className="flex justify-end gap-3 mt-6">
-                        {!isEditing ? (
-                           <button
-                              type="button"
-                              onClick={() => setIsEditing(true)}
-                              className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow-lg hover:scale-105 font-medium"
-                           >
-                              <Edit2 size={18} />
-                              Edit Profile
-                           </button>
-                        ) : (
-                           <>
-                              <button
-                                 type="button"
-                                 onClick={handleCancel}
-                                 disabled={isSaving}
-                                 className="flex items-center gap-2 px-5 py-2.5 bg-slate-700 text-white rounded-xl hover:bg-slate-600 shadow-lg hover:scale-105 disabled:opacity-50 font-medium"
-                              >
-                                 <X size={18} />
-                                 Cancel
-                              </button>
-                              <button
-                                 type="submit"
-                                 disabled={isSaving}
-                                 className="flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 shadow-lg hover:scale-105 disabled:opacity-50 font-medium"
-                              >
-                                 {isSaving ? (
-                                    <>
-                                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                       Saving...
-                                    </>
-                                 ) : (
-                                    <>
-                                       <Save size={18} />
-                                       Save Changes
-                                    </>
-                                 )}
-                              </button>
-                           </>
-                        )}
-                     </div>
-                  </form>
-               </div>
+               </form>
             </div>
          </div>
       </div>
    );
 };
+
+// ✅ Reusable editable field
+const ProfileField = ({ icon, label, editing, name, value, onChange }) => (
+   <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+      <div className="flex items-center gap-2 mb-3">
+         {icon}
+         <p className="text-xs text-gray-500 font-semibold uppercase">
+            {label}
+         </p>
+      </div>
+      {editing ? (
+         <input
+            name={name}
+            value={value}
+            onChange={onChange}
+            className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2"
+         />
+      ) : (
+         <p className="text-gray-900 font-semibold">
+            {value || "Not Provided"}
+         </p>
+      )}
+   </div>
+);
+
+// ✅ Read-only field
+const StaticField = ({ icon, label, value }) => (
+   <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+      <div className="flex items-center gap-2 mb-3">
+         {icon}
+         <p className="text-xs text-gray-500 font-semibold uppercase">
+            {label}
+         </p>
+      </div>
+      <p className="text-gray-900 font-semibold">{value}</p>
+   </div>
+);
 
 export default ProfilePage;

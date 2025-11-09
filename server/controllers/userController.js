@@ -296,7 +296,7 @@ export const updateProfile = async (req, res) => {
          gender,
          designation,
          personalUrl,
-         organisation,
+         organization,
          address,
          bio,
       } = req.body;
@@ -310,7 +310,7 @@ export const updateProfile = async (req, res) => {
          !gender &&
          !designation &&
          !personalUrl &&
-         !organisation &&
+         !organization &&
          !address &&
          !bio &&
          !imageFile
@@ -328,7 +328,7 @@ export const updateProfile = async (req, res) => {
       if (gender) updateData.gender = gender;
       if (designation) updateData.designation = designation;
       if (personalUrl) updateData.personalUrl = personalUrl;
-      if (organisation) updateData.organisation = organisation;
+      if (organization) updateData.organization = organization;
       if (address) updateData.address = address;
       if (bio) updateData.bio = bio;
 

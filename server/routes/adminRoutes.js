@@ -6,11 +6,14 @@ import {
    addReviewer,
    assignSubmission,
    changeSubmissionStatus,
+   deleteAuthor,
+   deleteRegistration,
    deleteSubmission,
    getAllRegistrations,
    getAllReviewers,
    getAllSubmissions,
    getAllUsers,
+   getRegistrationByUser,
    getReviewerById,
    getSubmissionById,
    getUserById,
@@ -56,9 +59,13 @@ adminRouter.delete("/submission/:id", authAdmin, deleteSubmission);
 adminRouter.get("/users", authAdmin, getAllUsers);
 adminRouter.get("/user/:id", authAdmin, getUserById);
 adminRouter.get("/user/:id/submissions", authAdmin, getUserSubmissions);
+adminRouter.delete("/user/:id", authAdmin, deleteAuthor);
+adminRouter.get("/user/:id/submissions", authAdmin, getUserSubmissions);
 
 // all registrations
 adminRouter.get("/registrations", authAdmin, getAllRegistrations);
+adminRouter.delete("/registrations/:id", authAdmin, deleteRegistration);
+adminRouter.get("/registration/user/:userId", authAdmin, getRegistrationByUser);
 adminRouter.put("/mark-feedback-seen/:id", authAdmin, markFeedbackSeen);
 
 adminRouter.post("/notify-author", authAdmin, notifyAuthor);

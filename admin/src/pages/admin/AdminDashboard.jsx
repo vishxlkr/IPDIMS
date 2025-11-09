@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
@@ -10,6 +10,7 @@ import {
    Clock,
    AlertCircle,
 } from "lucide-react";
+import { AdminContext } from "../../context/AdminContext";
 
 const AdminDashboard = () => {
    const [stats, setStats] = useState({
@@ -25,7 +26,8 @@ const AdminDashboard = () => {
    const [recentSubmissions, setRecentSubmissions] = useState([]);
    const [loading, setLoading] = useState(true);
 
-   const backendUrl = "http://localhost:4000";
+   // const backendUrl = "http://localhost:4000";
+   const { backendUrl } = useContext(AdminContext);
    const atoken = localStorage.getItem("aToken");
 
    useEffect(() => {

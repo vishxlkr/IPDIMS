@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
@@ -16,6 +16,7 @@ import {
    Calendar,
    User,
 } from "lucide-react";
+import { AdminContext } from "../../context/AdminContext";
 
 const ManageReviewers = () => {
    const [reviewers, setReviewers] = useState([]);
@@ -39,7 +40,8 @@ const ManageReviewers = () => {
    });
    const [imageFile, setImageFile] = useState(null);
 
-   const backendUrl = "http://localhost:4000";
+   // const backendUrl = "http://localhost:4000";
+   const { backendUrl } = useContext(AdminContext);
    const atoken = localStorage.getItem("aToken");
 
    useEffect(() => {

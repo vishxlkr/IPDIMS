@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
@@ -11,6 +11,7 @@ import {
    FileText,
    Calendar,
 } from "lucide-react";
+import { AdminContext } from "../../context/AdminContext";
 
 const AdminAuthors = () => {
    const [authors, setAuthors] = useState([]);
@@ -21,8 +22,9 @@ const AdminAuthors = () => {
    const [showDetailsModal, setShowDetailsModal] = useState(false);
    const [authorSubmissions, setAuthorSubmissions] = useState([]);
 
-   const backendUrl = "http://localhost:4000";
+   // const backendUrl = "http://localhost:4000";
    const atoken = localStorage.getItem("aToken");
+   const { backendUrl } = useContext(AdminContext);
 
    useEffect(() => {
       fetchAuthors();

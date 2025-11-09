@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { Eye, Download } from "lucide-react";
 import { toast } from "react-toastify";
+import { AdminContext } from "../../context/AdminContext";
 
 const AdminRegistrations = () => {
    const [registrations, setRegistrations] = useState([]);
@@ -9,7 +10,8 @@ const AdminRegistrations = () => {
    const [showModal, setShowModal] = useState(false);
    const [selectedRegistration, setSelectedRegistration] = useState(null);
 
-   const backendUrl = "http://localhost:4000";
+   // const backendUrl = "http://localhost:4000";
+   const { backendUrl } = useContext(AdminContext);
    const atoken = localStorage.getItem("aToken");
 
    // ✅ Fetch all registrations

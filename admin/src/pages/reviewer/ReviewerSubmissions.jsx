@@ -257,7 +257,7 @@ const ReviewerSubmissions = () => {
                                              : submission.status === "Rejected"
                                              ? "bg-red-100 text-red-800"
                                              : submission.status ===
-                                               "Revision Requested"
+                                               "Revision Required"
                                              ? "bg-orange-100 text-orange-800"
                                              : "bg-blue-100 text-blue-800"
                                        }`}
@@ -398,8 +398,8 @@ const ReviewerSubmissions = () => {
                            <option value="Under Review">Under Review</option>
                            <option value="Accepted">Accept</option>
                            <option value="Rejected">Reject</option>
-                           <option value="Revision Requested">
-                              Request Revision
+                           <option value="Revision Required">
+                              Revision Required
                            </option>
                         </select>
                      </div>

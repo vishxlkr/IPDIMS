@@ -222,7 +222,7 @@ export const submitReview = async (req, res) => {
       });
 
       // ✅ Update submission status to reviewer’s decision
-      submission.status = decision || "Under Review";
+      // submission.status = decision || "Under Review";
       await submission.save();
 
       res.status(200).json({

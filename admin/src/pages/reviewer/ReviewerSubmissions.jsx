@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
@@ -17,6 +17,7 @@ import {
    MessageSquare,
    Send,
 } from "lucide-react";
+import { AdminContext } from "../../context/AdminContext";
 
 const ReviewerSubmissions = () => {
    const [submissions, setSubmissions] = useState([]);
@@ -32,7 +33,8 @@ const ReviewerSubmissions = () => {
    const [rating, setRating] = useState("");
    const [feedbacks, setFeedbacks] = useState([]); // 🆕 to show all previous feedbacks
 
-   const backendUrl = "http://localhost:4000";
+   // const backendUrl = "http://localhost:4000";
+   const { backendUrl } = useContext(AdminContext);
    const rtoken = localStorage.getItem("rToken");
 
    useEffect(() => {

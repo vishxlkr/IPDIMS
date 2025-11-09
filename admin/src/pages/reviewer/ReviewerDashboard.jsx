@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
@@ -10,6 +10,7 @@ import {
    TrendingUp,
    Eye,
 } from "lucide-react";
+import { AdminContext } from "../../context/AdminContext";
 
 const ReviewerDashboard = () => {
    const [stats, setStats] = useState({
@@ -22,7 +23,8 @@ const ReviewerDashboard = () => {
    const [recentSubmissions, setRecentSubmissions] = useState([]);
    const [loading, setLoading] = useState(true);
 
-   const backendUrl = "http://localhost:4000";
+   // const backendUrl = "http://localhost:4000";
+   const { backendUrl } = useContext(AdminContext);
    const rtoken = localStorage.getItem("rToken");
 
    useEffect(() => {

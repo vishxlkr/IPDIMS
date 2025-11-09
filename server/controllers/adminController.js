@@ -233,13 +233,19 @@ export const getSubmissionById = async (req, res) => {
       const submission = await submissionModel
          .findById(req.params.id)
          .populate("author", "name email organization") // populate user info
-         .populate("reviewer", "name email organization"); // populate reviewer info
+         .populate("reviewer", "name email organization") // populate reviewer info
+         .populate("feedback.reviewer", "name email");
 
       if (!submission) {
          return res
             .status(404)
             .json({ success: false, message: "Submission not found" });
       }
+
+      // Sort feedback newest first
+      submission.feedback = submission.feedback.sort(
+         (a, b) => b.createdAt - a.createdAt
+      );
 
       res.status(200).json({ success: true, submission });
    } catch (error) {
@@ -344,10 +350,9 @@ Team IPDIMS
 };
 
 // api to change submission status
-
 export const changeSubmissionStatus = async (req, res) => {
    try {
-      const { submissionId, status } = req.body;
+      const { submissionId, status, notify, customMessage } = req.body;
 
       if (!submissionId || !status) {
          return res.status(400).json({
@@ -369,19 +374,24 @@ export const changeSubmissionStatus = async (req, res) => {
 
       submission.status = status;
       await submission.save();
+
       console.log("✅ Status updated to:", status);
 
-      // ✅ Send Email to user
-      const userEmail = submission.authorEmail || submission.author.email;
-      const userName = submission.authorName || submission.author.name;
+      // ✉️ Only send email if notify = true
+      if (notify) {
+         const userEmail = submission.authorEmail || submission.author.email;
+         const userName = submission.authorName || submission.author.name;
 
-      const subject = `Your Paper Status Updated - ${status}`;
-      const message = `
+         const subject = `Your Paper Status Updated - ${status}`;
+         const message = `
 Hello ${userName},
+
 Your paper submission status has been updated.
 
 📄 Paper Title: ${submission.title}
 📌 New Status: ${status}
+
+${customMessage ? `\n📝 Note from Admin:\n${customMessage}\n` : ""}
 
 You may log in to your dashboard to see more details.
 
@@ -389,21 +399,23 @@ Regards,
 Team IPDIMS
 `;
 
-      try {
-         await sendEmail({
-            email: userEmail,
-            subject,
-            message,
-         });
-
-         console.log("📧 Email sent to:", userEmail);
-      } catch (emailErr) {
-         console.error("❌ Email sending failed:", emailErr.message);
+         try {
+            await sendEmail({
+               email: userEmail,
+               subject,
+               message,
+            });
+            console.log("📧 Email sent to:", userEmail);
+         } catch (emailErr) {
+            console.error("❌ Email sending failed:", emailErr.message);
+         }
       }
 
       res.status(200).json({
          success: true,
-         message: "Status updated successfully & user notified",
+         message: notify
+            ? "Status updated successfully & user notified"
+            : "Status updated successfully (no notification sent)",
          submission,
       });
    } catch (error) {
@@ -468,10 +480,8 @@ export const getAllUsers = async (req, res) => {
 // Get user by ID
 export const getUserById = async (req, res) => {
    try {
-      const user = await userModel
-         .findById(req.params.id)
-         .select("-password") // exclude password
-         .populate("submissions"); // optional: if you have a submissions reference in userModel
+      const user = await userModel.findById(req.params.id).select("-password"); // exclude password
+      // .populate("submissions"); // optional: if you have a submissions reference in userModel
 
       if (!user) {
          return res
@@ -537,6 +547,126 @@ export const getAllRegistrations = async (req, res) => {
       res.status(500).json({
          success: false,
          message: "Server error while fetching registrations",
+      });
+   }
+};
+
+// api to mark feedback as seen
+export const markFeedbackSeen = async (req, res) => {
+   try {
+      const submissionId = req.params.id;
+
+      const submission = await submissionModel.findById(submissionId);
+      if (!submission) {
+         return res
+            .status(404)
+            .json({ success: false, message: "Submission not found" });
+      }
+
+      // If you have a flag for unseen feedbacks, reset it here
+      submission.hasNewFeedback = false;
+
+      await submission.save();
+
+      res.status(200).json({
+         success: true,
+         message: "Feedback marked as seen",
+      });
+   } catch (error) {
+      console.error("Error marking feedback as seen:", error);
+      res.status(500).json({
+         success: false,
+         message: "Failed to mark feedback as seen",
+         error: error.message,
+      });
+   }
+};
+
+// api to notify author about new feedback
+export const notifyAuthor = async (req, res) => {
+   try {
+      const { submissionId, feedbackId } = req.body;
+
+      if (!submissionId || !feedbackId) {
+         return res.status(400).json({
+            success: false,
+            message: "submissionId and feedbackId are required",
+         });
+      }
+
+      // Fetch submission with feedback and author details
+      const submission = await submissionModel
+         .findById(submissionId)
+         .populate("author", "name email")
+         .populate("feedback.reviewer", "name email");
+
+      if (!submission) {
+         return res
+            .status(404)
+            .json({ success: false, message: "Submission not found" });
+      }
+
+      const feedback = submission.feedback.id(feedbackId);
+      if (!feedback) {
+         return res
+            .status(404)
+            .json({ success: false, message: "Feedback not found" });
+      }
+
+      // Get author info
+      const authorEmail = submission.authorEmail || submission.author?.email;
+      const authorName = submission.authorName || submission.author?.name;
+
+      if (!authorEmail) {
+         return res
+            .status(400)
+            .json({ success: false, message: "Author email not found" });
+      }
+
+      // Prepare email content
+      const subject = `Reviewer Feedback on Your Paper: "${submission.title}"`;
+
+      const message = `
+Hello ${authorName || "Author"},
+
+You have received new feedback from the reviewer for your paper submission.
+
+📄 Paper Title: ${submission.title}
+🗣 Reviewer: ${feedback.reviewer?.name || "Anonymous Reviewer"}
+
+💬 Reviewer Comments:
+${feedback.comment}
+
+📌 Recommendation: ${feedback.recommendation}
+
+Please log in to your IPDIMS dashboard to review the feedback and make necessary changes if required.
+
+Best regards,  
+Team IPDIMS
+`;
+
+      // Send email
+      try {
+         await sendEmail({
+            email: authorEmail,
+            subject,
+            message,
+         });
+         console.log("📧 Feedback email sent to:", authorEmail);
+      } catch (emailErr) {
+         console.error("❌ Error sending feedback email:", emailErr.message);
+      }
+
+      res.status(200).json({
+         success: true,
+         message: "Author notified successfully via email",
+      });
+   } catch (error) {
+      console.error("❌ Error notifying author:", error);
+      res.status(500).json({
+         success: false,
+         message: "Failed to notify author",
+         error: error.message,
       });
    }
 };

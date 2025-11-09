@@ -124,7 +124,7 @@ export const getAssignedSubmissionById = async (req, res) => {
 
       const submission = await submissionModel
          .findOne({ _id: id, reviewer: reviewerId }) // ensure assigned to that reviewer
-         .populate("user", "name email affiliation");
+         .populate("author", "name email affiliation");
 
       if (!submission)
          return res.status(404).json({
@@ -186,14 +186,13 @@ export const getDashboardStats = async (req, res) => {
    }
 };
 
-// api to give feedback by the reviewer
-
 export const submitReview = async (req, res) => {
    try {
       const { id: submissionId } = req.params;
-      const reviewerId = req.user.id;
+      const reviewerId = req.user.id; // comes from auth middleware
       const { feedbackText, rating, decision } = req.body;
 
+      // ✅ Check if submission exists and assigned to this reviewer
       const submission = await submissionModel.findOne({
          _id: submissionId,
          reviewer: reviewerId,
@@ -202,38 +201,91 @@ export const submitReview = async (req, res) => {
       if (!submission) {
          return res.status(403).json({
             success: false,
-            message: "Not authorized for this submission",
+            message: "Submission not found or not assigned to this reviewer",
          });
       }
 
       if (!feedbackText) {
          return res.status(400).json({
             success: false,
-            message: "Feedback is required",
+            message: "Feedback text is required",
          });
       }
 
-      submission.feedback = {
+      // ✅ Add new feedback entry at top (newest first)
+      submission.feedback.unshift({
          reviewer: reviewerId,
-         text: feedbackText,
+         comment: feedbackText, // ✅ FIXED
          rating: rating || null,
-         decision: decision || "Under Review",
+         recommendation: decision || "Under Review", // ✅ match your schema naming
          reviewedAt: new Date(),
-      };
+      });
 
-      if (req.file) {
-         submission.reviewFile = req.file.path;
-      }
-
+      // ✅ Update submission status to reviewer’s decision
       submission.status = decision || "Under Review";
       await submission.save();
 
-      res.json({
+      res.status(200).json({
          success: true,
-         message: "Review submitted successfully",
-         submission,
+         message: "Feedback submitted successfully",
+         feedback: submission.feedback,
       });
-   } catch (err) {
-      res.status(500).json({ success: false, message: err.message });
+   } catch (error) {
+      console.error("❌ Error in submitReview:", error);
+      res.status(500).json({
+         success: false,
+         message: "Failed to submit feedback",
+         error: error.message,
+      });
    }
 };
+
+// export const submitReview = async (req, res) => {
+//    try {
+//       const { id: submissionId } = req.params;
+//       const reviewerId = req.user.id;
+//       const { feedbackText, rating, decision } = req.body;
+
+//       const submission = await submissionModel.findOne({
+//          _id: submissionId,
+//          reviewer: reviewerId,
+//       });
+
+//       if (!submission) {
+//          return res.status(403).json({
+//             success: false,
+//             message: "Not authorized for this submission",
+//          });
+//       }
+
+//       if (!feedbackText) {
+//          return res.status(400).json({
+//             success: false,
+//             message: "Feedback is required",
+//          });
+//       }
+
+//       submission.feedback = {
+//          reviewer: reviewerId,
+//          text: feedbackText,
+//          rating: rating || null,
+//          decision: decision || "Under Review",
+//          reviewedAt: new Date(),
+//       };
+
+//       if (req.file) {
+//          submission.reviewFile = req.file.path;
+//       }
+
+//       submission.status = decision || "Under Review";
+//       await submission.save();
+
+//       res.json({
+//          success: true,
+//          message: "Review submitted successfully",
+//          submission,
+//       });
+//    } catch (err) {
+//       res.status(500).json({ success: false, message: err.message });
+//    }
+// };

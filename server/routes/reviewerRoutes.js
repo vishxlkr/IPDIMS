@@ -5,8 +5,8 @@ import {
    updateReviewerProfile,
    getAssignedSubmissions,
    getAssignedSubmissionById,
-   submitReview,
    getDashboardStats,
+   submitReview,
 } from "../controllers/reviewerController.js";
 import { authReviewer } from "../middlewares/authReviewer.js";
 

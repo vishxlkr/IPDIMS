@@ -16,6 +16,8 @@ import {
    getUserById,
    getUserSubmissions,
    loginAdmin,
+   markFeedbackSeen,
+   notifyAuthor,
    updateReviewerStatus,
 } from "../controllers/adminController.js";
 
@@ -57,5 +59,8 @@ adminRouter.get("/user/:id/submissions", authAdmin, getUserSubmissions);
 
 // all registrations
 adminRouter.get("/registrations", authAdmin, getAllRegistrations);
+adminRouter.put("/mark-feedback-seen/:id", authAdmin, markFeedbackSeen);
+
+adminRouter.post("/notify-author", authAdmin, notifyAuthor);
 
 export default adminRouter;

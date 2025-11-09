@@ -188,6 +188,9 @@ const ReviewerDashboard = () => {
                      <thead className="bg-gray-50">
                         <tr>
                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                              Paper ID
+                           </th>
+                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                               Title
                            </th>
                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -211,6 +214,12 @@ const ReviewerDashboard = () => {
                                  key={submission._id}
                                  className="hover:bg-gray-50 transition-colors"
                               >
+                                 {" "}
+                                 <td className="px-6 py-4">
+                                    <div className="text-sm font-bold text-gray-700">
+                                       {submission.paperId ?? "-"}
+                                    </div>
+                                 </td>
                                  <td className="px-6 py-4">
                                     <div className="text-sm font-medium text-gray-900 max-w-xs truncate">
                                        {submission.title || "Untitled"}

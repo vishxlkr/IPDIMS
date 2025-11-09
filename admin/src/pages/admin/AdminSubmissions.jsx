@@ -23,6 +23,7 @@ import {
    FileEdit,
    UserCheck,
    MessageSquare,
+   Bell,
 } from "lucide-react";
 
 const AdminSubmissions = () => {
@@ -35,7 +36,10 @@ const AdminSubmissions = () => {
    const [selectedSubmission, setSelectedSubmission] = useState(null);
    const [showDetailsModal, setShowDetailsModal] = useState(false);
    const [showAssignModal, setShowAssignModal] = useState(false);
+   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
    const [selectedReviewer, setSelectedReviewer] = useState("");
+   const [feedbacks, setFeedbacks] = useState([]);
+   const [newFeedbackFlags, setNewFeedbackFlags] = useState({});
 
    const backendUrl = "http://localhost:4000";
    const atoken = localStorage.getItem("aToken");
@@ -61,6 +65,13 @@ const AdminSubmissions = () => {
 
          if (data.success) {
             setSubmissions(data.submissions || []);
+
+            // Track which submissions have new feedback
+            const feedbackMap = {};
+            (data.submissions || []).forEach((sub) => {
+               feedbackMap[sub._id] = sub.hasNewFeedback || false;
+            });
+            setNewFeedbackFlags(feedbackMap);
          } else {
             toast.error(data.message || "Failed to fetch submissions");
          }
@@ -146,6 +157,71 @@ const AdminSubmissions = () => {
       } catch (error) {
          console.error("Error fetching submission details:", error);
          toast.error("Failed to load submission details");
+      }
+   };
+
+   const handleViewFeedback = async (submissionId) => {
+      try {
+         const { data } = await axios.get(
+            `${backendUrl}/api/admin/submission/${submissionId}`,
+            { headers: { atoken } }
+         );
+
+         console.log("Feedback data received:", data);
+
+         if (data.success) {
+            // Sort feedbacks newest first
+            const sortedFeedbacks = (data.submission.feedback || []).sort(
+               (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+            );
+
+            setFeedbacks(sortedFeedbacks);
+            setSelectedSubmission(data.submission);
+            setShowFeedbackModal(true);
+
+            // Remove green dot once opened
+            setNewFeedbackFlags((prev) => ({ ...prev, [submissionId]: false }));
+
+            // Optional: Mark as seen on backend
+            try {
+               await axios.put(
+                  `${backendUrl}/api/admin/mark-feedback-seen/${submissionId}`,
+                  {},
+                  { headers: { atoken } }
+               );
+            } catch (err) {
+               console.log("Could not mark feedback as seen:", err);
+            }
+         }
+      } catch (error) {
+         console.error("Error fetching feedback:", error);
+         toast.error("Failed to load feedbacks");
+      }
+   };
+
+   const handleNotifyAuthor = async (feedbackId) => {
+      if (!selectedSubmission) return;
+
+      try {
+         const { data } = await axios.post(
+            `${backendUrl}/api/admin/notify-author`,
+            {
+               submissionId: selectedSubmission._id,
+               feedbackId: feedbackId,
+            },
+            { headers: { atoken } }
+         );
+
+         if (data.success) {
+            toast.success("Author notified successfully!");
+         } else {
+            toast.error(data.message || "Failed to notify author");
+         }
+      } catch (error) {
+         console.error("Error notifying author:", error);
+         toast.error(
+            error.response?.data?.message || "Failed to notify author"
+         );
       }
    };
 
@@ -424,7 +500,7 @@ const AdminSubmissions = () => {
                                     >
                                        <td className="px-6 py-4">
                                           <div className="text-sm font-bold text-gray-700">
-                                             #{paperNumber}
+                                             {submission.paperId ?? "-"}
                                           </div>
                                        </td>
                                        <td className="px-6 py-4">
@@ -486,7 +562,6 @@ const AdminSubmissions = () => {
                                        </td>
                                        <td className="px-6 py-4">
                                           <div className="flex items-center justify-between w-full">
-                                             {/* Left side: reviewer name or not assigned */}
                                              {submission.reviewer ? (
                                                 <span className="flex items-center gap-2 text-sm font-medium text-gray-800">
                                                    <User className="w-4 h-4 text-purple-600" />
@@ -499,7 +574,6 @@ const AdminSubmissions = () => {
                                                 </span>
                                              )}
 
-                                             {/* Assign/Change button */}
                                              <button
                                                 onClick={() =>
                                                    openAssignModal(submission)
@@ -526,6 +600,22 @@ const AdminSubmissions = () => {
                                                 title="View Details"
                                              >
                                                 <Eye className="w-5 h-5" />
+                                             </button>
+                                             <button
+                                                onClick={() =>
+                                                   handleViewFeedback(
+                                                      submission._id
+                                                   )
+                                                }
+                                                className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors relative"
+                                                title="View Feedback"
+                                             >
+                                                <MessageSquare className="w-5 h-5" />
+                                                {newFeedbackFlags[
+                                                   submission._id
+                                                ] && (
+                                                   <span className="absolute top-1 right-1 block w-2 h-2 bg-green-500 rounded-full"></span>
+                                                )}
                                              </button>
                                              <button
                                                 onClick={() =>
@@ -749,23 +839,6 @@ const AdminSubmissions = () => {
                            </p>
                         </div>
                      )}
-
-                     {selectedSubmission.feedback && (
-                        <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                           <div className="flex items-center gap-2 mb-3">
-                              <MessageSquare
-                                 className="text-blue-600"
-                                 size={18}
-                              />
-                              <p className="text-xs text-blue-600 font-semibold">
-                                 REVIEWER FEEDBACK
-                              </p>
-                           </div>
-                           <p className="text-gray-900 leading-relaxed whitespace-pre-wrap">
-                              {selectedSubmission.feedback}
-                           </p>
-                        </div>
-                     )}
                   </div>
 
                   <div className="sticky bottom-0 bg-white border-t border-gray-200 p-6 flex justify-end gap-3">
@@ -783,6 +856,136 @@ const AdminSubmissions = () => {
                      )}
                      <button
                         onClick={() => setShowDetailsModal(false)}
+                        className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-medium transition-all"
+                     >
+                        Close
+                     </button>
+                  </div>
+               </div>
+            </div>
+         )}
+
+         {/* Feedback Modal */}
+         {showFeedbackModal && selectedSubmission && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+               <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                  {/* Header */}
+                  <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between z-10">
+                     <div>
+                        <h2 className="text-2xl font-bold text-gray-800">
+                           Feedback History
+                        </h2>
+                        <p className="text-sm text-gray-600 mt-1">
+                           {selectedSubmission.title}
+                        </p>
+                     </div>
+                     <button
+                        onClick={() => {
+                           setShowFeedbackModal(false);
+                           setFeedbacks([]);
+                        }}
+                        className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
+                     >
+                        <X size={24} />
+                     </button>
+                  </div>
+
+                  {/* Feedback List */}
+                  <div className="p-6 space-y-4">
+                     {feedbacks.length > 0 ? (
+                        feedbacks.map((feedback, index) => (
+                           <div
+                              key={feedback._id || index}
+                              className="bg-linear-to-r from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-200 shadow-sm"
+                           >
+                              {/* Reviewer Info */}
+                              <div className="flex items-start justify-between mb-3">
+                                 <div className="flex items-center gap-3">
+                                    <div className="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold">
+                                       {feedback.reviewer?.name?.charAt(0) ||
+                                          "R"}
+                                    </div>
+                                    <div>
+                                       <p className="font-semibold text-gray-900">
+                                          {feedback.reviewer?.name ||
+                                             "Reviewer"}
+                                       </p>
+                                       <p className="text-xs text-gray-600 flex items-center gap-1">
+                                          <Calendar size={12} />
+                                          {new Date(
+                                             feedback.createdAt
+                                          ).toLocaleDateString("en-US", {
+                                             year: "numeric",
+                                             month: "short",
+                                             day: "numeric",
+                                             hour: "2-digit",
+                                             minute: "2-digit",
+                                          })}
+                                       </p>
+                                    </div>
+                                 </div>
+
+                                 {/* Notify Button */}
+                                 <button
+                                    onClick={() =>
+                                       handleNotifyAuthor(feedback._id)
+                                    }
+                                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-all shadow-sm hover:shadow-md"
+                                 >
+                                    <Bell size={16} />
+                                    Notify Author
+                                 </button>
+                              </div>
+
+                              {/* Feedback Text */}
+                              <div className="bg-white rounded-lg p-4 border border-blue-100">
+                                 <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
+                                    {feedback.comment || "No feedback text"}
+                                 </p>
+                              </div>
+
+                              {/* Recommendation */}
+                              {feedback.recommendation && (
+                                 <div className="mt-3 flex items-center gap-2">
+                                    <span className="text-sm font-semibold text-gray-700">
+                                       Recommendation:
+                                    </span>
+                                    <span
+                                       className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
+                                 ${
+                                    feedback.recommendation === "Accepted"
+                                       ? "bg-green-100 text-green-800"
+                                       : feedback.recommendation === "Rejected"
+                                       ? "bg-red-100 text-red-800"
+                                       : "bg-orange-100 text-orange-800"
+                                 }`}
+                                    >
+                                       {feedback.recommendation}
+                                    </span>
+                                 </div>
+                              )}
+                           </div>
+                        ))
+                     ) : (
+                        <div className="text-center py-12">
+                           <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                           <p className="text-gray-500 text-lg font-medium">
+                              No feedback yet
+                           </p>
+                           <p className="text-gray-400 text-sm mt-2">
+                              Feedbacks from reviewers will appear here
+                           </p>
+                        </div>
+                     )}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="sticky bottom-0 bg-white border-t border-gray-200 p-6 flex justify-end">
+                     <button
+                        onClick={() => {
+                           setShowFeedbackModal(false);
+                           setFeedbacks([]);
+                        }}
                         className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-medium transition-all"
                      >
                         Close

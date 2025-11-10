@@ -21,6 +21,7 @@ const Login = () => {
    const [otp, setOtp] = useState("");
 
    // ---------- AUTH FUNCTIONS ----------
+
    const signup = async (name, email, password) => {
       try {
          setLoading(true);
@@ -29,10 +30,7 @@ const Login = () => {
             email,
             password,
          });
-         if (data.success) {
-            toast.success("OTP sent to your email!");
-            return { success: true };
-         }
+         if (data.success) return { success: true };
          toast.error(data.message);
          return { success: false };
       } catch (error) {
@@ -54,16 +52,23 @@ const Login = () => {
             }
          );
 
-         const tokenValue = data.token || data.user?.token;
-
-         if (data.success && tokenValue) {
+         // ✅ Only signup should set token, not reset
+         if (data.success && purpose === "signup") {
+            const tokenValue = data.user?.token;
             localStorage.setItem("token", tokenValue);
             setToken(tokenValue);
+            setUserData(data.user); //
             toast.success(data.message);
             return { success: true, user: data.user };
          }
 
-         toast.error(data.message || "Verification failed");
+         // ✅ If password reset, only verify OTP and move to next step
+         if (data.success && purpose === "reset") {
+            toast.success("OTP verified successfully!");
+            return { success: true };
+         }
+
+         toast.error(data.message);
          return { success: false };
       } catch (error) {
          toast.error(error.response?.data?.message || error.message);
@@ -81,16 +86,17 @@ const Login = () => {
             password,
          });
 
-         const tokenValue = data.token || data.user?.token;
+         const tokenValue = data.user?.token;
 
          if (data.success && tokenValue) {
             localStorage.setItem("token", tokenValue);
             setToken(tokenValue);
+            setUserData(data.user);
             toast.success("Login successful!");
             return { success: true, user: data.user };
          }
 
-         toast.error(data.message || "Login failed");
+         toast.error(data.message);
          return { success: false };
       } catch (error) {
          toast.error(error.message);
@@ -131,22 +137,26 @@ const Login = () => {
             {
                email,
                otp,
-               newPassword,
+               newPassword, // ✅ Key must be newPassword (matches backend)
             }
          );
+
          if (data.success) {
             toast.success("Password updated successfully!");
             return { success: true };
          }
+
          toast.error(data.message);
          return { success: false };
       } catch (error) {
-         toast.error(error.message);
+         toast.error(error.response?.data?.message || error.message);
          return { success: false };
       } finally {
          setLoading(false);
       }
    };
+
+   // ---------- HANDLE SUBMIT FLOW ----------
 
    const handleSubmit = async (e) => {
       e.preventDefault();
@@ -173,17 +183,32 @@ const Login = () => {
          const res = await verifyOtp(email, otp);
          if (res.success) {
             if (purpose === "signup") {
-               setUserData(res.user);
                navigate("/");
             } else if (purpose === "reset") {
-               setStep("newPassword");
+               setStep("newPassword"); // ✅ Move to new password screen
             }
          }
       } else if (step === "newPassword") {
          if (password !== confirmPassword)
             return toast.error("Passwords do not match!");
+
          const res = await resetPassword(email, otp, password);
-         if (res.success) navigate("/login");
+         if (res.success) {
+            // ✅ Clear all state to prevent useEffect redirecting to "/"
+            setEmail("");
+            setPassword("");
+            setConfirmPassword("");
+            setOtp("");
+            setPurpose("");
+            setStep("login");
+
+            localStorage.removeItem("token");
+            setToken(null);
+            setUserData(null);
+
+            toast.success("Password changed successfully. Please login.");
+            navigate("/login", { replace: true });
+         }
       }
    };
 
@@ -309,6 +334,7 @@ const Login = () => {
                         </p>
                      </>
                   )}
+
                   {step === "signup" && (
                      <p>
                         Already have an account?{" "}
@@ -320,6 +346,7 @@ const Login = () => {
                         </span>
                      </p>
                   )}
+
                   {step === "reset" && (
                      <p>
                         Back to{" "}
@@ -333,7 +360,7 @@ const Login = () => {
                   )}
                </div>
             </div>
-            {/* ✅ Admin Button: directly below the card, same width */}
+
             <div className="min-w-[340px] sm:min-w-96 mt-4">
                <button
                   type="button"

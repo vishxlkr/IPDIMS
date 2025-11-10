@@ -69,7 +69,7 @@ const App = () => {
                {/* Left Column - Main Content */}
                <div className="md:col-span-2">
                   {/* About IPDIMS Section */}
-                  <section className="bg-white/10  p-6 md:p-8 rounded-xl shadow-lg mb-8">
+                  <section className="bg-gray-800  p-6 md:p-8 rounded-xl shadow-lg mb-8">
                      <h2 className="text-2xl md:text-3xl font-bold text-blue-600 mb-4 border-b-2 border-green-500 pb-2">
                         About IPDIMS 2025
                      </h2>

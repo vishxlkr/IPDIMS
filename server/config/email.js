@@ -13,7 +13,7 @@ const sendEmail = async (options) => {
    });
 
    const mailOptions = {
-      from: `E-mail Verification <${process.env.EMAIL_USER}>`, // your mail your mail whose app password is created from which you want to send mail
+      from: `IPDIMS <${process.env.EMAIL_USER}>`, // your mail your mail whose app password is created from which you want to send mail
       to: options.email,
       subject: options.subject,
       text: options.message,

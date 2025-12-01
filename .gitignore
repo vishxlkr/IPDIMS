@@ -1,6 +1,7 @@
 # Node modules (ignore for both client and server)
 client/node_modules/
 server/node_modules/
+node_modules/
 
 # Build and dist folders
 client/build/

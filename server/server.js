@@ -38,12 +38,13 @@
 // });
 
 //--------for vercel deployment--------
-
 import express from "express";
 import cors from "cors";
 import "dotenv/config";
+
 import connectDB from "./config/mongodb.js";
 import connectCloudinary from "./config/cloudinary.js";
+
 import userRouter from "./routes/userRoutes.js";
 import adminRouter from "./routes/adminRoutes.js";
 import reviewerRouter from "./routes/reviewerRoutes.js";
@@ -62,32 +63,44 @@ let cloudinaryConnected = false;
 
 // Connect DB only once (serverless safe)
 app.use(async (req, res, next) => {
-  if (!dbConnected) {
-    await connectDB();
-    dbConnected = true;
-  }
-  next();
+   try {
+      if (!dbConnected) {
+         await connectDB();
+         dbConnected = true;
+      }
+      next();
+   } catch (error) {
+      console.error("MongoDB connection error:", error);
+      res.status(500).json({
+         error: "DB connection failed",
+         details: error.message,
+      });
+   }
 });
 
 // Connect Cloudinary once (serverless safe)
 app.use((req, res, next) => {
-  if (!cloudinaryConnected) {
-    connectCloudinary();
-    cloudinaryConnected = true;
-  }
-  next();
+   try {
+      if (!cloudinaryConnected) {
+         connectCloudinary();
+         cloudinaryConnected = true;
+      }
+      next();
+   } catch (error) {
+      console.error("Cloudinary config error:", error);
+      res.status(500).json({ error: "Cloudinary init failed" });
+   }
 });
 
-// API Routes (REMOVE /api because Vercel adds it)
+// API Routes
 app.use("/user", userRouter);
 app.use("/admin", adminRouter);
 app.use("/reviewer", reviewerRouter);
 
 // Test route
 app.get("/", (req, res) => {
-  res.send("API is working on Vercel");
+   res.send("API is working on Vercel");
 });
 
-// ❌ DO NOT USE app.listen() ON VERCEL
-// export app for serverless function
+// ❌ NO app.listen() on Vercel
 export default app;

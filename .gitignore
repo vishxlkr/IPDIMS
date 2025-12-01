@@ -3,8 +3,7 @@ client/node_modules/
 server/node_modules/
 
 /node_modules
-/server/package.json
-/server/package-lock.json
+
 
 
 # Build and dist folders

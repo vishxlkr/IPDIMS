@@ -72,15 +72,15 @@ VITE_BACKEND_URL=http://localhost:4000
 
 ## Screenshots
 
-### User
+### For User
+
 <img width="1919" height="1079" alt="Screenshot 2025-12-02 013344" src="https://github.com/user-attachments/assets/fe860409-84b2-4ab3-91a6-27c1fe22412c" />
 <img width="1583" height="827" alt="Screenshot 2025-12-02 013409" src="https://github.com/user-attachments/assets/4e755927-e503-44a0-a3f1-3e56fc6eaf3f" />
 <img width="1919" height="1079" alt="Screenshot 2025-12-02 013506" src="https://github.com/user-attachments/assets/8c8b6fed-cb2c-4bd9-a9df-ee57c1b8b894" />
 <img width="1919" height="1079" alt="Screenshot 2025-12-02 013510" src="https://github.com/user-attachments/assets/ca2e256b-8c39-484a-a1df-0b33ee23d954" />
 
+### For Admin
 
-
-### Admin
 <img width="1501" height="871" alt="Screenshot 2025-12-02 014348" src="https://github.com/user-attachments/assets/56e2da64-5ecb-4e4f-a1ea-eda6ced8ec9a" />
 <img width="1919" height="1079" alt="Screenshot 2025-12-02 013420" src="https://github.com/user-attachments/assets/5fb43d6e-42b5-4908-b627-973ed24e2fb3" />
 <img width="1919" height="1079" alt="Screenshot 2025-12-02 013425" src="https://github.com/user-attachments/assets/4a502397-fb9a-4b91-b383-97639eef6d00" />
@@ -88,13 +88,12 @@ VITE_BACKEND_URL=http://localhost:4000
 <img width="1919" height="1079" alt="Screenshot 2025-12-02 013436" src="https://github.com/user-attachments/assets/e3fe943c-7ab8-4945-bd02-13e49f723c56" />
 <img width="1919" height="1079" alt="Screenshot 2025-12-02 013439" src="https://github.com/user-attachments/assets/563fbb31-5000-4a69-b40b-feb2431c3b4b" />
 
-
 ### For Reviewer
+
 <img width="1534" height="865" alt="Screenshot 2025-12-02 014354" src="https://github.com/user-attachments/assets/804ccbce-9677-4698-bc7b-bc0a0cde610a" />
 <img width="1919" height="1079" alt="Screenshot 2025-12-02 013556" src="https://github.com/user-attachments/assets/b31e70bd-8d56-413a-a239-3e8618210499" />
 <img width="1919" height="1079" alt="Screenshot 2025-12-02 013600" src="https://github.com/user-attachments/assets/40fec5db-c745-4c03-8ce0-b3beb0e52562" />
 <img width="1911" height="1068" alt="Screenshot 2025-12-02 013604" src="https://github.com/user-attachments/assets/b90a61fe-f9e2-4049-8047-de3b9a69a23d" />
-
 
 ## Run Locally
 

@@ -49,7 +49,7 @@ const Login = () => {
             {
                email,
                otp,
-            }
+            },
          );
 
          // ✅ Only signup should set token, not reset
@@ -113,7 +113,7 @@ const Login = () => {
             `${backendUrl}/api/user/forgot-password`,
             {
                email,
-            }
+            },
          );
          if (data.success) {
             toast.success("OTP sent for password reset!");
@@ -137,8 +137,8 @@ const Login = () => {
             {
                email,
                otp,
-               newPassword, // ✅ Key must be newPassword (matches backend)
-            }
+               newPassword, //  Key must be newPassword (matches backend)
+            },
          );
 
          if (data.success) {
@@ -229,12 +229,12 @@ const Login = () => {
                   {step === "login"
                      ? "Login"
                      : step === "signup"
-                     ? "Sign Up"
-                     : step === "reset"
-                     ? "Reset Password"
-                     : step === "otp"
-                     ? "Enter OTP"
-                     : "Set New Password"}
+                       ? "Sign Up"
+                       : step === "reset"
+                         ? "Reset Password"
+                         : step === "otp"
+                           ? "Enter OTP"
+                           : "Set New Password"}
                </p>
 
                {step === "signup" && (
@@ -303,12 +303,12 @@ const Login = () => {
                   {step === "login"
                      ? "Login"
                      : step === "signup"
-                     ? "Sign Up"
-                     : step === "reset"
-                     ? "Send OTP"
-                     : step === "otp"
-                     ? "Verify OTP"
-                     : "Save Password"}
+                       ? "Sign Up"
+                       : step === "reset"
+                         ? "Send OTP"
+                         : step === "otp"
+                           ? "Verify OTP"
+                           : "Save Password"}
                </button>
 
                <div className="w-full mt-2 text-sm">

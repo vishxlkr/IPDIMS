@@ -385,7 +385,7 @@ export const addRegistration = async (req, res) => {
       const lastEntry = await registrationModel.findOne().sort({ paperId: -1 });
       const nextPaperId = lastEntry ? lastEntry.paperId + 1 : 1;
 
-      // ✅ Upload proof file to Cloudinary
+      //  Upload proof file to Cloudinary
       const uploadResult = await cloudinary.uploader.upload(file.path, {
          folder: "payment_proofs",
          resource_type: "auto",

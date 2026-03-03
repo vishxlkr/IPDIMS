@@ -68,7 +68,7 @@ export const newSubmission = async (req, res) => {
                access_mode: "public", // Explicitly public access
             });
 
-            // ✅ URL handling
+            //  URL handling
             downloadUrl = uploadResult.secure_url;
             viewUrl = uploadResult.secure_url;
 

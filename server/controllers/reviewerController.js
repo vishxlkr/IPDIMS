@@ -263,11 +263,11 @@ export const submitReview = async (req, res) => {
       submission.needsReviewerAction = false;
       // submission.needsAuthorAction = false; // Already false mostly
 
-      // ✅ Avoid overwriting status if multiple reviewers are working independently
+      //  Avoid overwriting status if multiple reviewers are working independently
       // Or set status based on logic. Currently keeping existing logic minimal or just logging feedback.
       // submission.status = decision || "Under Review";
 
-      // ✅ Update submission status to reviewer’s decision
+      //  Update submission status to reviewer’s decision
       // submission.status = decision || "Under Review";
 
       // Explicitly update timestamp to ensure it floats to top

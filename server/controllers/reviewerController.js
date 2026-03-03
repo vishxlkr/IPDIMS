@@ -210,7 +210,7 @@ export const submitReview = async (req, res) => {
          confidentialComments,
       } = req.body;
 
-      // ✅ Check if submission exists and assigned to this reviewer
+      //  Check if submission exists and assigned to this reviewer
       const submission = await submissionModel.findOne({
          _id: submissionId,
          $or: [{ reviewer: reviewerId }, { reviewers: reviewerId }],
@@ -230,7 +230,7 @@ export const submitReview = async (req, res) => {
          });
       }
 
-      // ✅ Check if reviewer has already submitted feedback
+      //  Check if reviewer has already submitted feedback
       const existingFeedbackIndex = submission.feedback.findIndex(
          (f) => f.reviewer.toString() === reviewerId,
       );

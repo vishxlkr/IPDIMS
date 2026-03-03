@@ -342,7 +342,7 @@ export const updateProfile = async (req, res) => {
          await userModel.findByIdAndUpdate(
             userId,
             { image: imageURL },
-            { new: true }
+            { new: true },
          );
       }
 
@@ -381,7 +381,7 @@ export const addRegistration = async (req, res) => {
             message: "Payment proof is required",
          });
 
-      // ✅ Auto generate paperId (sequential globally, not per user)
+      //  Auto generate paperId (sequential globally, not per user)
       const lastEntry = await registrationModel.findOne().sort({ paperId: -1 });
       const nextPaperId = lastEntry ? lastEntry.paperId + 1 : 1;
 

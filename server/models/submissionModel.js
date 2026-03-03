@@ -35,9 +35,20 @@ const submissionSchema = new mongoose.Schema(
       authorEmail: { type: String, required: true },
       authorAffiliation: { type: String, default: "" },
 
-      attachment: { type: String, default: "" },
+      attachment: {
+         downloadUrl: { type: String, default: "" },
+         viewUrl: { type: String, default: "" },
+      },
 
-      // Reviewer reference
+      // Reviewers reference (Multiple reviewers)
+      reviewers: [
+         {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "reviewer",
+         },
+      ],
+
+      // Keeping single reviewer for backward compatibility if needed, but primary logic should move to reviewers array
       reviewer: {
          type: mongoose.Schema.Types.ObjectId,
          ref: "reviewer",
@@ -51,7 +62,7 @@ const submissionSchema = new mongoose.Schema(
             "Under Review",
             "Accepted",
             "Rejected",
-            "Revision Required",
+            "Revision Requested", // Fixed typo "Revision Required" to match frontend
          ],
          default: "Pending",
       },
@@ -59,7 +70,18 @@ const submissionSchema = new mongoose.Schema(
       feedback: [
          {
             reviewer: { type: mongoose.Schema.Types.ObjectId, ref: "reviewer" },
-            comment: { type: String, required: true },
+
+            // Score Sheet (1-5)
+            scores: {
+               engineeringSignificance: { type: Number, default: 0 },
+               scientificSignificance: { type: Number, default: 0 },
+               completeness: { type: Number, default: 0 },
+               acknowledgement: { type: Number, default: 0 },
+               presentation: { type: Number, default: 0 },
+            },
+
+            bestPaperNomination: { type: String, default: "No" }, // Yes/No
+
             recommendation: {
                type: String,
                enum: [
@@ -70,6 +92,10 @@ const submissionSchema = new mongoose.Schema(
                ],
                default: "Under Review",
             },
+
+            confidentialComments: { type: String, default: "" }, // To Editor
+            comment: { type: String, required: true }, // To Author (Constructive feedback)
+
             createdAt: { type: Date, default: Date.now },
          },
       ],
@@ -81,8 +107,13 @@ const submissionSchema = new mongoose.Schema(
          type: String,
          default: `IPDIMS ${new Date().getFullYear()}`,
       },
+
+      // Workflow Flags for prioritize "Needs Action"
+      needsAdminAction: { type: Boolean, default: false },
+      needsReviewerAction: { type: Boolean, default: false },
+      needsAuthorAction: { type: Boolean, default: false },
    },
-   { timestamps: true }
+   { timestamps: true },
 );
 
 /* -----------------------------------------
@@ -95,7 +126,7 @@ submissionSchema.pre("save", async function (next) {
       const counter = await Counter.findByIdAndUpdate(
          { _id: "paperId" },
          { $inc: { seq: 1 } }, // seq = seq + 1
-         { new: true, upsert: true } // create if doesn't exist
+         { new: true, upsert: true }, // create if doesn't exist
       );
 
       this.paperId = counter.seq; // Assign incremented ID

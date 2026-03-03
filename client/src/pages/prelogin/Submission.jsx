@@ -7,14 +7,13 @@ const Submission = () => {
       <div className="bg-black text-white min-h-screen py-12 px-6 md:px-16 font-sans">
          {/* Header Section */}
          <div className="flex flex-col md:flex-row justify-center items-center gap-6 mb-12">
-            <h1 className="text-xl md:text-3xl font-extrabold text-blue-600 tracking-wide">
+            <h1 className="text-3xl md:text-5xl font-extrabold text-blue-500 text-center tracking-wide">
                Submit your Manuscript here
             </h1>
 
-            {/* Button */}
             <button
                onClick={() => navigate("/add-submission")}
-               className="px-6 py-3 rounded-lg bg-red-600 text-white font-semibold shadow-lg hover:bg-red-700 hover:scale-105 transition-transform duration-300"
+               className="mt-2 px-6 py-3 rounded-lg bg-red-600 text-white font-semibold shadow-lg hover:bg-red-700 hover:scale-105 transition-transform duration-300"
             >
                Add submission
             </button>
@@ -23,8 +22,8 @@ const Submission = () => {
          {/* Content Section */}
          <div className="space-y-8 max-w-5xl mx-auto">
             {/* Submission Guidelines */}
-            <section className="bg-white/10 backdrop-blur-xl border border-gray-700 shadow-lg rounded-2xl p-6 md:p-10 leading-relaxed">
-               <h2 className="text-2xl md:text-3xl font-bold text-blue-600 mb-4 border-b-2 border-green-500 pb-2">
+            <section className="bg-white/10 backdrop-blur-xl border border-gray-700 shadow-xl rounded-2xl p-6 md:p-8 leading-relaxed">
+               <h2 className="text-2xl md:text-3xl font-bold text-blue-400 mb-4 border-b border-green-500 pb-2">
                   Submission Guidelines
                </h2>
                <p className="mb-4 text-gray-300">
@@ -62,8 +61,8 @@ const Submission = () => {
             </section>
 
             {/* Policy on Plagiarism */}
-            <section className="bg-white/10 backdrop-blur-xl border border-gray-700 shadow-lg rounded-2xl p-6 md:p-10 leading-relaxed">
-               <h2 className="text-2xl md:text-3xl font-bold text-blue-600 mb-4 border-b-2 border-green-500 pb-2">
+            <section className="bg-white/10 backdrop-blur-xl border border-gray-700 shadow-xl rounded-2xl p-6 md:p-8 leading-relaxed">
+               <h2 className="text-2xl md:text-3xl font-bold text-blue-400 mb-4 border-b border-green-500 pb-2">
                   Policy on Plagiarism
                </h2>
                <p className="mb-4 text-gray-300">

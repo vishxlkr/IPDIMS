@@ -14,12 +14,12 @@ const ImportantDates = () => {
    ];
 
    return (
-      <div className="bg-black text-white min-h-screen py-12 px-6 md:px-16 font-sans">
-         <h2 className="text-3xl md:text-4xl font-extrabold text-center text-blue-600 mb-12 tracking-wide">
+      <div className="bg-black text-white min-h-screen py-10 px-6 font-sans">
+         <h2 className="text-3xl md:text-5xl font-extrabold text-blue-500 mb-10 text-center tracking-wide">
             Important Dates
          </h2>
 
-         <div className="max-w-4xl mx-auto bg-white/10 backdrop-blur-xl border border-gray-700 shadow-lg rounded-2xl p-8 space-y-6">
+         <div className="max-w-4xl mx-auto bg-white/10 backdrop-blur-xl border border-gray-700 shadow-xl rounded-2xl p-8 space-y-6">
             {dates.map((item, index) => (
                <div
                   key={index}

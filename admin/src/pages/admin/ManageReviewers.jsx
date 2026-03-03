@@ -59,7 +59,7 @@ const ManageReviewers = () => {
             `${backendUrl}/api/admin/all-reviewer`,
             {
                headers: { atoken },
-            }
+            },
          );
 
          if (data.success) {
@@ -70,7 +70,7 @@ const ManageReviewers = () => {
       } catch (error) {
          console.error("Error fetching reviewers:", error);
          toast.error(
-            error.response?.data?.message || "Error fetching reviewers"
+            error.response?.data?.message || "Error fetching reviewers",
          );
       } finally {
          setLoading(false);
@@ -91,7 +91,7 @@ const ManageReviewers = () => {
                   .includes(searchTerm.toLowerCase()) ||
                reviewer.organization
                   ?.toLowerCase()
-                  .includes(searchTerm.toLowerCase())
+                  .includes(searchTerm.toLowerCase()),
          );
       }
 
@@ -104,7 +104,7 @@ const ManageReviewers = () => {
             `${backendUrl}/api/admin/reviewer/${reviewerId}`,
             {
                headers: { atoken },
-            }
+            },
          );
 
          if (data.success) {
@@ -124,14 +124,14 @@ const ManageReviewers = () => {
             {
                isActive: !currentStatus,
             },
-            { headers: { atoken } }
+            { headers: { atoken } },
          );
 
          if (data.success) {
             toast.success(
                `Reviewer ${
                   !currentStatus ? "activated" : "deactivated"
-               } successfully!`
+               } successfully!`,
             );
             fetchReviewers();
          } else {
@@ -140,7 +140,7 @@ const ManageReviewers = () => {
       } catch (error) {
          console.error("Error updating reviewer status:", error);
          toast.error(
-            error.response?.data?.message || "Failed to update status"
+            error.response?.data?.message || "Failed to update status",
          );
       }
    };
@@ -190,7 +190,7 @@ const ManageReviewers = () => {
                   atoken,
                   "Content-Type": "multipart/form-data",
                },
-            }
+            },
          );
 
          if (data.success) {
@@ -304,7 +304,7 @@ const ManageReviewers = () => {
                                  onClick={() =>
                                     handleToggleStatus(
                                        reviewer._id,
-                                       reviewer.isActive
+                                       reviewer.isActive,
                                     )
                                  }
                                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -427,7 +427,7 @@ const ManageReviewers = () => {
                               value={formData.name}
                               onChange={handleInputChange}
                               required
-                              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                               placeholder="Enter full name"
                            />
                         </div>
@@ -442,7 +442,7 @@ const ManageReviewers = () => {
                               value={formData.email}
                               onChange={handleInputChange}
                               required
-                              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-4 py-2.5 text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                               placeholder="Enter email"
                            />
                         </div>
@@ -458,7 +458,7 @@ const ManageReviewers = () => {
                               onChange={handleInputChange}
                               required
                               minLength={8}
-                              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-4 py-2.5 border text-gray-700 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                               placeholder="Min. 8 characters"
                            />
                         </div>
@@ -472,7 +472,7 @@ const ManageReviewers = () => {
                               name="phone"
                               value={formData.phone}
                               onChange={handleInputChange}
-                              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-4 py-2.5 border text-gray-700 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                               placeholder="Enter phone number"
                            />
                         </div>
@@ -486,7 +486,7 @@ const ManageReviewers = () => {
                               name="designation"
                               value={formData.designation}
                               onChange={handleInputChange}
-                              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-4 py-2.5 border text-gray-700 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                               placeholder="e.g. Professor, Associate Professor"
                            />
                         </div>
@@ -500,7 +500,7 @@ const ManageReviewers = () => {
                               name="organization"
                               value={formData.organization}
                               onChange={handleInputChange}
-                              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-4 py-2.5 border text-gray-700 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                               placeholder="Enter organization"
                            />
                         </div>
@@ -513,7 +513,7 @@ const ManageReviewers = () => {
                               name="gender"
                               value={formData.gender}
                               onChange={handleInputChange}
-                              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-4 py-2.5 text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                            >
                               <option value="">Select gender</option>
                               <option value="Male">Male</option>
@@ -530,7 +530,7 @@ const ManageReviewers = () => {
                               type="file"
                               accept="image/*"
                               onChange={handleImageChange}
-                              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-4 py-2.5 text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                            />
                         </div>
                      </div>
@@ -544,7 +544,7 @@ const ManageReviewers = () => {
                            name="specialization"
                            value={formData.specialization}
                            onChange={handleInputChange}
-                           className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           className="w-full px-4 py-2.5 text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                            placeholder="e.g. Machine Learning, AI, Data Science"
                         />
                      </div>
@@ -558,7 +558,7 @@ const ManageReviewers = () => {
                            name="address"
                            value={formData.address}
                            onChange={handleInputChange}
-                           className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           className="w-full px-4 py-2.5 text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                            placeholder="Enter address"
                         />
                      </div>
@@ -572,7 +572,7 @@ const ManageReviewers = () => {
                            value={formData.bio}
                            onChange={handleInputChange}
                            rows="3"
-                           className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           className="w-full px-4 py-2.5 text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                            placeholder="Brief bio about the reviewer"
                         ></textarea>
                      </div>
@@ -742,7 +742,7 @@ const ManageReviewers = () => {
                                        >
                                           {spec}
                                        </span>
-                                    )
+                                    ),
                                  )}
                               </div>
                            </div>

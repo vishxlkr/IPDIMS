@@ -324,7 +324,7 @@ const Registration = () => {
                   Authorization: `Bearer ${token}`,
                   "Content-Type": "multipart/form-data",
                },
-            }
+            },
          );
 
          if (res.data.success) {
@@ -362,7 +362,7 @@ const Registration = () => {
 
          <div className="max-w-5xl mx-auto space-y-12">
             <header className="text-center">
-               <h2 className="text-3xl md:text-4xl font-bold text-indigo-400 mb-6">
+               <h2 className="text-3xl md:text-5xl font-extrabold text-blue-500 mb-10 tracking-wide">
                   Registration
                </h2>
             </header>
@@ -390,7 +390,7 @@ const Registration = () => {
                <form className="space-y-6" onSubmit={handleSubmit}>
                   {/* Paper Title */}
                   <div>
-                     <label className="block font-semibold mb-2 text-indigo-300">
+                     <label className="block font-semibold mb-2 text-blue-300">
                         Paper Title
                      </label>
                      <input
@@ -406,7 +406,7 @@ const Registration = () => {
 
                   {/* Presenter Info */}
                   <div>
-                     <h4 className="text-lg font-bold text-indigo-300 mb-4">
+                     <h4 className="text-lg font-bold text-blue-300 mb-4">
                         Presenter Details
                      </h4>
                      <div className="grid md:grid-cols-2 gap-6">
@@ -485,7 +485,7 @@ const Registration = () => {
 
                   {/* Registration Category */}
                   <div>
-                     <label className="block font-semibold mb-2 text-indigo-300">
+                     <label className="block font-semibold mb-2 text-blue-300">
                         Registration Category
                      </label>
                      <select
@@ -504,7 +504,7 @@ const Registration = () => {
 
                   {/* Registration Type */}
                   <div>
-                     <label className="block font-semibold mb-2 text-indigo-300">
+                     <label className="block font-semibold mb-2 text-blue-300">
                         Type of Registration
                      </label>
                      <select
@@ -520,7 +520,7 @@ const Registration = () => {
 
                   {/* Payment Details */}
                   <div>
-                     <h4 className="text-lg font-bold text-indigo-300 mb-4">
+                     <h4 className="text-lg font-bold text-blue-300 mb-4">
                         Payment Details
                      </h4>
                      <div className="grid md:grid-cols-2 gap-6">
@@ -583,7 +583,7 @@ const Registration = () => {
 
                   {/* Accommodation */}
                   <div>
-                     <h4 className="text-lg font-bold text-indigo-300 mb-4">
+                     <h4 className="text-lg font-bold text-blue-300 mb-4">
                         Accommodation Requirement
                      </h4>
                      <div className="flex gap-6">
@@ -613,7 +613,7 @@ const Registration = () => {
 
                   {/* Food */}
                   <div>
-                     <h4 className="text-lg font-bold text-indigo-300 mb-4">
+                     <h4 className="text-lg font-bold text-blue-300 mb-4">
                         Food Preference
                      </h4>
                      <div className="flex gap-6">
@@ -652,7 +652,7 @@ const Registration = () => {
 
                   {/* Additional Notes */}
                   <div>
-                     <label className="block font-semibold mb-2 text-indigo-300">
+                     <label className="block font-semibold mb-2 text-blue-300">
                         Additional Notes
                      </label>
                      <textarea
@@ -668,7 +668,7 @@ const Registration = () => {
                      <button
                         type="submit"
                         disabled={loading}
-                        className="bg-indigo-600 text-white px-8 py-3 rounded-lg shadow-lg hover:bg-indigo-700 hover:scale-105 transition-transform duration-300"
+                        className="bg-blue-600 text-white px-8 py-3 rounded-lg shadow-xl hover:bg-blue-700 hover:scale-105 transition-transform duration-300"
                      >
                         {loading ? "Registering..." : "Register"}
                      </button>

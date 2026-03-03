@@ -38,27 +38,37 @@ const ContactUs = () => {
    ];
 
    return (
-      <div className=" bg-black text-white max-w-5xl mx-auto py-12 px-6 ">
-         <h1 className="text-3xl md:text-4xl font-bold text-blue-500 mb-10 border-b-2 border-green-500 pb-3">
-            Contact Us
-         </h1>
+      <div className="bg-black text-white min-h-screen py-10 px-6 font-sans">
+         <div className="max-w-7xl mx-auto">
+            <h1 className="text-3xl md:text-5xl font-extrabold text-blue-500 mb-10 text-center tracking-wide">
+               Contact Us
+            </h1>
 
-         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {contacts.map((person, idx) => (
-               <div
-                  key={idx}
-                  className="bg-white/10 border p-6 rounded-xl shadow-lg hover:scale-101 transition-transform duration-300"
-               >
-                  <h2 className="text-xl font-bold text-white mb-2">
-                     {person.name}
-                  </h2>
-                  <p className="text-sm text-green-400 mb-1">{person.role}</p>
-                  <p className="text-gray-300">{person.designation}</p>
-                  <p className="text-gray-300">{person.dept}</p>
-                  <p className="text-gray-300 mb-2">{person.institute}</p>
-                  <p className="text-gray-400">📞 {person.phone}</p>
-               </div>
-            ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+               {contacts.map((person, idx) => (
+                  <div
+                     key={idx}
+                     className="bg-white/10 backdrop-blur-xl border border-gray-700 p-8 rounded-2xl shadow-xl hover:scale-105 transition-transform duration-300"
+                  >
+                     <h2 className="text-2xl font-bold text-blue-400 mb-2">
+                        {person.name}
+                     </h2>
+                     <p className="text-sm text-green-400 font-semibold mb-1">
+                        {person.role}
+                     </p>
+                     <p className="text-gray-300 text-lg">
+                        {person.designation}
+                     </p>
+                     <p className="text-gray-300 text-lg">{person.dept}</p>
+                     <p className="text-gray-300 mb-2 text-lg">
+                        {person.institute}
+                     </p>
+                     <p className="text-gray-400 font-medium">
+                        📞 {person.phone}
+                     </p>
+                  </div>
+               ))}
+            </div>
          </div>
       </div>
    );

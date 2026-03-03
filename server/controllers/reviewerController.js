@@ -22,7 +22,7 @@ export const loginReviewer = async (req, res) => {
       const token = jwt.sign(
          { id: reviewer._id, role: "reviewer" },
          process.env.JWT_SECRET,
-         { expiresIn: "7d" }
+         { expiresIn: "7d" },
       );
       res.json({ success: true, token, reviewer });
    } catch (error) {
@@ -68,7 +68,7 @@ export const updateReviewerProfile = async (req, res) => {
                   ...(phone && { phone }),
                },
             },
-            { new: true, runValidators: true }
+            { new: true, runValidators: true },
          )
          .select("-password");
 
@@ -98,9 +98,11 @@ export const getAssignedSubmissions = async (req, res) => {
       const reviewerId = req.user.id;
 
       const submissions = await submissionModel
-         .find({ reviewer: reviewerId })
+         .find({
+            $or: [{ reviewer: reviewerId }, { reviewers: reviewerId }],
+         })
          .populate("author", "name email affiliation")
-         .sort({ createdAt: -1 });
+         .sort({ needsReviewerAction: -1, updatedAt: -1 }); // Reviewer Sort
 
       res.json({
          success: true,
@@ -123,8 +125,16 @@ export const getAssignedSubmissionById = async (req, res) => {
       const { id } = req.params;
 
       const submission = await submissionModel
-         .findOne({ _id: id, reviewer: reviewerId }) // ensure assigned to that reviewer
-         .populate("author", "name email affiliation");
+         .findOne({
+            _id: id,
+            $or: [{ reviewer: reviewerId }, { reviewers: reviewerId }],
+         }) // ensure assigned to that reviewer
+         .populate("author", "name email affiliation")
+         .populate({
+            path: "feedback.reviewer",
+            model: "reviewer",
+            select: "name email",
+         });
 
       if (!submission)
          return res.status(404).json({
@@ -147,23 +157,25 @@ export const getDashboardStats = async (req, res) => {
    try {
       const reviewerId = req.user.id;
 
-      const total = await submissionModel.countDocuments({
-         reviewer: reviewerId,
-      });
+      const query = {
+         $or: [{ reviewer: reviewerId }, { reviewers: reviewerId }],
+      };
+
+      const total = await submissionModel.countDocuments(query);
       const pending = await submissionModel.countDocuments({
-         reviewer: reviewerId,
-         status: "Under Review",
+         ...query,
+         status: { $in: ["Pending", "Under Review"] },
       });
       const accepted = await submissionModel.countDocuments({
-         reviewer: reviewerId,
+         ...query,
          status: "Accepted",
       });
       const rejected = await submissionModel.countDocuments({
-         reviewer: reviewerId,
+         ...query,
          status: "Rejected",
       });
       const revisionRequested = await submissionModel.countDocuments({
-         reviewer: reviewerId,
+         ...query,
          status: "Revision Requested",
       });
 
@@ -189,13 +201,19 @@ export const getDashboardStats = async (req, res) => {
 export const submitReview = async (req, res) => {
    try {
       const { id: submissionId } = req.params;
-      const reviewerId = req.user.id; // comes from auth middleware
-      const { feedbackText, rating, decision } = req.body;
+      const reviewerId = req.user.id;
+      const {
+         feedbackText,
+         decision,
+         scores,
+         bestPaperNomination,
+         confidentialComments,
+      } = req.body;
 
       // ✅ Check if submission exists and assigned to this reviewer
       const submission = await submissionModel.findOne({
          _id: submissionId,
-         reviewer: reviewerId,
+         $or: [{ reviewer: reviewerId }, { reviewers: reviewerId }],
       });
 
       if (!submission) {
@@ -212,17 +230,48 @@ export const submitReview = async (req, res) => {
          });
       }
 
-      // ✅ Add new feedback entry at top (newest first)
-      submission.feedback.unshift({
-         reviewer: reviewerId,
-         comment: feedbackText, // ✅ FIXED
-         rating: rating || null,
-         recommendation: decision || "Under Review", // ✅ match your schema naming
-         reviewedAt: new Date(),
-      });
+      // ✅ Check if reviewer has already submitted feedback
+      const existingFeedbackIndex = submission.feedback.findIndex(
+         (f) => f.reviewer.toString() === reviewerId,
+      );
+
+      if (existingFeedbackIndex !== -1) {
+         // Update existing feedback
+         const fb = submission.feedback[existingFeedbackIndex];
+         fb.comment = feedbackText;
+         fb.confidentialComments = confidentialComments || "";
+         fb.recommendation = decision || "Under Review";
+         fb.scores = scores || {};
+         fb.bestPaperNomination = bestPaperNomination || "No";
+         // We keep original createdAt and reviewer
+      } else {
+         // Add new feedback entry at top (newest first)
+         submission.feedback.unshift({
+            reviewer: reviewerId,
+            comment: feedbackText, // Comments to Author
+            confidentialComments: confidentialComments || "",
+            recommendation: decision || "Under Review",
+            scores: scores || {}, // { engineeringSignificance: 5, ... }
+            bestPaperNomination: bestPaperNomination || "No",
+            createdAt: new Date(),
+         });
+      }
+
+      // 3. Reviewer submits review -> Needs Admin Action
+      // 6. Reviewer re-reviews -> Needs Admin Action
+      submission.needsAdminAction = true;
+      submission.needsReviewerAction = false;
+      // submission.needsAuthorAction = false; // Already false mostly
+
+      // ✅ Avoid overwriting status if multiple reviewers are working independently
+      // Or set status based on logic. Currently keeping existing logic minimal or just logging feedback.
+      // submission.status = decision || "Under Review";
 
       // ✅ Update submission status to reviewer’s decision
       // submission.status = decision || "Under Review";
+
+      // Explicitly update timestamp to ensure it floats to top
+      submission.updatedAt = new Date(); // Mongoose handles this, but forcing just in case
       await submission.save();
 
       res.status(200).json({

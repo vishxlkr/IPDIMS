@@ -2,21 +2,21 @@ import React from "react";
 
 const Venue = () => {
    return (
-      <div className="bg-black text-white min-h-screen py-12 px-6 md:px-16 font-sans">
-         <div className="max-w-5xl mx-auto space-y-12">
+      <div className="bg-black text-white min-h-screen py-10 px-6 font-sans">
+         <div className="max-w-7xl mx-auto space-y-8">
             {/* Page Title */}
             <header className="text-center">
-               <h1 className="text-3xl md:text-4xl font-bold text-blue-500 mb-6 border-b-2 border-green-500 pb-3">
+               <h1 className="text-3xl md:text-5xl font-extrabold text-blue-500 mb-10 text-center tracking-wide">
                   Venue & Accommodation
                </h1>
             </header>
 
             {/* Venue Section */}
-            <section className="bg-white/10 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-lg p-6 md:p-8 hover:scale-102 transition-transform duration-300">
-               <h2 className="text-2xl font-semibold text-white mb-3 border-b border-green-500 pb-2">
+            <section className="bg-white/10 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-xl p-6 md:p-8 hover:scale-102 transition-transform duration-300">
+               <h2 className="text-2xl font-bold text-blue-400 mb-4 border-b border-green-500 pb-2">
                   Venue
                </h2>
-               <p className="text-gray-300 leading-relaxed">
+               <p className="text-gray-300 leading-relaxed text-lg">
                   Department of Industrial Design <br />
                   National Institute of Technology, Rourkela <br />
                   Odisha – 769008
@@ -24,11 +24,11 @@ const Venue = () => {
             </section>
 
             {/* Accommodation Section */}
-            <section className="bg-white/10 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-lg p-6 md:p-8 hover:scale-102 transition-transform duration-300">
-               <h2 className="text-2xl font-semibold text-white mb-3 border-b border-green-500 pb-2">
+            <section className="bg-white/10 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-xl p-6 md:p-8 hover:scale-102 transition-transform duration-300">
+               <h2 className="text-2xl font-bold text-blue-400 mb-4 border-b border-green-500 pb-2">
                   Accommodation
                </h2>
-               <p className="text-gray-300 leading-relaxed">
+               <p className="text-gray-300 leading-relaxed text-lg">
                   Limited institute guest house accommodation is available on a{" "}
                   <span className="text-green-500 font-medium">
                      first-come-first-serve basis
@@ -40,11 +40,11 @@ const Venue = () => {
             </section>
 
             {/* Reach Us Section */}
-            <section className="bg-white/10 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-lg p-6 md:p-8 hover:scale-102 transition-transform duration-300">
-               <h2 className="text-2xl font-semibold text-white mb-3 border-b border-green-500 pb-2">
+            <section className="bg-white/10 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-xl p-6 md:p-8 hover:scale-102 transition-transform duration-300">
+               <h2 className="text-2xl font-bold text-blue-400 mb-4 border-b border-green-500 pb-2">
                   Reach Us
                </h2>
-               <p className="text-gray-300 leading-relaxed">
+               <p className="text-gray-300 leading-relaxed text-lg">
                   The city of Rourkela is a bustling industrial town,
                   cosmopolitan by nature and is well connected to all parts of
                   the country by road and rail. It is en-route Howrah–Mumbai

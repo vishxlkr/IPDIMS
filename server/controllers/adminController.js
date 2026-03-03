@@ -209,9 +209,23 @@ export const getAllSubmissions = async (req, res) => {
    try {
       const submissions = await submissionModel
          .find()
-         .sort({ createdAt: -1 }) // newest first
+         .sort({ needsAdminAction: -1, updatedAt: -1 }) // Admin Sort
          .populate("author", "name email affiliation") // optional, if author is referenced
-         .populate("reviewer", "name email");
+         .populate("reviewers", "name email");
+
+      // Debug log to verify usage of endpoint and sorting
+      console.log(
+         "Admin getAllSubmissions called. Returning count:",
+         submissions.length,
+      );
+      if (submissions.length > 0) {
+         console.log(
+            "Top submission:",
+            submissions[0]._id,
+            "NeedsAdmin:",
+            submissions[0].needsAdminAction,
+         );
+      }
 
       res.status(200).json({
          success: true,
@@ -233,8 +247,12 @@ export const getSubmissionById = async (req, res) => {
       const submission = await submissionModel
          .findById(req.params.id)
          .populate("author", "name email organization") // populate user info
-         .populate("reviewer", "name email organization") // populate reviewer info
-         .populate("feedback.reviewer", "name email");
+         .populate("reviewers", "name email organization") // populate reviewer info
+         .populate({
+            path: "feedback.reviewer",
+            model: "reviewer",
+            select: "name email image",
+         });
 
       if (!submission) {
          return res
@@ -242,10 +260,13 @@ export const getSubmissionById = async (req, res) => {
             .json({ success: false, message: "Submission not found" });
       }
 
-      // Sort feedback newest first
-      submission.feedback = submission.feedback.sort(
-         (a, b) => b.createdAt - a.createdAt
-      );
+      // Sort feedback newest first if not already sorted by query
+      // (Though mongoose find usually returns document order, explicit sort on array is good)
+      if (submission.feedback && submission.feedback.length > 0) {
+         submission.feedback.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+         );
+      }
 
       res.status(200).json({ success: true, submission });
    } catch (error) {
@@ -262,81 +283,140 @@ export const getSubmissionById = async (req, res) => {
 // ----------------------------
 export const assignSubmission = async (req, res) => {
    try {
-      const { submissionId, reviewerId } = req.body;
+      const { submissionId, reviewerIds } = req.body;
 
-      if (!submissionId || !reviewerId) {
+      if (!submissionId || !reviewerIds || !Array.isArray(reviewerIds)) {
          return res.status(400).json({
             success: false,
-            message: "Submission ID and Reviewer ID are required",
+            message: "Submission ID and Reviewer IDs (array) are required",
          });
       }
 
       const submission = await submissionModel.findById(submissionId);
-      const reviewer = await reviewerModel.findById(reviewerId);
 
       if (!submission) {
          return res
             .status(404)
             .json({ success: false, message: "Submission not found" });
       }
-      if (!reviewer) {
-         return res
-            .status(404)
-            .json({ success: false, message: "Reviewer not found" });
+
+      // Update submission with new list of reviewers
+      submission.reviewers = reviewerIds;
+
+      // Update status if it was pending and now has reviewers
+      if (submission.status === "Pending" && reviewerIds.length > 0) {
+         submission.status = "Under Review";
+      } else if (
+         reviewerIds.length === 0 &&
+         submission.status === "Under Review"
+      ) {
+         // Optional: revert to pending if all reviewers removed?
+         // keeping it simple for now
+         submission.status = "Pending";
       }
 
-      // Assign submission
-      submission.reviewer = reviewerId;
-      submission.status = "Under Review";
+      // 2. Admin assigns reviewer -> Needs Reviewer Action
+      if (reviewerIds.length > 0) {
+         submission.needsReviewerAction = true;
+         submission.needsAdminAction = false;
+         submission.needsAuthorAction = false;
+      }
+      // If reviewer removed, maybe revert flags?
+      // Assuming typical workflow: Assign -> Reviewer sees it.
+
+      // Backward compatibility (optional, set first reviewer as main 'reviewer' field)
+      if (reviewerIds.length > 0) {
+         submission.reviewer = reviewerIds[0];
+      } else {
+         submission.reviewer = null;
+      }
+
       await submission.save();
 
-      // Add submission to reviewer's assigned list if not already present
-      if (!reviewer.assignedSubmissions.includes(submissionId)) {
-         reviewer.assignedSubmissions.push(submissionId);
+      // Update reviewers' assigned lists (add if not present)
+      // Note: optimally we should also remove this submission from reviewers who were unassigned
+      // For simplicity/safety, we'll just add it to the new ones for now or do a bulk update
+
+      // 1. Remove submission from all reviewers (clean slate approach for this submission)
+      // This might be heavy if many reviewers, but accurate
+      await reviewerModel.updateMany(
+         { assignedSubmissions: submissionId },
+         { $pull: { assignedSubmissions: submissionId } },
+      );
+
+      // 2. Add to selected reviewers
+      if (reviewerIds.length > 0) {
+         await reviewerModel.updateMany(
+            { _id: { $in: reviewerIds } },
+            {
+               $addToSet: { assignedSubmissions: submissionId },
+               $set: { lastAssignedAt: new Date() },
+            },
+         );
       }
-      reviewer.lastAssignedAt = new Date();
-      await reviewer.save();
 
       // Populate for response
       const populatedSubmission = await submissionModel
          .findById(submissionId)
          .populate("author", "name email organization")
-         .populate("reviewer", "name email organization");
+         .populate("reviewers", "name email organization");
 
-      // ✅ Send email notification to reviewer
-      try {
-         const subject = "New Paper Assigned For Review";
-         const message = `
+      // Send email to newly assigned reviewers
+      const newReviewers = await reviewerModel.find({
+         _id: { $in: reviewerIds },
+      });
+
+      for (const reviewer of newReviewers) {
+         try {
+            // Generate magic token
+            const token = jwt.sign(
+               { id: reviewer._id, role: "reviewer" },
+               process.env.JWT_SECRET,
+               { expiresIn: "7d" },
+            );
+
+            // Access client URL from env
+            const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+            const magicLink = `${clientUrl}/reviewer-access?token=${token}`;
+
+            const subject =
+               "New Paper Assigned For Review - Access Link Inside";
+            const message = `
 Hello ${reviewer.name},
 
 You have been assigned a new paper for review.
 
 Paper Details:
-📄 Title: ${submission.title}
-👤 Author: ${submission.authorName}
-📧 Author Email: ${submission.authorEmail}
-👉 Download Paper: ${submission.attachment}
+Title: ${submission.title}
+Author: ${submission.authorName || "N/A"}
 
-Please log in to your reviewer dashboard to review the paper.
+Click here to review the paper directly (No manual login required):
+${magicLink}
+
+This link is valid for 7 days.
 
 Regards,
 Team IPDIMS
-         `;
+`;
 
-         await sendEmail({
-            email: reviewer.email,
-            subject,
-            message,
-         });
+            await sendEmail({
+               email: reviewer.email,
+               subject: subject,
+               message: message,
+            });
 
-         console.log("📧 Reviewer notified:", reviewer.email);
-      } catch (emailErr) {
-         console.error("❌ Failed to send reviewer email:", emailErr.message);
+            console.log("Email sent to reviewer:", reviewer.email);
+         } catch (emailErr) {
+            console.error(
+               `Failed to send reviewer email to ${reviewer.email}:`,
+               emailErr.message,
+            );
+         }
       }
 
       res.status(200).json({
          success: true,
-         message: "Submission assigned successfully",
+         message: "Reviewers assigned successfully",
          submission: populatedSubmission,
       });
    } catch (error) {
@@ -373,6 +453,21 @@ export const changeSubmissionStatus = async (req, res) => {
       }
 
       submission.status = status;
+
+      // 4. Admin decision logic for workflow flags
+      if (status === "Revision Requested") {
+         submission.needsAuthorAction = true;
+         submission.needsAdminAction = false;
+         submission.needsReviewerAction = false;
+      } else if (status === "Accepted" || status === "Rejected") {
+         // Completed / History
+         submission.needsAuthorAction = false;
+         submission.needsAdminAction = false;
+         submission.needsReviewerAction = false;
+      }
+      // If status is "Under Review", it might have been set by Assign or something else.
+      // But typically Admin changes to one of the above.
+
       await submission.save();
 
       console.log("✅ Status updated to:", status);

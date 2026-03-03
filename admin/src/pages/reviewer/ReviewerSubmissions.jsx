@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
-   Eye,
+   Info,
    Search,
    Filter,
    Download,
@@ -19,6 +19,15 @@ import {
 } from "lucide-react";
 import { AdminContext } from "../../context/AdminContext";
 
+// PDF Viewer Imports
+import { Viewer, Worker } from "@react-pdf-viewer/core";
+import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
+import "@react-pdf-viewer/core/lib/styles/index.css";
+import "@react-pdf-viewer/default-layout/lib/styles/index.css";
+
+// Use a specific version of pdfjs-dist worker that matches the installed version
+const pdfjsVersion = "3.11.174";
+
 const ReviewerSubmissions = () => {
    const [submissions, setSubmissions] = useState([]);
    const [filteredSubmissions, setFilteredSubmissions] = useState([]);
@@ -28,12 +37,29 @@ const ReviewerSubmissions = () => {
    const [selectedSubmission, setSelectedSubmission] = useState(null);
    const [showDetailsModal, setShowDetailsModal] = useState(false);
    const [showReviewModal, setShowReviewModal] = useState(false);
-   const [feedbackText, setFeedbackText] = useState("");
-   const [decision, setDecision] = useState("Under Review");
-   const [rating, setRating] = useState("");
-   const [feedbacks, setFeedbacks] = useState([]); // 🆕 to show all previous feedbacks
 
-   // const backendUrl = "http://localhost:4000";
+   // Review Form State
+   const [feedbackText, setFeedbackText] = useState(""); // This will be "Comments to the Author"
+   const [confidentialComments, setConfidentialComments] = useState("");
+   const [decision, setDecision] = useState("Under Review");
+   const [rating, setRating] = useState(""); // Will hold "Overall Recommendation" like Accept/Reject for now or numerical
+   const [isBestPaper, setIsBestPaper] = useState("No");
+
+   const [scores, setScores] = useState({
+      engineeringSignificance: "",
+      scientificSignificance: "",
+      completeness: "",
+      acknowledgement: "",
+      presentation: "",
+   });
+
+   const [initialFormState, setInitialFormState] = useState(null);
+
+   const [feedbacks, setFeedbacks] = useState([]);
+
+   // Create new plugin instance
+   const defaultLayoutPluginInstance = defaultLayoutPlugin();
+
    const { backendUrl } = useContext(AdminContext);
    const rtoken = localStorage.getItem("rToken");
 
@@ -52,7 +78,7 @@ const ReviewerSubmissions = () => {
             `${backendUrl}/api/reviewer/submissions`,
             {
                headers: { rtoken },
-            }
+            },
          );
 
          if (data.success) {
@@ -63,7 +89,7 @@ const ReviewerSubmissions = () => {
       } catch (error) {
          console.error("Error fetching submissions:", error);
          toast.error(
-            error.response?.data?.message || "Error fetching submissions"
+            error.response?.data?.message || "Error fetching submissions",
          );
       } finally {
          setLoading(false);
@@ -84,7 +110,7 @@ const ReviewerSubmissions = () => {
                   .includes(searchTerm.toLowerCase()) ||
                sub.author?.name
                   ?.toLowerCase()
-                  .includes(searchTerm.toLowerCase())
+                  .includes(searchTerm.toLowerCase()),
          );
       }
       setFilteredSubmissions(filtered);
@@ -94,12 +120,12 @@ const ReviewerSubmissions = () => {
       try {
          const { data } = await axios.get(
             `${backendUrl}/api/reviewer/submissions/${submissionId}`,
-            { headers: { rtoken } }
+            { headers: { rtoken } },
          );
 
          if (data.success) {
             const sortedFeedbacks = (data.submission.feedback || []).sort(
-               (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+               (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
             );
             setFeedbacks(sortedFeedbacks);
             setSelectedSubmission(data.submission);
@@ -111,17 +137,102 @@ const ReviewerSubmissions = () => {
       }
    };
 
+   const handleDownload = async (url, filename) => {
+      try {
+         const response = await fetch(url);
+         const blob = await response.blob();
+         const blobUrl = window.URL.createObjectURL(
+            new Blob([blob], { type: "application/pdf" }),
+         );
+
+         const link = document.createElement("a");
+         link.href = blobUrl;
+         link.download = filename.endsWith(".pdf")
+            ? filename
+            : `${filename}.pdf`;
+         document.body.appendChild(link);
+         link.click();
+         document.body.removeChild(link);
+         window.URL.revokeObjectURL(blobUrl);
+      } catch (error) {
+         console.error("Download failed:", error);
+         toast.error("Failed to download file");
+      }
+   };
+
    const openReviewModal = (submission) => {
       setSelectedSubmission(submission);
-      setFeedbackText("");
-      setDecision("Under Review");
-      setRating("");
+
+      //Decode token to get current reviewer ID
+      let currentReviewerId = null;
+      if (rtoken) {
+         try {
+            const payload = JSON.parse(atob(rtoken.split(".")[1]));
+            currentReviewerId = payload.id;
+         } catch (e) {
+            console.error("Error decoding token for reviewer ID", e);
+         }
+      }
+
+      // Check if feedback already exists for this reviewer
+      const existingFeedback = submission.feedback?.find((fb) => {
+         const revId = fb.reviewer?._id || fb.reviewer;
+         return String(revId) === String(currentReviewerId);
+      });
+
+      let startState = {};
+
+      if (existingFeedback) {
+         startState = {
+            feedbackText: existingFeedback.comment || "",
+            confidentialComments: existingFeedback.confidentialComments || "",
+            isBestPaper: existingFeedback.bestPaperNomination || "No",
+            scores: existingFeedback.scores || {
+               engineeringSignificance: "",
+               scientificSignificance: "",
+               completeness: "",
+               acknowledgement: "",
+               presentation: "",
+            },
+            decision: existingFeedback.recommendation || "Under Review",
+         };
+      } else {
+         startState = {
+            feedbackText: "",
+            confidentialComments: "",
+            isBestPaper: "No",
+            scores: {
+               engineeringSignificance: "",
+               scientificSignificance: "",
+               completeness: "",
+               acknowledgement: "",
+               presentation: "",
+            },
+            decision: "Under Review",
+         };
+      }
+
+      setFeedbackText(startState.feedbackText);
+      setConfidentialComments(startState.confidentialComments);
+      setIsBestPaper(startState.isBestPaper);
+      setScores(startState.scores);
+      setDecision(startState.decision);
+      setInitialFormState(startState);
+
       setShowReviewModal(true);
    };
 
    const handleSubmitReview = async () => {
+      // Validate all required fields
       if (!feedbackText.trim()) {
-         toast.error("Please provide feedback");
+         toast.error("Please provide comments to the author");
+         return;
+      }
+
+      // Check if all scores are filled
+      const allScoresFilled = Object.values(scores).every((s) => s !== "");
+      if (!allScoresFilled) {
+         toast.error("Please complete all scoring criteria");
          return;
       }
 
@@ -129,11 +240,13 @@ const ReviewerSubmissions = () => {
          const { data } = await axios.post(
             `${backendUrl}/api/reviewer/submissions/${selectedSubmission._id}/review`,
             {
-               feedbackText,
-               rating: rating || null,
-               decision,
+               feedbackText, // Comments to Author
+               decision, // Recommendation
+               scores, // Structured scores object
+               bestPaperNomination: isBestPaper,
+               confidentialComments,
             },
-            { headers: { rtoken } }
+            { headers: { rtoken } },
          );
 
          if (data.success) {
@@ -142,6 +255,15 @@ const ReviewerSubmissions = () => {
             setFeedbackText("");
             setDecision("Under Review");
             setRating("");
+            setConfidentialComments("");
+            setIsBestPaper("No");
+            setScores({
+               engineeringSignificance: "",
+               scientificSignificance: "",
+               completeness: "",
+               acknowledgement: "",
+               presentation: "",
+            });
             fetchSubmissions();
          } else {
             toast.error(data.message || "Failed to submit review");
@@ -149,7 +271,7 @@ const ReviewerSubmissions = () => {
       } catch (error) {
          console.error("Error submitting review:", error);
          toast.error(
-            error.response?.data?.message || "Failed to submit review"
+            error.response?.data?.message || "Failed to submit review",
          );
       }
    };
@@ -158,6 +280,31 @@ const ReviewerSubmissions = () => {
       return (
          <div className="flex items-center justify-center min-h-screen bg-gray-50">
             <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+         </div>
+      );
+   }
+
+   const isFormDirty = () => {
+      // If initialFormState is not set yet, assume false to disable button
+      if (!initialFormState) return false;
+
+      // Deep compare scores
+      const scoresChanged =
+         JSON.stringify(scores) !== JSON.stringify(initialFormState.scores);
+
+      return (
+         scoresChanged ||
+         feedbackText !== initialFormState.feedbackText ||
+         confidentialComments !== initialFormState.confidentialComments ||
+         isBestPaper !== initialFormState.isBestPaper ||
+         decision !== initialFormState.decision
+      );
+   };
+
+   if (loading) {
+      return (
+         <div className="flex items-center justify-center min-h-screen bg-gray-50">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
          </div>
       );
    }
@@ -240,7 +387,7 @@ const ReviewerSubmissions = () => {
                                  <td className="px-6 py-4 font-semibold text-gray-700">
                                     {submission.paperId ?? "-"}
                                  </td>
-                                 <td className="px-6 py-4">
+                                 <td className="px-6 py-4 text-gray-800">
                                     {submission.title || "Untitled"}
                                  </td>
                                  <td className="px-6 py-4">
@@ -257,11 +404,11 @@ const ReviewerSubmissions = () => {
                                           submission.status === "Accepted"
                                              ? "bg-green-100 text-green-800"
                                              : submission.status === "Rejected"
-                                             ? "bg-red-100 text-red-800"
-                                             : submission.status ===
-                                               "Revision Required"
-                                             ? "bg-orange-100 text-orange-800"
-                                             : "bg-blue-100 text-blue-800"
+                                               ? "bg-red-100 text-red-800"
+                                               : submission.status ===
+                                                   "Revision Required"
+                                                 ? "bg-orange-100 text-orange-800"
+                                                 : "bg-blue-100 text-blue-800"
                                        }`}
                                     >
                                        {submission.status}
@@ -275,7 +422,7 @@ const ReviewerSubmissions = () => {
                                           }
                                           className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                        >
-                                          <Eye className="w-5 h-5" />
+                                          <FileText className="w-5 h-5" />
                                        </button>
                                        <button
                                           onClick={() =>
@@ -308,7 +455,7 @@ const ReviewerSubmissions = () => {
          {/* Details Modal */}
          {showDetailsModal && selectedSubmission && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-               <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+               <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto no-scrollbar">
                   <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center">
                      <h2 className="text-2xl font-bold text-gray-800">
                         Submission Details
@@ -336,7 +483,7 @@ const ReviewerSubmissions = () => {
                         <p className="text-sm text-gray-600">
                            Submitted on:{" "}
                            {new Date(
-                              selectedSubmission.createdAt
+                              selectedSubmission.createdAt,
                            ).toLocaleString()}
                         </p>
                      </div>
@@ -349,19 +496,29 @@ const ReviewerSubmissions = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2 text-sm">
                            <p>
-                              <span className="font-semibold">Name:</span>{" "}
-                              {selectedSubmission.authorName}
+                              <span className="font-semibold text-gray-900">
+                                 Name:
+                              </span>
+                              <p className="text-gray-700">
+                                 {selectedSubmission.authorName}
+                              </p>
                            </p>
                            <p>
-                              <span className="font-semibold">Email:</span>{" "}
-                              {selectedSubmission.authorEmail}
+                              <span className="font-semibold text-gray-900">
+                                 Email:
+                              </span>
+                              <p className="text-gray-700">
+                                 <p>{selectedSubmission.authorEmail}</p>
+                              </p>
                            </p>
                            <p>
-                              <span className="font-semibold">
+                              <span className="font-semibold text-gray-900">
                                  Affiliation:
-                              </span>{" "}
-                              {selectedSubmission.authorAffiliation ||
-                                 "Not Provided"}
+                              </span>
+                              <p className="text-gray-700">
+                                 {selectedSubmission.authorAffiliation ||
+                                    "Not Provided"}
+                              </p>
                            </p>
                         </div>
                      </div>
@@ -397,19 +554,21 @@ const ReviewerSubmissions = () => {
 
                      {/* Manuscript Attachment */}
                      {selectedSubmission.attachment && (
-                        <div className="bg-gray-50 p-4 rounded-xl border">
+                        <div className="bg-white p-4 rounded-xl border flex items-center justify-between">
                            <h4 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                              <FileText size={18} /> Manuscript File
+                              <FileText size={18} /> Manuscript
                            </h4>
-
-                           <a
-                              href={`${backendUrl}/${selectedSubmission.attachment}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="mt-2 inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+                           <button
+                              onClick={() =>
+                                 handleDownload(
+                                    selectedSubmission.attachment.downloadUrl,
+                                    selectedSubmission.title || "submission",
+                                 )
+                              }
+                              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2"
                            >
-                              <Download size={16} /> Download Manuscript
-                           </a>
+                              <Download size={18} /> Download
+                           </button>
                         </div>
                      )}
 
@@ -455,73 +614,212 @@ const ReviewerSubmissions = () => {
             </div>
          )}
 
-         {/* Review Modal */}
+         {/* Revier - Feedback Modal - Split Screen */}
          {showReviewModal && selectedSubmission && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-               <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                  <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center">
-                     <h2 className="text-xl font-bold text-gray-800">
-                        Submit Review
+            <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50 p-4">
+               <div className="bg-white rounded-2xl shadow-2xl w-[98vw] h-[95vh] flex flex-col overflow-hidden">
+                  <div className="bg-white border-b border-gray-200 p-4 flex justify-between items-center shrink-0">
+                     <h2 className="text-xl font-bold text-gray-800 truncate pr-4">
+                        Reviewing: {selectedSubmission.title}
                      </h2>
                      <button
-                        onClick={() => {
-                           setShowReviewModal(false);
-                           setFeedbackText("");
-                           setDecision("Under Review");
-                           setRating("");
-                        }}
-                        className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
+                        onClick={() => setShowReviewModal(false)}
+                        className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 p-2 rounded-lg"
                      >
                         <X size={24} />
                      </button>
                   </div>
 
-                  <div className="p-6 space-y-4">
-                     <div>
-                        <label className="block text-sm font-semibold mb-1">
-                           Decision *
-                        </label>
-                        <select
-                           value={decision}
-                           onChange={(e) => setDecision(e.target.value)}
-                           className="w-full border border-gray-300 rounded-lg p-2"
-                        >
-                           <option value="Under Review">Under Review</option>
-                           <option value="Accepted">Accept</option>
-                           <option value="Rejected">Reject</option>
-                           <option value="Revision Required">
-                              Revision Required
-                           </option>
-                        </select>
+                  <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+                     {/* Left: PDF Viewer */}
+                     <div className="w-full md:w-3/5 lg:w-2/3 bg-gray-100 border-r border-gray-200 h-full relative">
+                        {selectedSubmission.attachment ? (
+                           <Worker
+                              workerUrl={`https://unpkg.com/pdfjs-dist@${pdfjsVersion}/build/pdf.worker.min.js`}
+                           >
+                              <div className="h-full w-full">
+                                 <Viewer
+                                    fileUrl={
+                                       selectedSubmission.attachment
+                                          .downloadUrl ||
+                                       `${backendUrl}/${selectedSubmission.attachment}`
+                                    }
+                                    plugins={[defaultLayoutPluginInstance]}
+                                 />
+                              </div>
+                           </Worker>
+                        ) : (
+                           <div className="flex items-center justify-center h-full text-gray-500">
+                              No PDF Document Found
+                           </div>
+                        )}
                      </div>
 
-                     <div>
-                        <label className="block text-sm font-semibold mb-1">
-                           Feedback *
-                        </label>
-                        <textarea
-                           value={feedbackText}
-                           onChange={(e) => setFeedbackText(e.target.value)}
-                           rows={6}
-                           placeholder="Provide detailed feedback..."
-                           className="w-full border border-gray-300 rounded-lg p-2"
-                        />
+                     {/* Right: Evaluation Form */}
+                     <div className="w-full md:w-2/5 lg:w-1/3 bg-white h-full overflow-y-auto p-6 scrollbar-thin">
+                        <div className="space-y-8 pb-20">
+                           {/* Scores */}
+                           <div>
+                              <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2">
+                                 Score Sheet (1=Poor, 5=Outstanding)
+                              </h3>
+
+                              {[
+                                 {
+                                    id: "engineeringSignificance",
+                                    label: "1. Engineering significance and originality",
+                                 },
+                                 {
+                                    id: "scientificSignificance",
+                                    label: "2. Scientific significance and originality",
+                                 },
+                                 {
+                                    id: "completeness",
+                                    label: "3. Completeness of the reported work",
+                                 },
+                                 {
+                                    id: "acknowledgement",
+                                    label: "4. Acknowledgement of previous work",
+                                 },
+                                 {
+                                    id: "presentation",
+                                    label: "5. Quality of presentation",
+                                 },
+                              ].map((criteria) => (
+                                 <div key={criteria.id} className="mb-6">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                       {criteria.label} *
+                                    </label>
+                                    <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                                       {[1, 2, 3, 4, 5].map((score) => (
+                                          <label
+                                             key={score}
+                                             className="cursor-pointer flex flex-col items-center"
+                                          >
+                                             <input
+                                                type="radio"
+                                                name={criteria.id}
+                                                value={score}
+                                                checked={
+                                                   Number(
+                                                      scores[criteria.id],
+                                                   ) === score
+                                                }
+                                                onChange={(e) =>
+                                                   setScores({
+                                                      ...scores,
+                                                      [criteria.id]:
+                                                         e.target.value,
+                                                   })
+                                                }
+                                                className="w-5 h-5 text-blue-600 focus:ring-blue-500"
+                                             />
+                                             <span className="text-xs mt-1 font-medium text-gray-600">
+                                                {score}
+                                             </span>
+                                          </label>
+                                       ))}
+                                    </div>
+                                 </div>
+                              ))}
+                           </div>
+
+                           {/* Best Paper */}
+                           <div>
+                              <label className="block text-sm font-bold text-gray-900 mb-2">
+                                 Should this be considered for Best Paper?
+                              </label>
+                              <select
+                                 value={isBestPaper}
+                                 onChange={(e) =>
+                                    setIsBestPaper(e.target.value)
+                                 }
+                                 className="w-full border text-gray-900 border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 bg-white"
+                              >
+                                 <option value="No">No</option>
+                                 <option value="Yes">Yes</option>
+                              </select>
+                           </div>
+
+                           {/* Recommendation */}
+                           <div>
+                              <label className="block text-sm font-bold text-gray-900 mb-2">
+                                 Recommendation *
+                              </label>
+                              <select
+                                 value={decision}
+                                 onChange={(e) => setDecision(e.target.value)}
+                                 className="w-full border text-gray-900 border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 bg-white"
+                              >
+                                 <option value="Under Review">
+                                    Select Recommendation...
+                                 </option>
+                                 <option value="Accepted">Accept</option>
+                                 <option value="Revision Required">
+                                    Minor Revision
+                                 </option>
+                                 {/* "Revision Required" maps to "Minor Revision" or "Major" conceptually depending on usage. I'll stick to backend values but display friendly text or match whatever backend expects. 
+                                     The existing code used "Revision Required". I'll use that as value. 
+                                 */}
+                                 <option value="Rejected">Reject</option>
+                              </select>
+                           </div>
+
+                           {/* Comments */}
+                           <div>
+                              <label className=" text-sm font-bold text-gray-900 mb-2 flex items-center gap-2">
+                                 Confidential Comments to Editor{" "}
+                                 <span className="text-gray-400 font-normal text-xs">
+                                    (Optional)
+                                 </span>
+                              </label>
+                              <textarea
+                                 value={confidentialComments}
+                                 onChange={(e) =>
+                                    setConfidentialComments(e.target.value)
+                                 }
+                                 rows={4}
+                                 placeholder="Only visible to committee..."
+                                 className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 text-sm text-gray-900"
+                              />
+                           </div>
+
+                           <div>
+                              <label className="block text-sm font-bold text-gray-900 mb-2">
+                                 Comments to the Author *
+                              </label>
+                              <textarea
+                                 value={feedbackText}
+                                 onChange={(e) =>
+                                    setFeedbackText(e.target.value)
+                                 }
+                                 rows={6}
+                                 placeholder="Constructive feedback for the authors..."
+                                 className="w-full border text-gray-900 border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 text-sm"
+                              />
+                           </div>
+                        </div>
                      </div>
                   </div>
 
-                  <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 flex justify-end gap-2">
+                  {/* Footer */}
+                  <div className="bg-gray-50 border-t border-gray-200 p-4 flex justify-end gap-3 shrink-0 z-10">
                      <button
                         onClick={() => setShowReviewModal(false)}
-                        className="px-4 py-2 bg-gray-200 rounded-lg"
+                        className="px-6 py-2.5 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 shadow-sm"
                      >
                         Cancel
                      </button>
                      <button
                         onClick={handleSubmitReview}
-                        disabled={!feedbackText.trim()}
-                        className="px-4 py-2 bg-green-600 text-white rounded-lg flex items-center gap-2 disabled:opacity-50"
+                        disabled={!isFormDirty()}
+                        className={`px-6 py-2.5 font-medium rounded-lg flex items-center gap-2 shadow-md transition-all ${
+                           isFormDirty()
+                              ? "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg"
+                              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        }`}
                      >
-                        <Send size={16} /> Submit Review
+                        <Send size={18} /> Submit Review
                      </button>
                   </div>
                </div>

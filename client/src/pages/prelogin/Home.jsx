@@ -69,8 +69,8 @@ const App = () => {
                {/* Left Column - Main Content */}
                <div className="md:col-span-2">
                   {/* About IPDIMS Section */}
-                  <section className="bg-gray-800  p-6 md:p-8 rounded-xl shadow-lg mb-8">
-                     <h2 className="text-2xl md:text-3xl font-bold text-blue-600 mb-4 border-b-2 border-green-500 pb-2">
+                  <section className="bg-white/10 backdrop-blur-xl border border-gray-700 p-6 md:p-8 rounded-2xl shadow-xl mb-8">
+                     <h2 className="text-2xl md:text-3xl font-bold text-blue-500 mb-4 border-b border-green-500 pb-2">
                         About IPDIMS 2025
                      </h2>
                      <p className="text-gray-300 leading-relaxed text-base">
@@ -102,8 +102,8 @@ const App = () => {
                   </section>
 
                   {/* About NIT Rourkela Section */}
-                  <section className="bg-gray-800 p-6 md:p-8 rounded-xl shadow-lg mb-8">
-                     <h2 className="text-2xl md:text-3xl font-bold text-blue-600 mb-4 border-b-2 border-green-500 pb-2">
+                  <section className="bg-white/10 backdrop-blur-xl border border-gray-700 p-6 md:p-8 rounded-2xl shadow-xl mb-8">
+                     <h2 className="text-2xl md:text-3xl font-bold text-blue-500 mb-4 border-b border-green-500 pb-2">
                         About NIT Rourkela
                      </h2>
                      <p className="text-gray-300 leading-relaxed text-base">
@@ -120,8 +120,8 @@ const App = () => {
                   </section>
 
                   {/* About Industrial Design Department Section */}
-                  <section className="bg-gray-800 p-6 md:p-8 rounded-xl shadow-lg mb-8">
-                     <h2 className="text-2xl md:text-3xl font-bold text-blue-600 mb-4 border-b-2 border-green-500 pb-2">
+                  <section className="bg-white/10 backdrop-blur-xl border border-gray-700 p-6 md:p-8 rounded-2xl shadow-xl mb-8">
+                     <h2 className="text-2xl md:text-3xl font-bold text-blue-500 mb-4 border-b border-green-500 pb-2">
                         About Industrial Design Department
                      </h2>
                      <p className="text-gray-300 leading-relaxed text-base">
@@ -141,8 +141,8 @@ const App = () => {
                   </section>
 
                   {/* Call for Papers Section */}
-                  <section className="bg-gray-800 p-6 md:p-8 rounded-xl shadow-lg mb-8">
-                     <h2 className="text-2xl md:text-3xl font-bold text-blue-600 mb-4 border-b-2 border-green-500 pb-2 ">
+                  <section className="bg-white/10 backdrop-blur-xl border border-gray-700 p-6 md:p-8 rounded-2xl shadow-xl mb-8">
+                     <h2 className="text-2xl md:text-3xl font-bold text-blue-500 mb-4 border-b border-green-500 pb-2">
                         Call for Papers
                      </h2>
                      <p className="text-gray-300 leading-relaxed text-sm italic text-center mb-6">
@@ -196,8 +196,8 @@ const App = () => {
 
                {/* Right Column - Past IPDIMS */}
                <div className="md:col-span-1">
-                  <div className="bg-gray-800 p-4 rounded-xl shadow-lg sticky top-8 max-w-xs mx-auto">
-                     <h2 className="text-2xl md:text-3xl font-bold text-blue-600 mb-4 border-b-2 border-green-500 pb-2 text-center">
+                  <div className="bg-white/10 backdrop-blur-xl border border-gray-700 p-6 rounded-2xl shadow-xl sticky top-8 max-w-xs mx-auto">
+                     <h2 className="text-2xl md:text-3xl font-bold text-blue-500 mb-4 border-b border-green-500 pb-2 text-center">
                         Past IPDIMS
                      </h2>
                      <div className="space-y-8 ">

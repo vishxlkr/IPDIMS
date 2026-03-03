@@ -198,6 +198,11 @@ const Navbar = () => {
    const [menuOpen, setMenuOpen] = useState(false);
    const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
+   const handleLogoClick = () => {
+      navigate("/");
+      window.scrollTo(0, 0);
+   };
+
    const handleLogout = () => {
       setToken("");
       setUserData(null);
@@ -219,7 +224,7 @@ const Navbar = () => {
    ];
 
    return (
-      <nav className="fixed top-0 w-full z-40 bg-[rgba(10,10,10,0.8)]  border-b border-white/10 shadow-lg">
+      <nav className="fixed top-0 w-full z-40 bg-[#0a0a0a] border-b border-white/10 shadow-lg">
          <div className="max-w-6xl mx-auto px-4">
             <div className="flex justify-between items-center h-16">
                {/* Left: Logo + Brand */}
@@ -228,14 +233,14 @@ const Navbar = () => {
                      src={logo}
                      alt="logo"
                      className="h-8 w-8 cursor-pointer transition-transform duration-200 hover:scale-110"
-                     onClick={() => navigate("/")}
+                     onClick={handleLogoClick}
                   />
-                  <NavLink
-                     to="/"
-                     className="text-xl font-bold text-white transition-transform duration-200 hover:scale-105"
+                  <div
+                     onClick={handleLogoClick}
+                     className="text-xl font-bold text-white transition-transform duration-200 hover:scale-105 cursor-pointer"
                   >
                      IPDIMS
-                  </NavLink>
+                  </div>
                </div>
 
                {/* Center: Nav Links */}

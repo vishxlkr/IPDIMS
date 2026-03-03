@@ -2,6 +2,7 @@ import submissionModel from "../models/submissionModel.js";
 import userModel from "../models/userModel.js";
 import { v2 as cloudinary } from "cloudinary";
 import sendEmail from "../config/email.js";
+import path from "path";
 
 // 🟢 Create a new submission
 export const newSubmission = async (req, res) => {
@@ -26,31 +27,52 @@ export const newSubmission = async (req, res) => {
          return res.json({ success: false, message: "User not found" });
       }
 
-      let fileUrl = "";
+      let downloadUrl = "";
+      let viewUrl = "";
 
       if (file) {
          try {
             console.log(
                "📁 Uploading to Cloudinary:",
                file.originalname,
-               file.mimetype
+               file.mimetype,
             );
 
-            // For PDF files, Cloudinary needs resource_type = "raw"
-            const resourceType =
-               file.mimetype === "application/pdf" ? "raw" : "auto";
+            const originalName = file.originalname;
+
+            // Use 'raw' but ensure public access is correct or use 'auto' with specific format
+            // 'auto' often converts PDFs to image-deliverable assets which is good for viewing,
+            // but sometimes 'raw' is safer for just file storage.
+            // However, 401 on 'raw' implies access control issues.
+            // Let's try 'image' resource type explicitly if we want PDF features from Cloudinary,
+            // OR go back to 'raw' but ensure no access control is set (which is default usually).
+
+            // Upload as 'raw' but force 'pdf' format if possible, or just rely on 'auto' which usually works for PDFs.
+            // However, to ensure correct Content-Type for viewers, 'auto' is best as it detects PDF -> image/pdf or application/pdf.
+            // Let's try explicit 'raw' resource type if 'auto' fails? No, 'auto' is correct for transformations/preview.
+            // BUT for just downloading/viewing as a file, 'raw' is safer if we want exact byte-for-byte.
+
+            // Use 'raw' as suggested for stable PDF handling.
+            // Avoid contradictory flags: use_filename AND unique_filename can be used but be careful.
+            // IMPORTANT: For raw files, if specific public_id is NOT provided, Cloudinary uses the filename.
+            // If unique_filename is true, it appends random string.
+            // We should NOT manually append extension to URL if Cloudinary does it correctly.
 
             const uploadResult = await cloudinary.uploader.upload(file.path, {
-               resource_type: "raw", // ✅ required for pdf, docx, pptx, zip...
+               resource_type: "raw", // Raw type as requested
                folder: "submissions",
-               use_filename: true, // ✅ keep original filename
-               unique_filename: false, // ✅ avoid random name
-               overwrite: true,
-               format: file.originalname.split(".").pop(), // ✅ preserve extension
+               use_filename: true, // Use the uploaded filename
+               unique_filename: true, // Append random characters for uniqueness
+               overwrite: false,
+               type: "upload", // Explicitly public upload
+               access_mode: "public", // Explicitly public access
             });
 
-            fileUrl = uploadResult.secure_url;
-            console.log("✅ Cloudinary upload success:", fileUrl);
+            // ✅ URL handling
+            downloadUrl = uploadResult.secure_url;
+            viewUrl = uploadResult.secure_url;
+
+            console.log("✅ Cloudinary upload success:", downloadUrl);
          } catch (err) {
             console.error("❌ Cloudinary upload failed:", err);
          }
@@ -58,7 +80,7 @@ export const newSubmission = async (req, res) => {
          console.warn("⚠️ No file uploaded in request");
       }
 
-      if (!fileUrl) {
+      if (!downloadUrl) {
          return res.json({
             success: false,
             message: "File upload failed. Please try again.",
@@ -74,8 +96,16 @@ export const newSubmission = async (req, res) => {
          authorName: user.name,
          authorEmail: user.email,
          authorAffiliation: user.organization || "",
-         attachment: fileUrl,
+         attachment: {
+            downloadUrl,
+            viewUrl,
+         },
          eventName: eventName || `IPDIMS ${new Date().getFullYear()}`,
+
+         // 1. Author submits paper -> Needs Admin Action
+         needsAdminAction: true,
+         needsReviewerAction: false,
+         needsAuthorAction: false,
       };
 
       // ✅ Save to MongoDB
@@ -99,7 +129,7 @@ A new submission has been added by a user. Here are the details:
 - Description: ${description}
 - Keywords: ${keywords}
 - Event: ${submissionData.eventName}
-- Attachment: ${fileUrl ? fileUrl : "No attachment"}
+- Attachment: ${downloadUrl ? downloadUrl : "No attachment"}
 
 Please review the submission in the admin panel.
 
@@ -142,7 +172,7 @@ export const getUserSubmissions = async (req, res) => {
 
       const submissions = await submissionModel
          .find({ author: userId })
-         .sort({ createdAt: -1 });
+         .sort({ needsAuthorAction: -1, updatedAt: -1 });
 
       res.status(200).json({
          success: true,
@@ -150,6 +180,85 @@ export const getUserSubmissions = async (req, res) => {
       });
    } catch (error) {
       console.error("Error fetching submissions:", error);
+      res.status(500).json({ success: false, message: "Server error" });
+   }
+};
+
+// 🔵 Update a submission
+export const updateSubmission = async (req, res) => {
+   try {
+      const { id } = req.params;
+      const { title, description, keywords } = req.body;
+      const file = req.file;
+      const userId = req.user.id;
+
+      // Find original submission
+      const submission = await submissionModel.findById(id);
+      if (!submission) {
+         return res
+            .status(404)
+            .json({ success: false, message: "Submission not found" });
+      }
+
+      // Check ownership
+      if (submission.author.toString() !== userId) {
+         return res.status(403).json({
+            success: false,
+            message: "Not authorized to edit this submission",
+         });
+      }
+
+      // Update basic fields
+      if (title) submission.title = title;
+      if (description) submission.description = description;
+      if (keywords)
+         submission.keywords = Array.isArray(keywords)
+            ? keywords
+            : keywords.split(",").map((k) => k.trim());
+
+      // Handle file update if new file provided
+      if (file) {
+         try {
+            const uploadResult = await cloudinary.uploader.upload(file.path, {
+               resource_type: "raw",
+               folder: "submissions",
+               use_filename: true,
+               unique_filename: true,
+               overwrite: false,
+               type: "upload",
+               access_mode: "public",
+            });
+
+            submission.attachment = {
+               downloadUrl: uploadResult.secure_url,
+               viewUrl: uploadResult.secure_url,
+            };
+         } catch (err) {
+            console.error("Cloudinary upload failed:", err);
+            return res
+               .status(500)
+               .json({ success: false, message: "File upload failed" });
+         }
+      }
+
+      // Automatically set status to "Under Review" upon user edit
+      submission.status = "Under Review";
+
+      // 5. Author submits revised paper -> Needs Reviewer Action
+      submission.needsAuthorAction = false;
+      submission.needsReviewerAction = true;
+      // In case they were revising based on admin feedback before reviewer assignment?
+      // Prompt says "needsReviewerAction = true". Assuming workflow strictly follows 4 -> 5.
+
+      await submission.save();
+
+      res.json({
+         success: true,
+         message: "Submission updated successfully",
+         submission,
+      });
+   } catch (error) {
+      console.error("Error updating submission:", error);
       res.status(500).json({ success: false, message: "Server error" });
    }
 };

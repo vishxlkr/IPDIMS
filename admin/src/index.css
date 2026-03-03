@@ -6,10 +6,19 @@
    /* --template-grid-cols-auto: repeat(auto-fill, minmax(200px, 1fr)); */
 }
 
-::-webkit-scrollbar {
+/* ::-webkit-scrollbar {
    display: none;
-}
+} */
 
 * {
    font-family: "Outfit", sans-serif;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+   display: none;
+}
+
+.no-scrollbar {
+   -ms-overflow-style: none;
+   scrollbar-width: none;
 }

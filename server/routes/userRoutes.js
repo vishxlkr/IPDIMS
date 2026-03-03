@@ -14,6 +14,7 @@ import authUser from "../middlewares/authUser.js";
 import {
    getUserSubmissions,
    newSubmission,
+   updateSubmission,
 } from "../controllers/submissionController.js";
 // import upload from "../middlewares/multer.js";
 
@@ -38,7 +39,13 @@ userRouter.post(
    "/add-submission",
    authUser,
    upload.single("attachment"),
-   newSubmission
+   newSubmission,
+);
+userRouter.put(
+   "/update-submission/:id",
+   authUser,
+   upload.single("attachment"),
+   updateSubmission,
 );
 userRouter.get("/my-submissions", authUser, getUserSubmissions);
 
@@ -50,7 +57,7 @@ userRouter.post(
    "/update-profile",
    authUser,
    upload.single("image"),
-   updateProfile
+   updateProfile,
 );
 
 // routes for registration and payment
@@ -58,7 +65,7 @@ userRouter.post(
    "/registration",
    authUser,
    upload.single("paymentProof"),
-   addRegistration
+   addRegistration,
 );
 
 export default userRouter;

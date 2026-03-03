@@ -60,20 +60,27 @@ const AdminDashboard = () => {
                totalReviewers: reviewers.length,
                activeReviewers: reviewers.filter((r) => r.isActive).length,
                pendingSubmissions: submissions.filter(
-                  (s) => s.status === "Pending"
+                  (s) => s.status === "Pending",
                ).length,
                underReviewSubmissions: submissions.filter(
-                  (s) => s.status === "Under Review"
+                  (s) => s.status === "Under Review",
                ).length,
                acceptedSubmissions: submissions.filter(
-                  (s) => s.status === "Accepted"
+                  (s) => s.status === "Accepted",
                ).length,
                rejectedSubmissions: submissions.filter(
-                  (s) => s.status === "Rejected"
+                  (s) => s.status === "Rejected",
                ).length,
             });
 
-            setRecentSubmissions(submissions.slice(0, 5));
+            // Sort submissions client-side for "Recent" to prioritize needsAdminAction
+            const sortedSubmissions = submissions.sort((a, b) => {
+               if (a.needsAdminAction === b.needsAdminAction) {
+                  return new Date(b.updatedAt) - new Date(a.updatedAt);
+               }
+               return a.needsAdminAction ? -1 : 1;
+            });
+            setRecentSubmissions(sortedSubmissions.slice(0, 5));
          }
       } catch (error) {
          console.error("Error fetching dashboard data:", error);
@@ -250,11 +257,11 @@ const AdminDashboard = () => {
                                           submission.status === "Accepted"
                                              ? "bg-green-100 text-green-800"
                                              : submission.status === "Rejected"
-                                             ? "bg-red-100 text-red-800"
-                                             : submission.status ===
-                                               "Under Review"
-                                             ? "bg-blue-100 text-blue-800"
-                                             : "bg-yellow-100 text-yellow-800"
+                                               ? "bg-red-100 text-red-800"
+                                               : submission.status ===
+                                                   "Under Review"
+                                                 ? "bg-blue-100 text-blue-800"
+                                                 : "bg-yellow-100 text-yellow-800"
                                        }`}
                                     >
                                        {submission.status}
@@ -262,7 +269,7 @@ const AdminDashboard = () => {
                                  </td>
                                  <td className="px-6 py-4 text-sm text-gray-600">
                                     {new Date(
-                                       submission.createdAt
+                                       submission.createdAt,
                                     ).toLocaleDateString()}
                                  </td>
                               </tr>

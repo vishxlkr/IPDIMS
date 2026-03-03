@@ -222,7 +222,7 @@ const Login = () => {
          className="min-h-[80vh] flex items-center justify-center"
       >
          <div className="flex flex-col items-center">
-            <div className="flex flex-col gap-3 m-auto items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-zinc-600 text-sm shadow-lg relative">
+            <div className="flex flex-col gap-3 m-auto items-start p-8 min-w-[340px] sm:min-w-96 bg-white border rounded-xl text-zinc-600 text-sm shadow-xl relative">
                {loading && <Loading />}
 
                <p className="text-2xl font-semibold">

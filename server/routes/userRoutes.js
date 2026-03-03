@@ -61,11 +61,11 @@ userRouter.post(
 );
 
 // routes for registration and payment
-userRouter.post(
-   "/registration",
-   authUser,
-   upload.single("paymentProof"),
-   addRegistration,
-);
+// userRouter.post(
+//    "/registration",
+//    authUser,
+//    upload.single("paymentProof"),
+//    addRegistration,
+// );
 
 export default userRouter;

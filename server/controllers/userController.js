@@ -77,7 +77,7 @@ export const signup = async (req, res) => {
    }
 };
 
-// ======================= VERIFY OTP =======================
+// verify otp
 export const verifyOtp = async (req, res) => {
    try {
       const { email, otp } = req.body;

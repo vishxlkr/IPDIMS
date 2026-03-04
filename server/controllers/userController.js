@@ -353,7 +353,7 @@ export const updateProfile = async (req, res) => {
    }
 };
 
-// ⭐ CONTROLLER: User Registration for Conference
+//  CONTROLLER: User Registration for Conference
 export const addRegistration = async (req, res) => {
    try {
       const {

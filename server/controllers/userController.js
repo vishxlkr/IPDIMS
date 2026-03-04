@@ -260,7 +260,7 @@ export const resetPassword = async (req, res) => {
    }
 };
 
-// ======================= GET PROFILE =======================
+// get profile
 export const getProfile = async (req, res) => {
    try {
       // req.user must be set by auth middleware

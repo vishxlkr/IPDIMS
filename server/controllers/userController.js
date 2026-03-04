@@ -219,7 +219,7 @@ export const forgotPassword = async (req, res) => {
    }
 };
 
-// ======================= RESET PASSWORD =======================
+// reset password
 export const resetPassword = async (req, res) => {
    try {
       const { email, otp, newPassword } = req.body;

@@ -13,7 +13,7 @@ const generateOTP = () =>
 const generateToken = (id) =>
    jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d" });
 
-// ======================= SIGNUP =======================
+// signup
 export const signup = async (req, res) => {
    try {
       const { name, email, password } = req.body;

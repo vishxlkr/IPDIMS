@@ -123,7 +123,7 @@ export const verifyOtp = async (req, res) => {
    }
 };
 
-// ======================= LOGIN =======================
+// login
 export const login = async (req, res) => {
    try {
       const { email, password } = req.body;

@@ -174,7 +174,7 @@ export const login = async (req, res) => {
    }
 };
 
-// ======================= FORGOT PASSWORD =======================
+// forgot password
 export const forgotPassword = async (req, res) => {
    try {
       const { email } = req.body;

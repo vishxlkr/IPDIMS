@@ -846,7 +846,7 @@ export const deleteAuthor = async (req, res) => {
    }
 };
 
-// ✅ Delete a registration by ID
+//  Delete a registration by ID
 export const deleteRegistration = async (req, res) => {
    try {
       const { id } = req.params;

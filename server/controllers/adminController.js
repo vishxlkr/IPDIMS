@@ -822,7 +822,7 @@ Team IPDIMS
    }
 };
 
-// ✅ api to Delete Author (Admin only)
+//  api to Delete Author (Admin only)
 export const deleteAuthor = async (req, res) => {
    try {
       const { id } = req.params;

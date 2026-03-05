@@ -20,14 +20,14 @@ import {
 
 const userRouter = express.Router();
 
-// 🔓 Public routes
+//  Public routes
 userRouter.post("/signup", signup);
 userRouter.post("/verify-otp", verifyOtp);
 userRouter.post("/login", login);
 userRouter.post("/forgot-password", forgotPassword);
 userRouter.post("/reset-password", resetPassword);
 
-// 🔐 Protected routes
+//  Protected routes
 userRouter.get("/profile", authUser, getProfile);
 
 // Multer setup for file upload

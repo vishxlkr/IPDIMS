@@ -22,6 +22,7 @@ export const loginReviewer = async (req, res) => {
       const token = jwt.sign(
          { id: reviewer._id, role: "reviewer" },
          process.env.JWT_SECRET,
+
          { expiresIn: "7d" },
       );
       res.json({ success: true, token, reviewer });

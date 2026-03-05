@@ -107,7 +107,7 @@ export const addReviewer = async (req, res) => {
 
       const newReviewer = new reviewerModel(reviewerData);
       await newReviewer.save();
-      console.log("reviwer added ");
+      console.log("reviewer added ");
 
       res.json({ success: true, message: "Reviewer added successfully" });
    } catch (error) {

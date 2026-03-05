@@ -34,7 +34,7 @@ userRouter.get("/profile", authUser, getProfile);
 const storage = multer.diskStorage({});
 const upload = multer({ storage });
 
-// 📝 Submission routes
+//  Submission routes
 userRouter.post(
    "/add-submission",
    authUser,

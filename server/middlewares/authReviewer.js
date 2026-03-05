@@ -11,7 +11,7 @@ export const authReviewer = async (req, res, next) => {
             .json({ success: false, message: "No token provided" });
       }
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET); // give object {reviewer._id , role}
 
       const reviewer = await reviewerModel
          .findById(decoded.id)

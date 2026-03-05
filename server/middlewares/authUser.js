@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 
 const authUser = async (req, res, next) => {
    try {
-      // 1️⃣ get token from Authorization header
+      // 1️ get token from Authorization header
       const authHeader = req.headers.authorization;
       if (!authHeader || !authHeader.startsWith("Bearer ")) {
          return res.status(401).json({
@@ -13,7 +13,7 @@ const authUser = async (req, res, next) => {
 
       const token = authHeader.split(" ")[1]; // get the actual token
 
-      // 2️⃣ verify token
+      // 2️ verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       if (!decoded || !decoded.id) {
          return res.status(401).json({

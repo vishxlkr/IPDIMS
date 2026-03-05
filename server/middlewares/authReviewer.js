@@ -3,7 +3,7 @@ import reviewerModel from "../models/reviewerModel.js";
 
 export const authReviewer = async (req, res, next) => {
    try {
-      const token = req.headers.rtoken; // ✅ Only check rtoken
+      const token = req.headers.rtoken; //  Only check rtoken
 
       if (!token) {
          return res

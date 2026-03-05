@@ -640,7 +640,7 @@ export const getUserSubmissions = async (req, res) => {
 //          submissions,
 //       });
 //    } catch (error) {
-//       console.error("❌ Error fetching user submissions:", error);
+//       console.error(" Error fetching user submissions:", error);
 //       res.status(500).json({
 //          success: false,
 //          message: "Server error while fetching user submissions",

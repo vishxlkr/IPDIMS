@@ -671,7 +671,7 @@ export const getAllRegistrations = async (req, res) => {
    }
 };
 
-// ✅ Get registration of a specific user (Admin only)
+//  Get registration of a specific user (Admin only)
 export const getRegistrationByUser = async (req, res) => {
    try {
       const { userId } = req.params;

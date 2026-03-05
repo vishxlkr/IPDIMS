@@ -624,7 +624,7 @@ export const getUserSubmissions = async (req, res) => {
    }
 };
 
-// ✅ Get all submissions of a specific user (AUTHOR)
+//  Get all submissions of a specific user (AUTHOR)
 // export const getUserSubmissions = async (req, res) => {
 //    try {
 //       const userId = req.params.id;

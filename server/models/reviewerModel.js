@@ -11,7 +11,7 @@ const reviewerSchema = new mongoose.Schema(
       // Professional Details
       designation: { type: String, default: "" },
       organization: { type: String, default: "" },
-      specialization: { type: [String], default: [] }, // e.g., "AI", "Manufacturing", etc.
+      specialization: { type: [String], default: [] },
 
       bio: { type: String, default: "" },
       address: { type: String, default: "" },
@@ -29,7 +29,7 @@ const reviewerSchema = new mongoose.Schema(
       isActive: { type: Boolean, default: true },
       lastAssignedAt: { type: Date, default: null },
    },
-   { timestamps: true }
+   { timestamps: true },
 );
 
 const reviewerModel =

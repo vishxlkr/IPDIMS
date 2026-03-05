@@ -18,6 +18,7 @@ export const loginAdmin = async (req, res) => {
          password === process.env.ADMIN_PASSWORD
       ) {
          const token = jwt.sign(email + password, process.env.JWT_SECRET);
+         // jwt.sign(data we want to store , secretkey );
          res.json({ success: true, token });
       } else {
          res.json({ success: false, message: "Invalid credentials" });

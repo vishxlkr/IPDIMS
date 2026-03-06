@@ -12,7 +12,7 @@ export const newSubmission = async (req, res) => {
       const file = req.file; // uploaded file
       const userId = req.user.id; // comes from auth middleware
 
-      console.log(" Received new submission request");
+      console.log("Received new submission request");
 
       //  Validate required fields
       if (!title || !description || !keywords) {
@@ -41,26 +41,8 @@ export const newSubmission = async (req, res) => {
 
             const originalName = file.originalname;
 
-            // Use 'raw' but ensure public access is correct or use 'auto' with specific format
-            // 'auto' often converts PDFs to image-deliverable assets which is good for viewing,
-            // but sometimes 'raw' is safer for just file storage.
-            // However, 401 on 'raw' implies access control issues.
-            // Let's try 'image' resource type explicitly if we want PDF features from Cloudinary,
-            // OR go back to 'raw' but ensure no access control is set (which is default usually).
-
-            // Upload as 'raw' but force 'pdf' format if possible, or just rely on 'auto' which usually works for PDFs.
-            // However, to ensure correct Content-Type for viewers, 'auto' is best as it detects PDF -> image/pdf or application/pdf.
-            // Let's try explicit 'raw' resource type if 'auto' fails? No, 'auto' is correct for transformations/preview.
-            // BUT for just downloading/viewing as a file, 'raw' is safer if we want exact byte-for-byte.
-
-            // Use 'raw' as suggested for stable PDF handling.
-            // Avoid contradictory flags: use_filename AND unique_filename can be used but be careful.
-            // IMPORTANT: For raw files, if specific public_id is NOT provided, Cloudinary uses the filename.
-            // If unique_filename is true, it appends random string.
-            // We should NOT manually append extension to URL if Cloudinary does it correctly.
-
             const uploadResult = await cloudinary.uploader.upload(file.path, {
-               resource_type: "raw", // Raw type as requested
+               resource_type: "raw", // "Raw" type as requested. or "auto"
                folder: "submissions",
                use_filename: true, // Use the uploaded filename
                unique_filename: true, // Append random characters for uniqueness

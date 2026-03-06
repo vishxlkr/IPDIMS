@@ -1,7 +1,7 @@
 import multer from "multer";
 import path from "path";
 
-// Storage
+// Storage information
 const storage = multer.diskStorage({
    destination: (req, file, cb) => {
       cb(null, "uploads/"); // Make sure this folder exists
@@ -11,7 +11,7 @@ const storage = multer.diskStorage({
    },
 });
 
-// Limits
+// multer configuration with storage information and limit
 const upload = multer({
    storage,
    limits: {

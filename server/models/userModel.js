@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema(
 
       gender: { type: String, default: "Not Selected" },
       designation: { type: String, default: "" },
-      personalUrl: { type: String, default: "" },
+      // personalUrl: { type: String, default: "" },
       organization: { type: String, default: "" },
       address: { type: String, default: "" },
       bio: { type: String, default: "" },
@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema(
          type: Date,
       },
    },
-   { timestamps: true }
+   { timestamps: true },
 );
 
 const userModel = mongoose.models.user || mongoose.model("user", userSchema);

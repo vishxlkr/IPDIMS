@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+// do changes later
 const registrationSchema = new mongoose.Schema(
    {
       paperId: { type: Number, required: true, unique: true },
@@ -24,7 +25,7 @@ const registrationSchema = new mongoose.Schema(
          required: true,
       },
    },
-   { timestamps: true }
+   { timestamps: true },
 );
 
 export default mongoose.model("registration", registrationSchema);

@@ -19,7 +19,7 @@ const AddSubmission = () => {
    const [keywords, setKeywords] = useState("");
    const [authorName, setAuthorName] = useState(userData?.name || "");
    const [authorEmail, setAuthorEmail] = useState(userData?.email || "");
-   const [authorAffiliation, setAuthorAffiliation] = useState("");
+   const [authorOrganization, setAuthorOrganization] = useState("");
    const [eventName, setEventName] = useState("IPDIMS 2025");
    const [attachment, setAttachment] = useState(null);
 
@@ -44,7 +44,7 @@ const AddSubmission = () => {
          formData.append("keywords", keywords);
          formData.append("authorName", authorName);
          formData.append("authorEmail", authorEmail);
-         formData.append("authorAffiliation", authorAffiliation);
+         formData.append("authorOrganization", authorOrganization);
          formData.append("eventName", eventName);
          if (attachment) formData.append("attachment", attachment);
 
@@ -56,7 +56,7 @@ const AddSubmission = () => {
                   Authorization: `Bearer ${token}`,
                   "Content-Type": "multipart/form-data",
                },
-            }
+            },
          );
 
          if (res.data.success) {
@@ -67,7 +67,7 @@ const AddSubmission = () => {
             setKeywords("");
             setAuthorName(userData?.name || "");
             setAuthorEmail(userData?.email || "");
-            setAuthorAffiliation(userData?.organization || "");
+            setAuthorOrganization(userData?.organization || "");
             setEventName("IPDIMS 2025");
             setAttachment(null);
 
@@ -76,7 +76,7 @@ const AddSubmission = () => {
             }
          } else {
             toast.error(
-               res.data.message || "Submission failed. Please try again."
+               res.data.message || "Submission failed. Please try again.",
             );
          }
       } catch (error) {
@@ -91,13 +91,13 @@ const AddSubmission = () => {
       if (userData) {
          setAuthorName(userData.name || "");
          setAuthorEmail(userData.email || "");
-         setAuthorAffiliation(userData.organization || ""); // or userData.affiliation
+         setAuthorOrganization(userData.organization || ""); // or userData.organization
       }
    }, [userData]);
 
    useEffect(() => {
-      console.log("Affiliation:", authorAffiliation);
-   }, [authorAffiliation]);
+      console.log("Organization:", authorOrganization);
+   }, [authorOrganization]);
 
    return (
       <div className="bg-black text-white min-h-screen py-12 px-6 md:px-16 font-sans relative">
@@ -219,13 +219,13 @@ const AddSubmission = () => {
                         </div>
                         <div>
                            <label className="block font-medium mb-2">
-                              Affiliation
+                              Organization
                            </label>
                            <input
                               type="text"
-                              value={authorAffiliation}
+                              value={authorOrganization}
                               onChange={(e) =>
-                                 setAuthorAffiliation(e.target.value)
+                                 setAuthorOrganization(e.target.value)
                               }
                               className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2"
                            />

@@ -11,10 +11,10 @@ const authUser = async (req, res, next) => {
          });
       }
 
-      const token = authHeader.split(" ")[1]; // get the actual token
+      const token = authHeader.split(" ")[1]; // only remove extra spaces
 
       // 2️ verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET); // we will get the id of the user
       if (!decoded || !decoded.id) {
          return res.status(401).json({
             success: false,

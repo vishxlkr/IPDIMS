@@ -11,7 +11,7 @@ const generateOTP = () =>
 
 // Generate JWT token
 const generateToken = (id) =>
-   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d" });
+   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
 // signup
 export const signup = async (req, res) => {

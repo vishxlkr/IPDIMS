@@ -7,11 +7,12 @@ import path from "path";
 // 🟢 Create a new submission
 export const newSubmission = async (req, res) => {
    try {
-      const { title, description, keywords, eventName } = req.body;
+      const { title, description, keywords, eventName, authorOrganization } =
+         req.body;
       const file = req.file; // uploaded file
       const userId = req.user.id; // comes from auth middleware
 
-      console.log("🧾 Received new submission request");
+      console.log(" Received new submission request");
 
       // ✅ Validate required fields
       if (!title || !description || !keywords) {
@@ -95,7 +96,7 @@ export const newSubmission = async (req, res) => {
          author: userId,
          authorName: user.name,
          authorEmail: user.email,
-         authorAffiliation: user.organization || "",
+         authorAffiliation: authorOrganization || user.organization || "",
          attachment: {
             downloadUrl,
             viewUrl,

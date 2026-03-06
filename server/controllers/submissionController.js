@@ -14,7 +14,7 @@ export const newSubmission = async (req, res) => {
 
       console.log(" Received new submission request");
 
-      // ✅ Validate required fields
+      //  Validate required fields
       if (!title || !description || !keywords) {
          return res.json({
             success: false,
@@ -22,7 +22,7 @@ export const newSubmission = async (req, res) => {
          });
       }
 
-      // ✅ Find user from DB
+      //  Find user from DB
       const user = await userModel.findById(userId);
       if (!user) {
          return res.json({ success: false, message: "User not found" });

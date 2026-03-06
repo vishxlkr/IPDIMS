@@ -55,12 +55,12 @@ export const newSubmission = async (req, res) => {
             downloadUrl = uploadResult.secure_url;
             viewUrl = uploadResult.secure_url;
 
-            console.log("✅ Cloudinary upload success:", downloadUrl);
+            console.log("Cloudinary upload success:", downloadUrl);
          } catch (err) {
-            console.error("❌ Cloudinary upload failed:", err);
+            console.error("Cloudinary upload failed:", err);
          }
       } else {
-         console.warn("⚠️ No file uploaded in request");
+         console.warn("No file uploaded in request");
       }
 
       if (!downloadUrl) {
@@ -70,7 +70,7 @@ export const newSubmission = async (req, res) => {
          });
       }
 
-      // ✅ Create submission data
+      // Create submission data
       const submissionData = {
          title,
          description,
@@ -91,13 +91,13 @@ export const newSubmission = async (req, res) => {
          needsAuthorAction: false,
       };
 
-      // ✅ Save to MongoDB
+      //  Save to MongoDB
       const newSubmissionDoc = new submissionModel(submissionData);
       await newSubmissionDoc.save();
 
-      console.log("✅ Submission saved successfully");
+      console.log(" Submission saved successfully");
 
-      // ✅ Send email notification to admin
+      //  Send email notification to admin
       const adminEmail = process.env.ADMIN_EMAIL; // from .env
       const emailSubject = `New Submission by ${user.name}`;
       const emailMessage = `
@@ -126,9 +126,9 @@ Your Application
             subject: emailSubject,
             message: emailMessage,
          });
-         console.log("📧 Admin notified via email");
+         console.log(" Admin notified via email");
       } catch (emailErr) {
-         console.error("⚠️ Failed to send email to admin:", emailErr.message);
+         console.error(" Failed to send email to admin:", emailErr.message);
       }
 
       res.json({

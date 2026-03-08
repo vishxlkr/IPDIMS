@@ -9,14 +9,13 @@ import {
    getProfile,
    updateProfile,
    addRegistration,
-} from "../controllers/userController.js"; // Move submissionController functions here
+} from "../controllers/userController.js";
 import authUser from "../middlewares/authUser.js";
 import {
    getUserSubmissions,
    newSubmission,
    updateSubmission,
 } from "../controllers/submissionController.js";
-// import upload from "../middlewares/multer.js";
 
 const userRouter = express.Router();
 

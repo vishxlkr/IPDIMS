@@ -224,14 +224,10 @@ export const updateSubmission = async (req, res) => {
          }
       }
 
-      // Automatically set status to "Under Review" upon user edit
       submission.status = "Under Review";
 
-      // 5. Author submits revised paper -> Needs Reviewer Action
       submission.needsAuthorAction = false;
       submission.needsReviewerAction = true;
-      // In case they were revising based on admin feedback before reviewer assignment?
-      // Prompt says "needsReviewerAction = true". Assuming workflow strictly follows 4 -> 5.
 
       await submission.save();
 

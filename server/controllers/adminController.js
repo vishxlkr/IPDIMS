@@ -552,7 +552,6 @@ export const getAllUsers = async (req, res) => {
 };
 
 // get user by user id
-// Get user by ID
 export const getUserById = async (req, res) => {
    try {
       const user = await userModel.findById(req.params.id).select("-password"); // exclude password
@@ -603,31 +602,6 @@ export const getUserSubmissions = async (req, res) => {
       });
    }
 };
-
-//  Get all submissions of a specific user (AUTHOR)
-// export const getUserSubmissions = async (req, res) => {
-//    try {
-//       const userId = req.params.id;
-
-//       const submissions = await submissionModel
-//          .find({ author: userId }) // match author field
-//          .sort({ createdAt: -1 }) // newest first
-//          .populate("reviewer", "name email organization") // show reviewer details
-//          .populate("author", "name email organization"); // show user details
-
-//       res.status(200).json({
-//          success: true,
-//          submissions,
-//       });
-//    } catch (error) {
-//       console.error(" Error fetching user submissions:", error);
-//       res.status(500).json({
-//          success: false,
-//          message: "Server error while fetching user submissions",
-//          error: error.message,
-//       });
-//    }
-// };
 
 // api to get all registrations
 

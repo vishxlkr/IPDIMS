@@ -438,25 +438,21 @@ export const changeSubmissionStatus = async (req, res) => {
 
       submission.status = status;
 
-      // 4. Admin decision logic for workflow flags
       if (status === "Revision Requested") {
          submission.needsAuthorAction = true;
          submission.needsAdminAction = false;
          submission.needsReviewerAction = false;
       } else if (status === "Accepted" || status === "Rejected") {
-         // Completed / History
          submission.needsAuthorAction = false;
          submission.needsAdminAction = false;
          submission.needsReviewerAction = false;
       }
-      // If status is "Under Review", it might have been set by Assign or something else.
-      // But typically Admin changes to one of the above.
 
       await submission.save();
 
       console.log("✅ Status updated to:", status);
 
-      // ✉️ Only send email if notify = true
+      //  Only send email if notify = true
       if (notify) {
          const userEmail = submission.authorEmail || submission.author.email;
          const userName = submission.authorName || submission.author.name;

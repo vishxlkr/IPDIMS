@@ -231,22 +231,18 @@ export const submitReview = async (req, res) => {
          });
       }
 
-      //  Check if reviewer has already submitted feedback
       const existingFeedbackIndex = submission.feedback.findIndex(
          (f) => f.reviewer.toString() === reviewerId,
       );
 
       if (existingFeedbackIndex !== -1) {
-         // Update existing feedback
          const fb = submission.feedback[existingFeedbackIndex];
          fb.comment = feedbackText;
          fb.confidentialComments = confidentialComments || "";
          fb.recommendation = decision || "Under Review";
          fb.scores = scores || {};
          fb.bestPaperNomination = bestPaperNomination || "No";
-         // We keep original createdAt and reviewer
       } else {
-         // Add new feedback entry at top (newest first)
          submission.feedback.unshift({
             reviewer: reviewerId,
             comment: feedbackText, // Comments to Author
@@ -258,21 +254,10 @@ export const submitReview = async (req, res) => {
          });
       }
 
-      // 3. Reviewer submits review -> Needs Admin Action
-      // 6. Reviewer re-reviews -> Needs Admin Action
       submission.needsAdminAction = true;
       submission.needsReviewerAction = false;
-      // submission.needsAuthorAction = false; // Already false mostly
 
-      //  Avoid overwriting status if multiple reviewers are working independently
-      // Or set status based on logic. Currently keeping existing logic minimal or just logging feedback.
-      // submission.status = decision || "Under Review";
-
-      //  Update submission status to reviewer’s decision
-      // submission.status = decision || "Under Review";
-
-      // Explicitly update timestamp to ensure it floats to top
-      submission.updatedAt = new Date(); // Mongoose handles this, but forcing just in case
+      submission.updatedAt = new Date();
       await submission.save();
 
       res.status(200).json({

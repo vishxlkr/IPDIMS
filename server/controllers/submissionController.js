@@ -175,7 +175,6 @@ export const updateSubmission = async (req, res) => {
       const file = req.file;
       const userId = req.user.id;
 
-      // Find original submission
       const submission = await submissionModel.findById(id);
       if (!submission) {
          return res
@@ -183,7 +182,6 @@ export const updateSubmission = async (req, res) => {
             .json({ success: false, message: "Submission not found" });
       }
 
-      // Check ownership
       if (submission.author.toString() !== userId) {
          return res.status(403).json({
             success: false,
@@ -191,7 +189,6 @@ export const updateSubmission = async (req, res) => {
          });
       }
 
-      // Update basic fields
       if (title) submission.title = title;
       if (description) submission.description = description;
       if (keywords)
@@ -199,7 +196,6 @@ export const updateSubmission = async (req, res) => {
             ? keywords
             : keywords.split(",").map((k) => k.trim());
 
-      // Handle file update if new file provided
       if (file) {
          try {
             const uploadResult = await cloudinary.uploader.upload(file.path, {

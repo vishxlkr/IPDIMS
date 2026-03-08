@@ -8,7 +8,7 @@ import validator from "validator";
 import sendEmail from "../config/email.js";
 import registrationModel from "../models/registrationModel.js";
 
-//1. api for the admin login
+// api for the admin login
 
 export const loginAdmin = async (req, res) => {
    try {
@@ -116,7 +116,7 @@ export const addReviewer = async (req, res) => {
    }
 };
 
-//2.  api to get all reviewer
+//  api to get all reviewer
 
 export const getAllReviewers = async (req, res) => {
    try {
@@ -205,7 +205,7 @@ export const updateReviewerStatus = async (req, res) => {
    }
 };
 
-//3.  api to get all submission
+//api to get all submission
 export const getAllSubmissions = async (req, res) => {
    try {
       const submissions = await submissionModel
@@ -281,7 +281,7 @@ export const getSubmissionById = async (req, res) => {
 };
 
 // api to  Assign Submission to Reviewer
-// ----------------------------
+
 export const assignSubmission = async (req, res) => {
    try {
       const { submissionId, reviewerIds } = req.body;
@@ -301,31 +301,23 @@ export const assignSubmission = async (req, res) => {
             .json({ success: false, message: "Submission not found" });
       }
 
-      // Update submission with new list of reviewers
       submission.reviewers = reviewerIds;
 
-      // Update status if it was pending and now has reviewers
       if (submission.status === "Pending" && reviewerIds.length > 0) {
          submission.status = "Under Review";
       } else if (
          reviewerIds.length === 0 &&
          submission.status === "Under Review"
       ) {
-         // Optional: revert to pending if all reviewers removed?
-         // keeping it simple for now
          submission.status = "Pending";
       }
 
-      // 2. Admin assigns reviewer -> Needs Reviewer Action
       if (reviewerIds.length > 0) {
          submission.needsReviewerAction = true;
          submission.needsAdminAction = false;
          submission.needsAuthorAction = false;
       }
-      // If reviewer removed, maybe revert flags?
-      // Assuming typical workflow: Assign -> Reviewer sees it.
 
-      // Backward compatibility (optional, set first reviewer as main 'reviewer' field)
       if (reviewerIds.length > 0) {
          submission.reviewer = reviewerIds[0];
       } else {
@@ -334,12 +326,6 @@ export const assignSubmission = async (req, res) => {
 
       await submission.save();
 
-      // Update reviewers' assigned lists (add if not present)
-      // Note: optimally we should also remove this submission from reviewers who were unassigned
-      // For simplicity/safety, we'll just add it to the new ones for now or do a bulk update
-
-      // 1. Remove submission from all reviewers (clean slate approach for this submission)
-      // This might be heavy if many reviewers, but accurate
       await reviewerModel.updateMany(
          { assignedSubmissions: submissionId },
          { $pull: { assignedSubmissions: submissionId } },
@@ -356,7 +342,6 @@ export const assignSubmission = async (req, res) => {
          );
       }
 
-      // Populate for response
       const populatedSubmission = await submissionModel
          .findById(submissionId)
          .populate("author", "name email organization")
@@ -369,14 +354,12 @@ export const assignSubmission = async (req, res) => {
 
       for (const reviewer of newReviewers) {
          try {
-            // Generate magic token
             const token = jwt.sign(
                { id: reviewer._id, role: "reviewer" },
                process.env.JWT_SECRET,
                { expiresIn: "7d" },
             );
 
-            // Access client URL from env
             const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
             const magicLink = `${clientUrl}/reviewer-access?token=${token}`;
 

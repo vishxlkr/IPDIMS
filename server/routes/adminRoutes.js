@@ -9,6 +9,7 @@ import {
    deleteAuthor,
    deleteRegistration,
    deleteSubmission,
+   deleteReviewer,
    getAllRegistrations,
    getAllReviewers,
    getAllSubmissions,
@@ -34,15 +35,16 @@ adminRouter.post(
    "/add-reviewer",
    authAdmin,
    upload.single("image"), // optional image upload
-   addReviewer
+   addReviewer,
 );
 adminRouter.get("/all-reviewer", authAdmin, getAllReviewers);
 adminRouter.get("/reviewer/:id", authAdmin, getReviewerById);
 adminRouter.post(
    "/change-availability/:reviewerId",
    authAdmin,
-   updateReviewerStatus
+   updateReviewerStatus,
 );
+adminRouter.delete("/reviewer/:id", authAdmin, deleteReviewer);
 
 // Submission routes
 adminRouter.get("/submissions", authAdmin, getAllSubmissions);
@@ -51,7 +53,7 @@ adminRouter.post("/assign-submission", authAdmin, assignSubmission);
 adminRouter.post(
    "/change-submission-status",
    authAdmin,
-   changeSubmissionStatus
+   changeSubmissionStatus,
 );
 adminRouter.delete("/submission/:id", authAdmin, deleteSubmission);
 

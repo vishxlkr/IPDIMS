@@ -3,6 +3,10 @@ import jwt from "jsonwebtoken";
 import userModel from "../models/userModel.js";
 import registrationModel from "../models/registrationModel.js";
 import sendEmail from "../config/email.js";
+import {
+   getOTPEmail,
+   getRegistrationSuccessEmail,
+} from "../config/emailTemplates/templates.js";
 import { v2 as cloudinary } from "cloudinary";
 
 // Generate 6-digit OTP
@@ -57,11 +61,13 @@ export const signup = async (req, res) => {
       }
 
       // Send OTP email
+      const htmlContent = getOTPEmail(otp);
       const message = `Your OTP for registration is: ${otp}. It expires in 10 minutes.`;
       await sendEmail({
          email: user.email,
-         subject: "OTP Verification",
+         subject: "IPDIMS - Verify Your Account",
          message,
+         html: htmlContent,
       });
 
       res.status(200).json({
@@ -108,6 +114,20 @@ export const verifyOtp = async (req, res) => {
       await user.save();
 
       const token = generateToken(user._id);
+
+      // Send Welcome/Registration Success Email
+      try {
+         const htmlContent = getRegistrationSuccessEmail(user.name);
+         await sendEmail({
+            email: user.email,
+            subject: "Registration Successful - Welcome to IPDIMS",
+            message: "Your IPDIMS account registration was successful.",
+            html: htmlContent,
+         });
+         console.log("Welcome email sent to:", user.email);
+      } catch (emailErr) {
+         console.error("Failed to send welcome email:", emailErr);
+      }
 
       res.status(200).json({
          success: true,

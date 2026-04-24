@@ -6,6 +6,12 @@ import submissionModel from "../models/submissionModel.js";
 import reviewerModel from "../models/reviewerModel.js";
 import validator from "validator";
 import sendEmail from "../config/email.js";
+import {
+   getReviewerAssignmentEmail,
+   getStatusUpdateEmail,
+   getFeedbackSentToAuthorEmail,
+   getReviewerRegistrationEmail,
+} from "../config/emailTemplates/templates.js";
 import registrationModel from "../models/registrationModel.js";
 
 // api for the admin login
@@ -47,11 +53,11 @@ export const addReviewer = async (req, res) => {
 
       const imageFile = req.file; // optional
 
-      // Mandatory fields
-      if (!name || !email || !password) {
+      // Mandatory fields (password is now optional)
+      if (!name || !email) {
          return res.json({
             success: false,
-            message: "Missing required fields",
+            message: "Name and email are required",
          });
       }
 
@@ -63,17 +69,15 @@ export const addReviewer = async (req, res) => {
          });
       }
 
-      // Validate password length
-      if (password.length < 8) {
-         return res.json({
-            success: false,
-            message: "Password must be at least 8 characters long",
-         });
-      }
+      // Generate password as email + # + month + year
+      const now = new Date();
+      const month = now.getMonth() + 1; // 1-12
+      const year = now.getFullYear();
+      const finalPassword = `${email}#${month}${year}`;
 
       // Hash password
       const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
+      const hashedPassword = await bcrypt.hash(finalPassword, salt);
 
       // Upload image if provided
       let imageUrl = "";
@@ -107,9 +111,30 @@ export const addReviewer = async (req, res) => {
 
       const newReviewer = new reviewerModel(reviewerData);
       await newReviewer.save();
-      console.log("reviewer added ");
+      console.log("reviewer added");
 
-      res.json({ success: true, message: "Reviewer added successfully" });
+      // Send registration email with credentials
+      try {
+         const emailContent = getReviewerRegistrationEmail(
+            name,
+            email,
+            finalPassword,
+         );
+         await sendEmail({
+            email: email,
+            subject: "Reviewer Registration - Login Credentials",
+            html: emailContent,
+         });
+         console.log("Registration email sent to reviewer");
+      } catch (emailError) {
+         console.log("Error sending email:", emailError);
+         // Don't fail the reviewer creation if email fails
+      }
+
+      res.json({
+         success: true,
+         message: "Reviewer added successfully and email sent",
+      });
    } catch (error) {
       console.log(error);
       res.json({ success: false, message: error.message });
@@ -201,6 +226,33 @@ export const updateReviewerStatus = async (req, res) => {
       res.status(500).json({
          success: false,
          message: "Server error while updating reviewer status",
+      });
+   }
+};
+
+// Admin: Delete Reviewer
+export const deleteReviewer = async (req, res) => {
+   try {
+      const { id } = req.params;
+      const reviewer = await reviewerModel.findByIdAndDelete(id);
+
+      if (!reviewer) {
+         return res.status(404).json({
+            success: false,
+            message: "Reviewer not found",
+         });
+      }
+
+      res.status(200).json({
+         success: true,
+         message: "Reviewer deleted successfully",
+      });
+   } catch (error) {
+      console.error("Error deleting reviewer:", error);
+      res.status(500).json({
+         success: false,
+         message: "Server error while deleting reviewer",
+         error: error.message,
       });
    }
 };
@@ -360,33 +412,22 @@ export const assignSubmission = async (req, res) => {
                { expiresIn: "7d" },
             );
 
-            const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
-            const magicLink = `${clientUrl}/reviewer-access?token=${token}`;
+            const adminUrl = process.env.ADMIN_URL || "http://localhost:5174";
+            const magicLink = `${adminUrl}/reviewer-access?token=${token}&submissionId=${submissionId}`;
 
-            const subject =
-               "New Paper Assigned For Review - Access Link Inside";
-            const message = `
-Hello ${reviewer.name},
-
-You have been assigned a new paper for review.
-
-Paper Details:
-Title: ${submission.title}
-Author: ${submission.authorName || "N/A"}
-
-Click here to review the paper directly (No manual login required):
-${magicLink}
-
-This link is valid for 7 days.
-
-Regards,
-Team IPDIMS
-`;
+            const subject = "IPDIMS - New Paper Assigned For Review";
+            const message = `New Paper Assigned: ${submission.title}`;
+            const htmlContent = getReviewerAssignmentEmail(
+               reviewer.name,
+               submission,
+               magicLink,
+            );
 
             await sendEmail({
                email: reviewer.email,
                subject: subject,
                message: message,
+               html: htmlContent,
             });
 
             console.log("Email sent to reviewer:", reviewer.email);
@@ -458,27 +499,20 @@ export const changeSubmissionStatus = async (req, res) => {
          const userName = submission.authorName || submission.author.name;
 
          const subject = `Your Paper Status Updated - ${status}`;
-         const message = `
-Hello ${userName},
-
-Your paper submission status has been updated.
-
-📄 Paper Title: ${submission.title}
-📌 New Status: ${status}
-
-${customMessage ? `\n📝 Note from Admin:\n${customMessage}\n` : ""}
-
-You may log in to your dashboard to see more details.
-
-Regards,  
-Team IPDIMS
-`;
+         const message = `Paper submission status updated to ${status}.`;
+         const htmlContent = getStatusUpdateEmail(
+            userName,
+            submission,
+            status,
+            customMessage,
+         );
 
          try {
             await sendEmail({
                email: userEmail,
                subject,
                message,
+               html: htmlContent,
             });
             console.log("📧 Email sent to:", userEmail);
          } catch (emailErr) {
@@ -729,26 +763,13 @@ export const notifyAuthor = async (req, res) => {
       }
 
       // Prepare email content
-      const subject = `Reviewer Feedback on Your Paper: "${submission.title}"`;
-
-      const message = `
-Hello ${authorName || "Author"},
-
-You have received new feedback from the reviewer for your paper submission.
-
-📄 Paper Title: ${submission.title}
-🗣 Reviewer: ${feedback.reviewer?.name || "Anonymous Reviewer"}
-
-💬 Reviewer Comments:
-${feedback.comment}
-
-📌 Recommendation: ${feedback.recommendation}
-
-Please log in to your IPDIMS dashboard to review the feedback and make necessary changes if required.
-
-Best regards,  
-Team IPDIMS
-`;
+      const subject = `IPDIMS - Reviewer Feedback on Your Paper: "${submission.title}"`;
+      const message = `New feedback from reviewer for paper: ${submission.title}`;
+      const htmlContent = getFeedbackSentToAuthorEmail(
+         authorName,
+         submission,
+         feedback,
+      );
 
       // Send email
       try {
@@ -756,6 +777,7 @@ Team IPDIMS
             email: authorEmail,
             subject,
             message,
+            html: htmlContent,
          });
          console.log("📧 Feedback email sent to:", authorEmail);
       } catch (emailErr) {

@@ -5,7 +5,7 @@ const authAdmin = async (req, res, next) => {
    try {
       const { atoken } = req.headers;
       if (!atoken) {
-         return res.json({
+         return res.status(401).json({
             success: false,
             message: "Not authorized, Login again",
          });
@@ -16,7 +16,7 @@ const authAdmin = async (req, res, next) => {
          token_decode !==
          process.env.ADMIN_EMAIL + process.env.ADMIN_PASSWORD
       ) {
-         return res.json({
+         return res.status(401).json({
             success: false,
             message: "Not authorized, Login again",
          });
@@ -25,7 +25,7 @@ const authAdmin = async (req, res, next) => {
       next();
    } catch (error) {
       console.log(error);
-      res.json({ success: false, message: error.message });
+      res.status(401).json({ success: false, message: error.message });
    }
 };
 

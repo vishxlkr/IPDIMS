@@ -61,19 +61,8 @@ const AddSubmission = () => {
 
          if (res.data.success) {
             toast.success("Submission added successfully!");
-            // Reset form
-            setTitle("");
-            setDescription("");
-            setKeywords("");
-            setAuthorName(userData?.name || "");
-            setAuthorEmail(userData?.email || "");
-            setAuthorOrganization(userData?.organization || "");
-            setEventName("IPDIMS 2025");
-            setAttachment(null);
-
-            if (fileInputRef.current) {
-               fileInputRef.current.value = "";
-            }
+            // Redirect to dashboard after successful submission
+            navigate("/dashboard/submissions");
          } else {
             toast.error(
                res.data.message || "Submission failed. Please try again.",

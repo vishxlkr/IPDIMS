@@ -2,7 +2,12 @@ import submissionModel from "../models/submissionModel.js";
 import userModel from "../models/userModel.js";
 import { v2 as cloudinary } from "cloudinary";
 import sendEmail from "../config/email.js";
+import {
+   getAuthorSubmissionSuccessEmail,
+   getAdminNewSubmissionEmail,
+} from "../config/emailTemplates/templates.js";
 import path from "path";
+import jwt from "jsonwebtoken";
 
 // 🟢 Create a new submission
 export const newSubmission = async (req, res) => {
@@ -83,6 +88,7 @@ export const newSubmission = async (req, res) => {
             downloadUrl,
             viewUrl,
          },
+         fileHistory: downloadUrl ? [{ downloadUrl, viewUrl }] : [],
          eventName: eventName || `IPDIMS ${new Date().getFullYear()}`,
 
          // 1. Author submits paper -> Needs Admin Action
@@ -99,36 +105,48 @@ export const newSubmission = async (req, res) => {
 
       //  Send email notification to admin
       const adminEmail = process.env.ADMIN_EMAIL; // from .env
-      const emailSubject = `New Submission by ${user.name}`;
-      const emailMessage = `
-Hello Admin,
+      const adminSecret = process.env.ADMIN_PASSWORD; // To sign the admin JWT
 
-A new submission has been added by a user. Here are the details:
+      const adminToken = jwt.sign(
+         adminEmail + adminSecret,
+         process.env.JWT_SECRET,
+      );
+      const adminUrl = process.env.ADMIN_URL || "http://localhost:5174";
+      const magicLink = `${adminUrl}/admin-access?token=${adminToken}&action=assign&submissionId=${newSubmissionDoc._id}`;
 
-- Name: ${user.name}
-- Email: ${user.email}
-- Affiliation: ${user.organization || "N/A"}
-- Submission Title: ${title}
-- Description: ${description}
-- Keywords: ${keywords}
-- Event: ${submissionData.eventName}
-- Attachment: ${downloadUrl ? downloadUrl : "No attachment"}
-
-Please review the submission in the admin panel.
-
-Thanks,
-Your Application
-      `;
+      const adminHtml = getAdminNewSubmissionEmail(
+         "Admin",
+         user,
+         submissionData,
+         downloadUrl,
+         magicLink,
+      );
 
       try {
          await sendEmail({
             email: adminEmail,
-            subject: emailSubject,
-            message: emailMessage,
+            subject: `IPDIMS - Action Required: Assing Reviewers`,
+            message: `New submission: ${title} by ${user.name}`,
+            html: adminHtml,
          });
-         console.log(" Admin notified via email");
+         console.log(" Admin notified via templated email");
+
+         const authorHtml = getAuthorSubmissionSuccessEmail(
+            user.name,
+            submissionData,
+         );
+         await sendEmail({
+            email: user.email,
+            subject: `IPDIMS - Submission Received Successfully`,
+            message: `Your submission "${title}" has been received.`,
+            html: authorHtml,
+         });
+         console.log(" Author notified via templated email");
       } catch (emailErr) {
-         console.error(" Failed to send email to admin:", emailErr.message);
+         console.error(
+            " Failed to send email notifications:",
+            emailErr.message,
+         );
       }
 
       res.json({
@@ -212,6 +230,10 @@ export const updateSubmission = async (req, res) => {
                downloadUrl: uploadResult.secure_url,
                viewUrl: uploadResult.secure_url,
             };
+            submission.fileHistory.push({
+               downloadUrl: uploadResult.secure_url,
+               viewUrl: uploadResult.secure_url,
+            });
          } catch (err) {
             console.error("Cloudinary upload failed:", err);
             return res

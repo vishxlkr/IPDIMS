@@ -40,6 +40,14 @@ const submissionSchema = new mongoose.Schema(
          viewUrl: { type: String, default: "" },
       },
 
+      fileHistory: [
+         {
+            downloadUrl: { type: String, default: "" },
+            viewUrl: { type: String, default: "" },
+            uploadedAt: { type: Date, default: Date.now },
+         },
+      ],
+
       // Reviewers reference (Multiple reviewers)
       reviewers: [
          {

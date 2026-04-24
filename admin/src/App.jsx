@@ -24,6 +24,8 @@ import ReviewerSubmissions from "./pages/reviewer/ReviewerSubmissions";
 import ReviewerProfile from "./pages/reviewer/ReviewerProfile";
 import ReviewerAccess from "./pages/reviewer/ReviewerAccess";
 
+import AdminAccess from "./pages/admin/AdminAccess";
+
 const App = () => {
    const { aToken } = useContext(AdminContext);
    const { rToken } = useContext(ReviewerContext);
@@ -40,6 +42,9 @@ const App = () => {
          <ToastContainer />
 
          <Routes>
+            {/* Admin Magic Link Access - Public/Open */}
+            <Route path="/admin-access" element={<AdminAccess />} />
+
             {/* Reviewer Magic Link Access - Public/Open */}
             <Route path="/reviewer-access" element={<ReviewerAccess />} />
 

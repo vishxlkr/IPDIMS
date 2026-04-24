@@ -11,6 +11,23 @@ const AppContextProvider = ({ children }) => {
    const [userData, setUserData] = useState(null);
    const [loading, setLoading] = useState(false);
 
+   useEffect(() => {
+      const interceptor = axios.interceptors.response.use(
+         (response) => response,
+         (error) => {
+            if (error.response && error.response.status === 401) {
+               setToken("");
+               setUserData(null);
+               localStorage.removeItem("token");
+               // Automatically redirect on 401 unauthorized
+               window.location.href = "/login";
+            }
+            return Promise.reject(error);
+         },
+      );
+      return () => axios.interceptors.response.eject(interceptor);
+   }, []);
+
    const getUserData = async () => {
       if (!token) return;
       try {

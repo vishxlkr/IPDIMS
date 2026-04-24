@@ -26,8 +26,11 @@ import AddSubmission from "./pages/postlogin/AddSubmission";
 import MyProfile from "./pages/postlogin/MyProfile";
 import DashboardLayout from "./components/DashboardLayout";
 import MySubmissions from "./pages/postlogin/MySubmissions";
+import { AppContext } from "./context/AppContext";
 
 export default function App() {
+   const { token } = React.useContext(AppContext);
+
    return (
       <div className="pt-16 bg-black">
          <ToastContainer />
@@ -37,7 +40,10 @@ export default function App() {
          <Routes>
             {/* ------------------ Pre-login pages ------------------ */}
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
+            <Route
+               path="/login"
+               element={token ? <Navigate to="/dashboard" /> : <Login />}
+            />
             <Route path="/submission" element={<Submission />} />
             <Route path="/registration" element={<Registration />} />
             <Route path="/important-dates" element={<ImportantDates />} />
@@ -50,10 +56,16 @@ export default function App() {
             <Route path="/appointment/:docId" element={<Appointment />} /> */}
 
             {/* /new button */}
-            <Route path="/add-submission" element={<AddSubmission />} />
+            <Route
+               path="/add-submission"
+               element={token ? <AddSubmission /> : <Navigate to="/login" />}
+            />
 
             {/* profile */}
-            <Route path="/dashboard" element={<DashboardLayout />}>
+            <Route
+               path="/dashboard"
+               element={token ? <DashboardLayout /> : <Navigate to="/login" />}
+            >
                <Route index element={<Navigate to="profile" replace />} />
                <Route path="profile" element={<MyProfile />} />
                <Route path="submissions" element={<MySubmissions />} />

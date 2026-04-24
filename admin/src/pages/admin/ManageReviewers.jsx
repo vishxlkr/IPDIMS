@@ -15,6 +15,7 @@ import {
    FileText,
    Calendar,
    User,
+   Trash2,
 } from "lucide-react";
 import { AdminContext } from "../../context/AdminContext";
 
@@ -117,6 +118,33 @@ const ManageReviewers = () => {
       }
    };
 
+   const handleDeleteReviewer = async (reviewerId) => {
+      if (
+         window.confirm(
+            "Are you sure you want to delete this reviewer? This action cannot be undone.",
+         )
+      ) {
+         try {
+            const { data } = await axios.delete(
+               `${backendUrl}/api/admin/reviewer/${reviewerId}`,
+               { headers: { atoken } },
+            );
+
+            if (data.success) {
+               toast.success(data.message || "Reviewer deleted successfully!");
+               fetchReviewers();
+            } else {
+               toast.error(data.message || "Failed to delete reviewer");
+            }
+         } catch (error) {
+            console.error("Error deleting reviewer:", error);
+            toast.error(
+               error.response?.data?.message || "Failed to delete reviewer",
+            );
+         }
+      }
+   };
+
    const handleToggleStatus = async (reviewerId, currentStatus) => {
       try {
          const { data } = await axios.post(
@@ -159,7 +187,7 @@ const ManageReviewers = () => {
    const handleAddReviewer = async (e) => {
       e.preventDefault();
 
-      if (!formData.name || !formData.email || !formData.password) {
+      if (!formData.name || !formData.email) {
          toast.error("Please fill in all required fields");
          return;
       }
@@ -300,26 +328,37 @@ const ManageReviewers = () => {
                                     </p>
                                  </div>
                               </div>
-                              <button
-                                 onClick={() =>
-                                    handleToggleStatus(
-                                       reviewer._id,
-                                       reviewer.isActive,
-                                    )
-                                 }
-                                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                                 title={
-                                    reviewer.isActive
-                                       ? "Deactivate"
-                                       : "Activate"
-                                 }
-                              >
-                                 {reviewer.isActive ? (
-                                    <ToggleRight className="w-6 h-6 text-green-600" />
-                                 ) : (
-                                    <ToggleLeft className="w-6 h-6 text-gray-400" />
-                                 )}
-                              </button>
+                              <div className="flex items-center gap-2">
+                                 <button
+                                    onClick={() =>
+                                       handleToggleStatus(
+                                          reviewer._id,
+                                          reviewer.isActive,
+                                       )
+                                    }
+                                    className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                                    title={
+                                       reviewer.isActive
+                                          ? "Deactivate"
+                                          : "Activate"
+                                    }
+                                 >
+                                    {reviewer.isActive ? (
+                                       <ToggleRight className="w-6 h-6 text-green-600" />
+                                    ) : (
+                                       <ToggleLeft className="w-6 h-6 text-gray-400" />
+                                    )}
+                                 </button>
+                                 <button
+                                    onClick={() =>
+                                       handleDeleteReviewer(reviewer._id)
+                                    }
+                                    className="p-1.5 hover:bg-red-50 rounded-lg transition-colors text-red-500 hover:text-red-700"
+                                    title="Delete Reviewer"
+                                 >
+                                    <Trash2 className="w-5 h-5" />
+                                 </button>
+                              </div>
                            </div>
 
                            <div className="space-y-2 mb-4">
@@ -449,17 +488,17 @@ const ManageReviewers = () => {
 
                         <div>
                            <label className="block text-sm font-semibold text-gray-700 mb-2">
-                              Password *
+                              Password{" "}
+                              <span className="text-gray-500 text-xs"></span>
                            </label>
                            <input
                               type="password"
                               name="password"
                               value={formData.password}
                               onChange={handleInputChange}
-                              required
                               minLength={8}
                               className="w-full px-4 py-2.5 border text-gray-700 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              placeholder="Min. 8 characters"
+                              placeholder="Enter Password"
                            />
                         </div>
 

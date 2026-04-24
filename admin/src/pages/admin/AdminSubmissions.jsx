@@ -53,6 +53,11 @@ const AdminSubmissions = () => {
    const [feedbacks, setFeedbacks] = useState([]);
    const [newFeedbackFlags, setNewFeedbackFlags] = useState({});
    const [tempStatus, setTempStatus] = useState("");
+   const [reviewerSearchTerm, setReviewerSearchTerm] = useState("");
+
+   const searchParams = new URLSearchParams(window.location.search);
+   const queuedAction = searchParams.get("action");
+   const queuedSubmissionId = searchParams.get("submissionId");
 
    // const backendUrl = "http://localhost:4000";
    const { backendUrl } = useContext(AdminContext);
@@ -66,6 +71,26 @@ const AdminSubmissions = () => {
    useEffect(() => {
       filterSubmissions();
    }, [searchTerm, statusFilter, submissions]);
+
+   useEffect(() => {
+      if (
+         queuedAction === "assign" &&
+         queuedSubmissionId &&
+         submissions.length > 0
+      ) {
+         const targetSubmission = submissions.find(
+            (s) => s._id === queuedSubmissionId,
+         );
+         if (targetSubmission && !showAssignModal) {
+            window.history.replaceState(
+               {},
+               document.title,
+               window.location.pathname,
+            );
+            openAssignModal(targetSubmission);
+         }
+      }
+   }, [submissions, queuedAction, queuedSubmissionId, showAssignModal]);
 
    const fetchSubmissions = async () => {
       try {
@@ -288,6 +313,7 @@ const AdminSubmissions = () => {
       const currentReviewerIds =
          submission.reviewers?.map((r) => r._id || r) || [];
       setSelectedReviewers(currentReviewerIds);
+      setReviewerSearchTerm("");
       setShowAssignModal(true);
    };
 
@@ -605,7 +631,7 @@ const AdminSubmissions = () => {
                                     </td>
                                     <td className="px-6 py-4">
                                        <div className="flex items-center gap-2">
-                                          {/* Square box for number of reviewers */}
+                                          {/* Square box for feedback progress fraction */}
                                           <div
                                              className={`w-10 h-10 flex items-center justify-center rounded-lg shadow-sm border ${
                                                 submission.reviewers &&
@@ -613,9 +639,19 @@ const AdminSubmissions = () => {
                                                    ? "bg-blue-100 border-blue-200 text-blue-700"
                                                    : "bg-red-50 border-red-200 text-red-500 animate-pulse"
                                              }`}
-                                             title={`${submission.reviewers?.length || 0} Reviewers Assigned`}
+                                             title={`${
+                                                submission.feedback?.filter(
+                                                   (f) => f.reviewer,
+                                                )?.length || 0
+                                             } out of ${submission.reviewers?.length || 0} reviewers submitted feedback`}
                                           >
-                                             <span className="text-lg font-bold">
+                                             <span className="text-sm font-bold">
+                                                {submission.feedback?.filter(
+                                                   (f) => f.reviewer,
+                                                )?.length || 0}
+                                                <span className="text-xs">
+                                                   /
+                                                </span>
                                                 {submission.reviewers?.length ||
                                                    0}
                                              </span>
@@ -850,48 +886,93 @@ const AdminSubmissions = () => {
                            </div>
                         )}
 
-                     {selectedSubmission.attachment && (
+                     {selectedSubmission.fileHistory?.length > 0 ? (
                         <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                            <div className="flex flex-col gap-4">
-                              <div className="flex items-center justify-between">
-                                 <div className="flex items-center gap-3">
-                                    <FileText
-                                       className="text-blue-600"
-                                       size={20}
-                                    />
-                                    <div>
-                                       <p className="text-xs text-gray-500 font-semibold mb-1">
-                                          ATTACHMENT
-                                       </p>
-                                       <p className="text-gray-900 font-medium text-sm">
-                                          Paper Submission
-                                       </p>
+                              <h4 className="text-gray-900 font-semibold flex items-center gap-2">
+                                 <FileText
+                                    className="text-blue-600"
+                                    size={20}
+                                 />
+                                 Submitted Files History
+                              </h4>
+                              {selectedSubmission.fileHistory.map(
+                                 (file, idx) => (
+                                    <div
+                                       key={idx}
+                                       className="flex items-center justify-between border-t border-gray-200 pt-3 first:border-0 first:pt-0"
+                                    >
+                                       <div className="flex flex-col">
+                                          <p className="text-gray-900 font-medium text-sm">
+                                             Version {idx + 1}{" "}
+                                             {idx ===
+                                             selectedSubmission.fileHistory
+                                                .length -
+                                                1
+                                                ? "(Latest)"
+                                                : ""}
+                                          </p>
+                                          <p className="text-xs text-gray-500">
+                                             Uploaded:{" "}
+                                             {new Date(
+                                                file.uploadedAt,
+                                             ).toLocaleString()}
+                                          </p>
+                                       </div>
+                                       <button
+                                          onClick={() =>
+                                             handleDownload(
+                                                file.downloadUrl,
+                                                `${selectedSubmission.title || "submission"}_v${idx + 1}`,
+                                             )
+                                          }
+                                          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                                       >
+                                          <Download size={16} />
+                                          Download
+                                       </button>
                                     </div>
-                                 </div>
-                                 <button
-                                    onClick={() =>
-                                       handleDownload(
-                                          selectedSubmission.attachment
-                                             .downloadUrl,
-                                          selectedSubmission.title ||
-                                             "submission",
-                                       )
-                                    }
-                                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-all"
-                                 >
-                                    <Download size={18} />
-                                    Download
-                                 </button>
-                              </div>
-                              {/* {selectedSubmission.attachment.viewUrl && (
-                                 <iframe
-                                    src={selectedSubmission.attachment.viewUrl}
-                                    className="w-full h-96 rounded border border-gray-300 bg-white"
-                                    title="PDF Preview"
-                                 ></iframe>
-                              )} */}
+                                 ),
+                              )}
                            </div>
                         </div>
+                     ) : (
+                        selectedSubmission.attachment && (
+                           <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                              <div className="flex flex-col gap-4">
+                                 <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                       <FileText
+                                          className="text-blue-600"
+                                          size={20}
+                                       />
+                                       <div>
+                                          <p className="text-xs text-gray-500 font-semibold mb-1">
+                                             ATTACHMENT
+                                          </p>
+                                          <p className="text-gray-900 font-medium text-sm">
+                                             Paper Submission
+                                          </p>
+                                       </div>
+                                    </div>
+                                    <button
+                                       onClick={() =>
+                                          handleDownload(
+                                             selectedSubmission.attachment
+                                                .downloadUrl,
+                                             selectedSubmission.title ||
+                                                "submission",
+                                          )
+                                       }
+                                       className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-all"
+                                    >
+                                       <Download size={18} />
+                                       Download
+                                    </button>
+                                 </div>
+                              </div>
+                           </div>
+                        )
                      )}
 
                      {selectedSubmission.reviewer && (
@@ -1264,9 +1345,9 @@ const AdminSubmissions = () => {
          {/* Assign Reviewer Modal */}
          {showAssignModal && selectedSubmission && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-               <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[80vh] flex flex-col">
+               <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full h-[80vh] flex flex-col">
                   {/* Header */}
-                  <div className="border-b border-gray-200 p-6 flex items-center justify-between">
+                  <div className="border-b border-gray-200 p-6 flex items-center justify-between shrink-0">
                      <h2 className="text-xl font-bold text-gray-800">
                         Assign Reviewers
                      </h2>
@@ -1274,6 +1355,7 @@ const AdminSubmissions = () => {
                         onClick={() => {
                            setShowAssignModal(false);
                            setSelectedReviewers([]);
+                           setReviewerSearchTerm("");
                         }}
                         className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
                      >
@@ -1282,15 +1364,40 @@ const AdminSubmissions = () => {
                   </div>
 
                   {/* Body - Scrollable */}
-                  <div className="p-6 overflow-y-auto max-h-[60vh]">
+                  <div className="p-6 overflow-y-auto flex-1">
                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        <label className="block text-sm font-semibold text-gray-700 mb-3">
                            Select Reviewers ({selectedReviewers.length}{" "}
                            selected)
                         </label>
+                        <div className="mb-4 relative">
+                           <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                           <input
+                              type="text"
+                              placeholder="Search by name or email..."
+                              value={reviewerSearchTerm}
+                              onChange={(e) =>
+                                 setReviewerSearchTerm(e.target.value)
+                              }
+                              className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           />
+                        </div>
                         <div className="grid grid-cols-1 gap-2 border border-gray-200 rounded-lg p-2 max-h-64 overflow-y-auto">
                            {reviewers
-                              .filter((r) => r.isActive)
+                              .filter(
+                                 (r) =>
+                                    r.isActive &&
+                                    (r.name
+                                       .toLowerCase()
+                                       .includes(
+                                          reviewerSearchTerm.toLowerCase(),
+                                       ) ||
+                                       r.email
+                                          .toLowerCase()
+                                          .includes(
+                                             reviewerSearchTerm.toLowerCase(),
+                                          )),
+                              )
                               .map((reviewer) => {
                                  const isSelected = selectedReviewers.includes(
                                     reviewer._id,
@@ -1308,7 +1415,7 @@ const AdminSubmissions = () => {
                                        }`}
                                     >
                                        <div
-                                          className={`w-5 h-5 rounded-full border flex items-center justify-center flex-shrink-0 transition-colors ${
+                                          className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-colors ${
                                              isSelected
                                                 ? "bg-blue-600 border-blue-600"
                                                 : "bg-white border-gray-400"
@@ -1342,11 +1449,12 @@ const AdminSubmissions = () => {
                   </div>
 
                   {/* Footer */}
-                  <div className="border-t border-gray-200 p-6 flex justify-end gap-3 bg-gray-50 rounded-b-2xl">
+                  <div className="border-t border-gray-200 p-6 flex justify-end gap-3 bg-gray-50 rounded-b-2xl shrink-0">
                      <button
                         onClick={() => {
                            setShowAssignModal(false);
                            setSelectedReviewers([]);
+                           setReviewerSearchTerm("");
                         }}
                         className="px-5 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-xl font-medium transition-all"
                      >

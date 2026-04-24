@@ -288,7 +288,7 @@ const MySubmissions = () => {
                                     {index + 1}
                                  </td>
                                  <td
-                                    className="px-4 py-4 font-medium text-gray-800 break-words"
+                                    className="px-4 py-4 font-medium text-gray-800 wrap-break-word"
                                     title={sub.title}
                                  >
                                     {sub.title || "Untitled"}
@@ -478,43 +478,83 @@ const MySubmissions = () => {
                               </div>
                            )}
 
-                           {/* Attachment */}
-                           {selectedSubmission.attachment && (
+                           {/* File History */}
+                           {selectedSubmission.fileHistory?.length > 0 ? (
                               <div className="bg-gray-50 rounded-xl p-4 border flex flex-col gap-4">
-                                 <div className="flex items-center justify-between w-full">
-                                    <div className="flex items-center gap-3">
-                                       <FileText
-                                          size={20}
-                                          className="text-blue-600"
-                                       />
-                                       <p className="text-gray-700 font-medium">
-                                          Paper Submission
-                                       </p>
-                                    </div>
-
-                                    <button
-                                       onClick={() =>
-                                          handleDownload(
-                                             selectedSubmission.attachment
-                                                .downloadUrl,
-                                             selectedSubmission.title ||
-                                                "submission",
-                                          )
-                                       }
-                                       className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2"
-                                    >
-                                       <Download size={18} /> Download
-                                    </button>
-                                 </div>
-
-                                 {/* {selectedSubmission.attachment.viewUrl && (
-                              <iframe
-                                 src={selectedSubmission.attachment.viewUrl}
-                                 className="w-full h-96 rounded-lg border border-gray-200"
-                                 title="PDF Preview"
-                              />
-                           )} */}
+                                 <h4 className="text-gray-700 font-semibold mb-2 flex items-center gap-2">
+                                    <FileText
+                                       size={20}
+                                       className="text-blue-600"
+                                    />
+                                    Submitted Files History
+                                 </h4>
+                                 {selectedSubmission.fileHistory.map(
+                                    (file, idx) => (
+                                       <div
+                                          key={idx}
+                                          className="flex items-center justify-between w-full border-t border-gray-200 pt-3 first:border-0 first:pt-0"
+                                       >
+                                          <div className="flex flex-col">
+                                             <p className="text-gray-700 font-medium">
+                                                Version {idx + 1}{" "}
+                                                {idx ===
+                                                selectedSubmission.fileHistory
+                                                   .length -
+                                                   1
+                                                   ? "(Latest)"
+                                                   : ""}
+                                             </p>
+                                             <p className="text-xs text-gray-500">
+                                                Uploaded:{" "}
+                                                {new Date(
+                                                   file.uploadedAt,
+                                                ).toLocaleString()}
+                                             </p>
+                                          </div>
+                                          <button
+                                             onClick={() =>
+                                                handleDownload(
+                                                   file.downloadUrl,
+                                                   `${selectedSubmission.title || "submission"}_v${idx + 1}`,
+                                                )
+                                             }
+                                             className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2"
+                                          >
+                                             <Download size={16} /> Download
+                                          </button>
+                                       </div>
+                                    ),
+                                 )}
                               </div>
+                           ) : (
+                              selectedSubmission.attachment && (
+                                 <div className="bg-gray-50 rounded-xl p-4 border flex flex-col gap-4">
+                                    <div className="flex items-center justify-between w-full">
+                                       <div className="flex items-center gap-3">
+                                          <FileText
+                                             size={20}
+                                             className="text-blue-600"
+                                          />
+                                          <p className="text-gray-700 font-medium">
+                                             Paper Submission
+                                          </p>
+                                       </div>
+                                       <button
+                                          onClick={() =>
+                                             handleDownload(
+                                                selectedSubmission.attachment
+                                                   .downloadUrl,
+                                                selectedSubmission.title ||
+                                                   "submission",
+                                             )
+                                          }
+                                          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2"
+                                       >
+                                          <Download size={18} /> Download
+                                       </button>
+                                    </div>
+                                 </div>
+                              )
                            )}
                         </>
                      )}

@@ -63,6 +63,11 @@ const ReviewerSubmissions = () => {
    const { backendUrl } = useContext(AdminContext);
    const rtoken = localStorage.getItem("rToken");
 
+   // To handle ?action=review&submissionId=...
+   const searchParams = new URLSearchParams(window.location.search);
+   const queuedAction = searchParams.get("action");
+   const queuedSubmissionId = searchParams.get("submissionId");
+
    useEffect(() => {
       fetchSubmissions();
    }, []);
@@ -70,6 +75,28 @@ const ReviewerSubmissions = () => {
    useEffect(() => {
       filterSubmissions();
    }, [searchTerm, statusFilter, submissions]);
+
+   // If the magic link requested a direct route to the review modal:
+   useEffect(() => {
+      if (
+         queuedAction === "review" &&
+         queuedSubmissionId &&
+         submissions.length > 0
+      ) {
+         const targetSubmission = submissions.find(
+            (s) => s._id === queuedSubmissionId,
+         );
+         if (targetSubmission && !showReviewModal) {
+            // Remove the query parameters smoothly so it doesn't loop
+            window.history.replaceState(
+               {},
+               document.title,
+               window.location.pathname,
+            );
+            openReviewModal(targetSubmission);
+         }
+      }
+   }, [submissions, queuedAction, queuedSubmissionId, showReviewModal]);
 
    const fetchSubmissions = async () => {
       try {
@@ -552,24 +579,66 @@ const ReviewerSubmissions = () => {
                         </p>
                      </div>
 
-                     {/* Manuscript Attachment */}
-                     {selectedSubmission.attachment && (
-                        <div className="bg-white p-4 rounded-xl border flex items-center justify-between">
+                     {/* Manuscript Attachment History */}
+                     {selectedSubmission.fileHistory?.length > 0 ? (
+                        <div className="bg-white p-4 rounded-xl border flex flex-col gap-4">
                            <h4 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                              <FileText size={18} /> Manuscript
+                              <FileText size={18} /> Submitted Files History
                            </h4>
-                           <button
-                              onClick={() =>
-                                 handleDownload(
-                                    selectedSubmission.attachment.downloadUrl,
-                                    selectedSubmission.title || "submission",
-                                 )
-                              }
-                              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2"
-                           >
-                              <Download size={18} /> Download
-                           </button>
+                           {selectedSubmission.fileHistory.map((file, idx) => (
+                              <div
+                                 key={idx}
+                                 className="flex items-center justify-between border-t border-gray-200 pt-3 first:border-0 first:pt-0"
+                              >
+                                 <div className="flex flex-col">
+                                    <p className="text-gray-900 font-medium text-sm">
+                                       Version {idx + 1}{" "}
+                                       {idx ===
+                                       selectedSubmission.fileHistory.length - 1
+                                          ? "(Latest)"
+                                          : ""}
+                                    </p>
+                                    <p className="text-xs text-gray-500">
+                                       Uploaded:{" "}
+                                       {new Date(
+                                          file.uploadedAt,
+                                       ).toLocaleString()}
+                                    </p>
+                                 </div>
+                                 <button
+                                    onClick={() =>
+                                       handleDownload(
+                                          file.downloadUrl,
+                                          `${selectedSubmission.title || "submission"}_v${idx + 1}`,
+                                       )
+                                    }
+                                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2"
+                                 >
+                                    <Download size={16} /> Download
+                                 </button>
+                              </div>
+                           ))}
                         </div>
+                     ) : (
+                        selectedSubmission.attachment && (
+                           <div className="bg-white p-4 rounded-xl border flex items-center justify-between">
+                              <h4 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                                 <FileText size={18} /> Manuscript
+                              </h4>
+                              <button
+                                 onClick={() =>
+                                    handleDownload(
+                                       selectedSubmission.attachment
+                                          .downloadUrl,
+                                       selectedSubmission.title || "submission",
+                                    )
+                                 }
+                                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2"
+                              >
+                                 <Download size={18} /> Download
+                              </button>
+                           </div>
+                        )
                      )}
 
                      {/* Previous Reviewer Feedback */}
@@ -633,16 +702,23 @@ const ReviewerSubmissions = () => {
                   <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
                      {/* Left: PDF Viewer */}
                      <div className="w-full md:w-3/5 lg:w-2/3 bg-gray-100 border-r border-gray-200 h-full relative">
-                        {selectedSubmission.attachment ? (
+                        {selectedSubmission.attachment ||
+                        selectedSubmission.fileHistory?.length > 0 ? (
                            <Worker
                               workerUrl={`https://unpkg.com/pdfjs-dist@${pdfjsVersion}/build/pdf.worker.min.js`}
                            >
                               <div className="h-full w-full">
                                  <Viewer
                                     fileUrl={
-                                       selectedSubmission.attachment
-                                          .downloadUrl ||
-                                       `${backendUrl}/${selectedSubmission.attachment}`
+                                       selectedSubmission.fileHistory?.length >
+                                       0
+                                          ? selectedSubmission.fileHistory[
+                                               selectedSubmission.fileHistory
+                                                  .length - 1
+                                            ].downloadUrl
+                                          : selectedSubmission.attachment
+                                               ?.downloadUrl ||
+                                            `${backendUrl}/${selectedSubmission.attachment}`
                                     }
                                     plugins={[defaultLayoutPluginInstance]}
                                  />

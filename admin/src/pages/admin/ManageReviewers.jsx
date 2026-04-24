@@ -258,11 +258,10 @@ const ManageReviewers = () => {
                   <h1 className="text-3xl font-bold text-slate-950">
                      Manage Reviewers
                   </h1>
-                  
                </div>
                <button
                   onClick={() => setShowAddModal(true)}
-                  className="flex items-center gap-2 bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-3 rounded font-semibold transition-all shadow-[0_18px_45px_rgba(15,23,42,0.08)] hover:shadow-[0_22px_55px_rgba(15,23,42,0.10)]"
+                  className="flex items-center gap-2 bg-accent hover:bg-cyan-700 text-white px-6 py-3 rounded font-semibold transition-all shadow-[0_18px_45px_rgba(15,23,42,0.08)] hover:shadow-[0_22px_55px_rgba(15,23,42,0.10)]"
                >
                   <UserPlus size={20} />
                   Add Reviewer
@@ -619,7 +618,7 @@ const ManageReviewers = () => {
                         </button>
                         <button
                            type="submit"
-                           className="px-6 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded font-medium transition-all flex items-center gap-2"
+                           className="px-6 py-2.5 bg-accent hover:bg-cyan-700 text-white rounded font-medium transition-all flex items-center gap-2"
                         >
                            <UserPlus size={18} />
                            Add Reviewer
@@ -829,4 +828,3 @@ const ManageReviewers = () => {
 };
 
 export default ManageReviewers;
-

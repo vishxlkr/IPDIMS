@@ -113,12 +113,14 @@ const ProfilePage = () => {
             {/* Card */}
             <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
                {/* Gradient Header like Reviewer UI */}
-               <div className="bg-linear-to-r from-blue-600 to-yellow-700 p-6">
+               <div className="bg-linear-to-r from-cyan-600 to-cyan-400 p-6">
                   <div className="flex items-center justify-between">
                      <div className="flex items-center gap-4">
                         {/* Profile Initial */}
                         <div className="w-24 h-24 rounded-full bg-white shadow-lg flex items-center justify-center text-4xl font-bold text-blue-600 border-4 border-blue-100">
-                           {formData.name ? formData.name.charAt(0).toUpperCase() : 'U'}
+                           {formData.name
+                              ? formData.name.charAt(0).toUpperCase()
+                              : "U"}
                         </div>
 
                         <div>

@@ -310,7 +310,7 @@ const MySubmissions = () => {
                                        onClick={() =>
                                           setSelectedSubmission(sub)
                                        }
-                                       className="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium"
+                                       className="inline-flex items-center gap-1 bg-accent hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium"
                                     >
                                        <Eye size={16} /> View
                                     </button>
@@ -515,7 +515,7 @@ const MySubmissions = () => {
                                                    `${selectedSubmission.title || "submission"}_v${idx + 1}`,
                                                 )
                                              }
-                                             className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2"
+                                             className="bg-accent hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2"
                                           >
                                              <Download size={16} /> Download
                                           </button>

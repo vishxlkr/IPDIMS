@@ -7,7 +7,10 @@
 }
 
 @theme {
-   --color-primary: #5044e5;
+   --color-primary: #5f6fff;
+   --color-primary-2: bg-blue-700;
+   --color-accent: #15a9c7;
+   --color-accent-2: blue-cyan-700;
    --template-grid-cols-auto: repeat(auto-fill, minmax(200px, 1fr));
 }
 

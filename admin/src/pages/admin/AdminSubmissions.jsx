@@ -1319,12 +1319,13 @@ const AdminSubmissions = () => {
                         </div>
 
                         <button
-                           onClick={() =>
+                           onClick={() => {
                               handleChangeStatus(
                                  selectedSubmission._id,
                                  tempStatus,
-                              )
-                           }
+                              );
+                              setShowFeedbackModal(false);
+                           }}
                            disabled={tempStatus === selectedSubmission.status}
                            className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all mr-10 shadow-md ${
                               tempStatus === selectedSubmission.status
@@ -1332,7 +1333,7 @@ const AdminSubmissions = () => {
                                  : "bg-blue-600 hover:bg-blue-700 hover:shadow-lg text-white"
                            }`}
                         >
-                           Save Changes
+                           Save
                         </button>
                      </div>
                   </div>

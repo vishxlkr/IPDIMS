@@ -1,78 +1,140 @@
-import React from "react";
-import {
-   BrowserRouter as Router,
-   Routes,
-   Route,
-   Navigate,
-} from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import React from "react";
+// import {
+//    BrowserRouter as Router,
+//    Routes,
+//    Route,
+//    Navigate,
+// } from "react-router-dom";
+// import { ToastContainer, toast } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
 
-// import { AuthProvider, useAuth } from "./context/AuthContext";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+// // import { AuthProvider, useAuth } from "./context/AuthContext";
+// import Navbar from "./components/Navbar";
+// import Footer from "./components/Footer";
 
-// Pre-login pages
-import Home from "./pages/prelogin/Home";
-import Submission from "./pages/prelogin/Submission";
-import Registration from "./pages/postlogin/Registration";
-import ImportantDates from "./pages/prelogin/ImportantDates";
-import Committee from "./pages/prelogin/Committee";
-import Venue from "./pages/prelogin/Venue";
-import ContactUs from "./pages/prelogin/ContactUs";
-import Login from "./pages/prelogin/Login";
-import AddSubmission from "./pages/postlogin/AddSubmission";
+// // Pre-login pages
+// import Home from "./pages/prelogin/Home";
+// import Submission from "./pages/prelogin/Submission";
+// import Registration from "./pages/postlogin/Registration";
+// import ImportantDates from "./pages/prelogin/ImportantDates";
+// import Committee from "./pages/prelogin/Committee";
+// import Venue from "./pages/prelogin/Venue";
+// import ContactUs from "./pages/prelogin/ContactUs";
+// import Login from "./pages/prelogin/Login";
+// import AddSubmission from "./pages/postlogin/AddSubmission";
 
-import MyProfile from "./pages/postlogin/MyProfile";
-import DashboardLayout from "./components/DashboardLayout";
-import MySubmissions from "./pages/postlogin/MySubmissions";
+// import MyProfile from "./pages/postlogin/MyProfile";
+// import DashboardLayout from "./components/DashboardLayout";
+// import MySubmissions from "./pages/postlogin/MySubmissions";
+// import { AppContext } from "./context/AppContext";
+
+// export default function App() {
+//    const { token } = React.useContext(AppContext);
+
+//    return (
+//       <div className="pt-16 bg-black">
+//          <ToastContainer />
+
+//          <Navbar />
+//          {/* <Sidebar /> */}
+//          <Routes>
+//             {/* ------------------ Pre-login pages ------------------ */}
+//             <Route path="/" element={<Home />} />
+//             <Route
+//                path="/login"
+//                element={token ? <Navigate to="/dashboard" /> : <Login />}
+//             />
+//             <Route path="/submission" element={<Submission />} />
+//             <Route path="/registration" element={<Registration />} />
+//             <Route path="/important-dates" element={<ImportantDates />} />
+//             <Route path="/committee" element={<Committee />} />
+//             <Route path="/venue" element={<Venue />} />
+//             <Route path="/contact-us" element={<ContactUs />} />
+//             {/* ---------------post login pages ------------- */}
+//             {/* <Route path="/my-profile" element={<MyProfile />} /> */}
+//             {/* <Route path="/my-appointments" element={<MyAppointments />} />
+//             <Route path="/appointment/:docId" element={<Appointment />} /> */}
+
+//             {/* /new button */}
+//             <Route
+//                path="/add-submission"
+//                element={token ? <AddSubmission /> : <Navigate to="/login" />}
+//             />
+
+//             {/* profile */}
+//             <Route
+//                path="/dashboard"
+//                element={token ? <DashboardLayout /> : <Navigate to="/login" />}
+//             >
+//                <Route index element={<Navigate to="profile" replace />} />
+//                <Route path="profile" element={<MyProfile />} />
+//                <Route path="submissions" element={<MySubmissions />} />
+//             </Route>
+//          </Routes>
+
+//          <Footer />
+//       </div>
+//    );
+// }
+
+
+
+
+
+
+import React, { useContext } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+
 import { AppContext } from "./context/AppContext";
 
+import Navbar from "./components/Navbar";
+import DashboardLayout from "./components/DashboardLayout";
+
+import Home from "./pages/prelogin/Home";
+import Login from "./pages/prelogin/Login";
+import Submission from "./pages/prelogin/Submission";
+import Registration from "./pages/postlogin/Registration";
+
+import MyProfile from "./pages/postlogin/MyProfile";
+import MySubmissions from "./pages/postlogin/MySubmissions";
+import AddSubmission from "./pages/postlogin/AddSubmission";
+
 export default function App() {
-   const { token } = React.useContext(AppContext);
+  const { token } = useContext(AppContext);
 
-   return (
-      <div className="pt-16 bg-black">
-         <ToastContainer />
+  return (
+    <>
+      {/* Navbar always on top */}
+      <Navbar />
 
-         <Navbar />
-         {/* <Sidebar /> */}
-         <Routes>
-            {/* ------------------ Pre-login pages ------------------ */}
-            <Route path="/" element={<Home />} />
-            <Route
-               path="/login"
-               element={token ? <Navigate to="/dashboard" /> : <Login />}
-            />
-            <Route path="/submission" element={<Submission />} />
-            <Route path="/registration" element={<Registration />} />
-            <Route path="/important-dates" element={<ImportantDates />} />
-            <Route path="/committee" element={<Committee />} />
-            <Route path="/venue" element={<Venue />} />
-            <Route path="/contact-us" element={<ContactUs />} />
-            {/* ---------------post login pages ------------- */}
-            {/* <Route path="/my-profile" element={<MyProfile />} /> */}
-            {/* <Route path="/my-appointments" element={<MyAppointments />} />
-            <Route path="/appointment/:docId" element={<Appointment />} /> */}
+      <ToastContainer />
 
-            {/* /new button */}
-            <Route
-               path="/add-submission"
-               element={token ? <AddSubmission /> : <Navigate to="/login" />}
-            />
+      <Routes>
+        {/* Public */}
+        <Route path="/" element={<Home />} />
+        <Route
+          path="/login"
+          element={token ? <Navigate to="/dashboard" /> : <Login />}
+        />
+        <Route path="/submission" element={<Submission />} />
+        <Route path="/registration" element={<Registration />} />
 
-            {/* profile */}
-            <Route
-               path="/dashboard"
-               element={token ? <DashboardLayout /> : <Navigate to="/login" />}
-            >
-               <Route index element={<Navigate to="profile" replace />} />
-               <Route path="profile" element={<MyProfile />} />
-               <Route path="submissions" element={<MySubmissions />} />
-            </Route>
-         </Routes>
+        {/* Protected Dashboard */}
+        <Route
+          path="/dashboard"
+          element={token ? <DashboardLayout /> : <Navigate to="/login" />}
+        >
+          <Route index element={<Navigate to="profile" />} />
+          <Route path="profile" element={<MyProfile />} />
+          <Route path="submissions" element={<MySubmissions />} />
+        </Route>
 
-         <Footer />
-      </div>
-   );
+        <Route
+          path="/add-submission"
+          element={token ? <AddSubmission /> : <Navigate to="/login" />}
+        />
+      </Routes>
+    </>
+  );
 }

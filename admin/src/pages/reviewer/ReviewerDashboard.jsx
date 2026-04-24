@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import Loading from "../../components/Loading";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
@@ -16,9 +17,7 @@ const ReviewerDashboard = () => {
    const [stats, setStats] = useState({
       total: 0,
       pending: 0,
-      accepted: 0,
-      rejected: 0,
-      revisionRequested: 0,
+      completed: 0,
    });
    const [recentSubmissions, setRecentSubmissions] = useState([]);
    const [loading, setLoading] = useState(true);
@@ -75,49 +74,41 @@ const ReviewerDashboard = () => {
       window.location.href = "/reviewer/submissions";
    };
 
-   if (loading) {
-      return (
-         <div className="flex items-center justify-center min-h-screen bg-gray-50">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
-         </div>
-      );
-   }
+   if (loading) return <Loading />;
 
    return (
-      <div className="min-h-screen bg-gray-50 p-6 -m-8">
-         <div className="max-w-7xl mx-auto">
+      <div className="min-h-[calc(100vh-5rem)] bg-gray-50 px-7 py-8">
+         <div className="w-full">
             <div className="mb-8">
-               <h1 className="text-4xl font-bold text-gray-800">
-                  Reviewer Dashboard
+               <h1 className="text-3xl font-bold text-slate-950">
+                  Dashboard
                </h1>
-               <p className="text-gray-600 mt-2">
-                  Welcome back! Here's an overview of your assigned submissions
-               </p>
+               
             </div>
 
             {/* Statistics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-               <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+               <div className="bg-white rounded shadow-[0_18px_45px_rgba(15,23,42,0.06)] p-6 ">
                   <div className="flex items-center justify-between">
                      <div>
-                        <p className="text-sm text-gray-500 font-semibold uppercase">
+                        <p className="text-sm text-slate-500 font-semibold uppercase">
                            Total Assigned
                         </p>
-                        <p className="text-3xl font-bold text-gray-800 mt-2">
+                        <p className="text-3xl font-bold text-slate-950 mt-2">
                            {stats.total}
                         </p>
                      </div>
-                     <FileText className="w-12 h-12 text-blue-500" />
+                     <FileText className="w-12 h-12 text-cyan-600" />
                   </div>
                </div>
 
-               <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
+               <div className="bg-white rounded shadow-[0_18px_45px_rgba(15,23,42,0.06)] p-6 ">
                   <div className="flex items-center justify-between">
                      <div>
-                        <p className="text-sm text-gray-500 font-semibold uppercase">
-                           Under Review
+                        <p className="text-sm text-slate-500 font-semibold uppercase">
+                           Pending Review
                         </p>
-                        <p className="text-3xl font-bold text-gray-800 mt-2">
+                        <p className="text-3xl font-bold text-slate-950 mt-2">
                            {stats.pending}
                         </p>
                      </div>
@@ -125,59 +116,31 @@ const ReviewerDashboard = () => {
                   </div>
                </div>
 
-               <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
+               <div className="bg-white rounded shadow-[0_18px_45px_rgba(15,23,42,0.06)] p-6 ">
                   <div className="flex items-center justify-between">
                      <div>
-                        <p className="text-sm text-gray-500 font-semibold uppercase">
-                           Accepted
+                        <p className="text-sm text-slate-500 font-semibold uppercase">
+                           Completed Reviews
                         </p>
-                        <p className="text-3xl font-bold text-gray-800 mt-2">
-                           {stats.accepted}
+                        <p className="text-3xl font-bold text-slate-950 mt-2">
+                           {stats.completed}
                         </p>
                      </div>
                      <CheckCircle className="w-12 h-12 text-green-500" />
                   </div>
                </div>
-
-               <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-red-500">
-                  <div className="flex items-center justify-between">
-                     <div>
-                        <p className="text-sm text-gray-500 font-semibold uppercase">
-                           Rejected
-                        </p>
-                        <p className="text-3xl font-bold text-gray-800 mt-2">
-                           {stats.rejected}
-                        </p>
-                     </div>
-                     <XCircle className="w-12 h-12 text-red-500" />
-                  </div>
-               </div>
-
-               <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-orange-500">
-                  <div className="flex items-center justify-between">
-                     <div>
-                        <p className="text-sm text-gray-500 font-semibold uppercase">
-                           Revision Req.
-                        </p>
-                        <p className="text-3xl font-bold text-gray-800 mt-2">
-                           {stats.revisionRequested}
-                        </p>
-                     </div>
-                     <AlertCircle className="w-12 h-12 text-orange-500" />
-                  </div>
-               </div>
             </div>
 
             {/* Recent Submissions */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
-               <div className="p-6 border-b border-gray-200">
+            <div className="bg-white rounded shadow-[0_18px_45px_rgba(15,23,42,0.06)] overflow-hidden border border-slate-200">
+               <div className="p-6 border-b border-slate-200">
                   <div className="flex items-center justify-between">
-                     <h2 className="text-2xl font-bold text-gray-800">
+                     <h2 className="text-2xl font-bold text-slate-950">
                         Recent Submissions
                      </h2>
                      <button
                         onClick={handleViewAllSubmissions}
-                        className="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center gap-1"
+                        className="text-cyan-600 hover:text-cyan-700 font-medium text-sm flex items-center gap-1"
                      >
                         View All
                         <TrendingUp className="w-4 h-4" />
@@ -186,30 +149,30 @@ const ReviewerDashboard = () => {
                </div>
 
                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                     <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-transparent">
+                     <thead className="bg-white">
                         <tr>
-                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                           <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                               Paper ID
                            </th>
-                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                           <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                               Title
                            </th>
-                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                           <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                               Author
                            </th>
-                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                           <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                               Status
                            </th>
-                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                           <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                               Date Assigned
                            </th>
-                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                           <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                               Action
                            </th>
                         </tr>
                      </thead>
-                     <tbody className="bg-white divide-y divide-gray-200">
+                     <tbody className="bg-white divide-y divide-transparent">
                         {recentSubmissions.length > 0 ? (
                            recentSubmissions.map((submission) => (
                               <tr
@@ -218,22 +181,22 @@ const ReviewerDashboard = () => {
                               >
                                  {" "}
                                  <td className="px-6 py-4">
-                                    <div className="text-sm font-bold text-gray-700">
+                                    <div className="text-sm font-bold text-slate-700">
                                        {submission.paperId ?? "-"}
                                     </div>
                                  </td>
                                  <td className="px-6 py-4">
-                                    <div className="text-sm font-medium text-gray-900 max-w-xs truncate">
+                                    <div className="text-sm font-medium text-slate-950 max-w-xs truncate">
                                        {submission.title || "Untitled"}
                                     </div>
                                  </td>
                                  <td className="px-6 py-4">
-                                    <div className="text-sm text-gray-900">
+                                    <div className="text-sm text-slate-950">
                                        {submission.user?.name ||
                                           submission.author?.name ||
                                           "N/A"}
                                     </div>
-                                    <div className="text-xs text-gray-500">
+                                    <div className="text-xs text-slate-500">
                                        {submission.user?.email ||
                                           submission.author?.email}
                                     </div>
@@ -247,7 +210,7 @@ const ReviewerDashboard = () => {
                                                ? "bg-red-100 text-red-800"
                                                : submission.status ===
                                                    "Under Review"
-                                                 ? "bg-blue-100 text-blue-800"
+                                                 ? "bg-cyan-100 text-cyan-700"
                                                  : submission.status ===
                                                      "Revision Requested"
                                                    ? "bg-orange-100 text-orange-800"
@@ -257,7 +220,7 @@ const ReviewerDashboard = () => {
                                        {submission.status}
                                     </span>
                                  </td>
-                                 <td className="px-6 py-4 text-sm text-gray-600">
+                                 <td className="px-6 py-4 text-sm text-slate-500">
                                     {new Date(
                                        submission.createdAt,
                                     ).toLocaleDateString()}
@@ -265,7 +228,7 @@ const ReviewerDashboard = () => {
                                  <td className="px-6 py-4">
                                     <button
                                        onClick={handleViewAllSubmissions}
-                                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                       className="p-2 text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"
                                        title="View Details"
                                     >
                                        <Eye className="w-5 h-5" />
@@ -277,7 +240,7 @@ const ReviewerDashboard = () => {
                            <tr>
                               <td
                                  colSpan="5"
-                                 className="px-6 py-12 text-center text-gray-500"
+                                 className="px-6 py-12 text-center text-slate-500"
                               >
                                  No submissions assigned yet
                               </td>
@@ -373,19 +336,19 @@ export default ReviewerDashboard;
 //    if (loading) {
 //       return (
 //          <div className="flex items-center justify-center min-h-screen bg-gray-50">
-//             <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+//             <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-cyan-500"></div>
 //          </div>
 //       );
 //    }
 
 //    return (
-//       <div className="min-h-screen bg-gray-50 p-6 -m-8">
-//          <div className="max-w-7xl mx-auto">
+//       <div className="min-h-[calc(100vh-5rem)] bg-gray-50 px-7 py-8">
+//          <div className="w-full">
 //             <div className="mb-8">
-//                <h1 className="text-4xl font-bold text-gray-800">
+//                <h1 className="text-3xl font-bold text-slate-950">
 //                   Reviewer Dashboard
 //                </h1>
-//                <p className="text-gray-600 mt-2">
+//                <p className="text-slate-500 mt-2">
 //                   Overview of your assigned papers
 //                </p>
 //             </div>
@@ -393,13 +356,13 @@ export default ReviewerDashboard;
 //             {/* Statistics Cards */}
 //             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 //                {/* Assigned */}
-//                <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+//                <div className="bg-white rounded shadow-[0_18px_45px_rgba(15,23,42,0.06)] p-6 ">
 //                   <div className="flex items-center justify-between">
 //                      <div>
-//                         <p className="text-sm text-gray-500 font-semibold uppercase">
+//                         <p className="text-sm text-slate-500 font-semibold uppercase">
 //                            Assigned
 //                         </p>
-//                         <p className="text-3xl font-bold text-gray-800 mt-2">
+//                         <p className="text-3xl font-bold text-slate-950 mt-2">
 //                            {stats.total}
 //                         </p>
 //                      </div>
@@ -408,13 +371,13 @@ export default ReviewerDashboard;
 //                </div>
 
 //                {/* Pending */}
-//                <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
+//                <div className="bg-white rounded shadow-[0_18px_45px_rgba(15,23,42,0.06)] p-6 ">
 //                   <div className="flex items-center justify-between">
 //                      <div>
-//                         <p className="text-sm text-gray-500 font-semibold uppercase">
+//                         <p className="text-sm text-slate-500 font-semibold uppercase">
 //                            Pending
 //                         </p>
-//                         <p className="text-3xl font-bold text-gray-800 mt-2">
+//                         <p className="text-3xl font-bold text-slate-950 mt-2">
 //                            {stats.pending}
 //                         </p>
 //                      </div>
@@ -423,13 +386,13 @@ export default ReviewerDashboard;
 //                </div>
 
 //                {/* Completed */}
-//                <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
+//                <div className="bg-white rounded shadow-[0_18px_45px_rgba(15,23,42,0.06)] p-6 ">
 //                   <div className="flex items-center justify-between">
 //                      <div>
-//                         <p className="text-sm text-gray-500 font-semibold uppercase">
+//                         <p className="text-sm text-slate-500 font-semibold uppercase">
 //                            Completed
 //                         </p>
-//                         <p className="text-3xl font-bold text-gray-800 mt-2">
+//                         <p className="text-3xl font-bold text-slate-950 mt-2">
 //                            {stats.completed}
 //                         </p>
 //                      </div>
@@ -439,15 +402,15 @@ export default ReviewerDashboard;
 //             </div>
 
 //             {/* Recent Submissions */}
-//             <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
-//                <div className="p-6 border-b border-gray-200">
+//             <div className="bg-white rounded shadow-[0_18px_45px_rgba(15,23,42,0.06)] overflow-hidden border border-slate-200">
+//                <div className="p-6 border-b border-slate-200">
 //                   <div className="flex items-center justify-between">
-//                      <h2 className="text-2xl font-bold text-gray-800">
+//                      <h2 className="text-2xl font-bold text-slate-950">
 //                         Recent Submissions
 //                      </h2>
 //                      <button
 //                         onClick={handleViewAllSubmissions}
-//                         className="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center gap-1"
+//                         className="text-cyan-600 hover:text-cyan-700 font-medium text-sm flex items-center gap-1"
 //                      >
 //                         View All
 //                         <TrendingUp className="w-4 h-4" />
@@ -456,38 +419,38 @@ export default ReviewerDashboard;
 //                </div>
 
 //                <div className="overflow-x-auto">
-//                   <table className="min-w-full divide-y divide-gray-200">
-//                      <thead className="bg-gray-50">
+//                   <table className="min-w-full divide-y divide-transparent">
+//                      <thead className="bg-white">
 //                         <tr>
-//                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">
+//                            <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase">
 //                               Paper ID
 //                            </th>
-//                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">
+//                            <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase">
 //                               Title
 //                            </th>
-//                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">
+//                            <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase">
 //                               Author
 //                            </th>
-//                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">
+//                            <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase">
 //                               Status
 //                            </th>
-//                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">
+//                            <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase">
 //                               Date
 //                            </th>
-//                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">
+//                            <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase">
 //                               Action
 //                            </th>
 //                         </tr>
 //                      </thead>
 
-//                      <tbody className="bg-white divide-y divide-gray-200">
+//                      <tbody className="bg-white divide-y divide-transparent">
 //                         {recentSubmissions.length > 0 ? (
 //                            recentSubmissions.map((submission) => (
 //                               <tr
 //                                  key={submission._id}
 //                                  className="hover:bg-gray-50"
 //                               >
-//                                  <td className="px-6 py-4 font-bold text-gray-700">
+//                                  <td className="px-6 py-4 font-bold text-slate-700">
 //                                     {submission.paperId ?? "-"}
 //                                  </td>
 //                                  <td className="px-6 py-4 truncate max-w-xs">
@@ -497,11 +460,11 @@ export default ReviewerDashboard;
 //                                     {submission.user?.name || "N/A"}
 //                                  </td>
 //                                  <td className="px-6 py-4">
-//                                     <span className="px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+//                                     <span className="px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-slate-950">
 //                                        {submission.status}
 //                                     </span>
 //                                  </td>
-//                                  <td className="px-6 py-4 text-sm text-gray-600">
+//                                  <td className="px-6 py-4 text-sm text-slate-500">
 //                                     {new Date(
 //                                        submission.createdAt,
 //                                     ).toLocaleDateString()}
@@ -509,7 +472,7 @@ export default ReviewerDashboard;
 //                                  <td className="px-6 py-4">
 //                                     <button
 //                                        onClick={handleViewAllSubmissions}
-//                                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+//                                        className="p-2 text-cyan-600 hover:bg-cyan-50 rounded-lg"
 //                                     >
 //                                        <Eye className="w-5 h-5" />
 //                                     </button>
@@ -520,7 +483,7 @@ export default ReviewerDashboard;
 //                            <tr>
 //                               <td
 //                                  colSpan="6"
-//                                  className="px-6 py-12 text-center text-gray-500"
+//                                  className="px-6 py-12 text-center text-slate-500"
 //                               >
 //                                  No submissions assigned
 //                               </td>
@@ -536,3 +499,4 @@ export default ReviewerDashboard;
 // };
 
 // export default ReviewerDashboard;
+

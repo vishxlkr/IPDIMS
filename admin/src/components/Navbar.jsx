@@ -10,7 +10,7 @@ const Navbar = () => {
    const navigate = useNavigate();
 
    const logout = () => {
-      const clientUrl = import.meta.env.VITE_CLIENT_URL;
+      const clientUrl = import.meta.env.VITE_CLIENT_URL || "http://localhost:5173";
       if (aToken) {
          setAToken("");
          localStorage.removeItem("aToken");
@@ -20,25 +20,25 @@ const Navbar = () => {
          localStorage.removeItem("rToken");
       }
 
-      window.location.assign(clientUrl); // ✅ Opens different project / port
+      window.location.assign(clientUrl);
    };
 
    return (
-      <nav className="fixed top-0 left-0 right-0 h-16 bg-[#0b0f19] border-b border-gray-800 px-6 flex items-center justify-between z-50">
+      <nav className="fixed left-0 right-0 top-0 z-30 flex h-[72px] items-center justify-between border-b border-slate-200 bg-white px-6 shadow-[0_2px_4px_rgba(0,0,0,0.02)] lg:left-[280px] lg:px-8">
          <h1
-            className="text-xl font-bold text-white cursor-pointer hover:text-blue-400 transition"
+            className="cursor-pointer text-[22px] font-bold text-slate-800 transition hover:text-[#0dcaf0]"
             onClick={() => navigate("/")}
          >
             IPDIMS
          </h1>
 
-         <div className="flex items-center gap-4">
-            <span className="px-3 py-1 bg-gray-700/60 rounded-full text-sm font-medium text-white">
+         <div className="flex items-center gap-5">
+            <span className="rounded-full border border-slate-200 bg-slate-50 px-4 py-1.5 text-[14px] font-semibold text-slate-500">
                {aToken ? "Admin" : rToken ? "Reviewer" : "Guest"}
             </span>
             <button
                onClick={logout}
-               className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-semibold text-white transition"
+               className="flex items-center gap-2 rounded bg-[#0dcaf0] px-4 py-2 text-[14px] font-semibold text-white shadow-sm transition hover:bg-[#0bacce]"
             >
                <LogOut size={16} /> Logout
             </button>

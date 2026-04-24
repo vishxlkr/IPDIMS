@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import Loading from "../../components/Loading";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Worker, Viewer } from "@react-pdf-viewer/core";
@@ -54,6 +55,7 @@ const AdminSubmissions = () => {
    const [newFeedbackFlags, setNewFeedbackFlags] = useState({});
    const [tempStatus, setTempStatus] = useState("");
    const [reviewerSearchTerm, setReviewerSearchTerm] = useState("");
+   const [isAssigning, setIsAssigning] = useState(false);
 
    const searchParams = new URLSearchParams(window.location.search);
    const queuedAction = searchParams.get("action");
@@ -324,6 +326,7 @@ const AdminSubmissions = () => {
       }
       // Note: allow empty array to unassign
 
+      setIsAssigning(true);
       try {
          const { data } = await axios.post(
             `${backendUrl}/api/admin/assign-submission`,
@@ -347,6 +350,8 @@ const AdminSubmissions = () => {
          toast.error(
             error.response?.data?.message || "Failed to assign reviewers",
          );
+      } finally {
+         setIsAssigning(false);
       }
    };
 
@@ -417,22 +422,15 @@ const AdminSubmissions = () => {
       }
    };
 
-   if (loading) {
-      return (
-         <div className="flex items-center justify-center min-h-screen bg-gray-50">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
-         </div>
-      );
-   }
+   if (loading) return <Loading />;
 
    return (
-      <div className="min-h-screen bg-gray-50 p-6 -m-8">
-         <div className="max-w-7xl mx-auto">
+      <div className="min-h-[calc(100vh-5rem)] bg-gray-50 px-7 py-8">
+         <div className="w-full ">
             <div className="mb-8">
-               <h1 className="text-4xl font-bold text-gray-800">Submissions</h1>
-               <p className="text-gray-600 mt-2">
-                  Manage and track all manuscript submissions
-               </p>
+               <h1 className="text-3xl font-bold text-slate-950">
+                  Submissions
+               </h1>
             </div>
 
             {/* Statistics Cards */}
@@ -1462,15 +1460,21 @@ const AdminSubmissions = () => {
                      </button>
                      <button
                         onClick={handleAssignReviewer}
-                        className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all flex items-center gap-2 shadow-sm"
+                        disabled={isAssigning}
+                        className={`px-5 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2 shadow-sm ${
+                           isAssigning
+                              ? "bg-gray-400 cursor-not-allowed text-white"
+                              : "bg-blue-600 hover:bg-blue-700 text-white"
+                        }`}
                      >
                         <UserPlus size={18} />
-                        Save Assignments
+                        {isAssigning ? "Saving..." : "Save Assignments"}
                      </button>
                   </div>
                </div>
             </div>
          )}
+         {isAssigning && <Loading />}
       </div>
    );
 };

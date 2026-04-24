@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import Loading from "../../components/Loading";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
@@ -247,50 +248,42 @@ const ManageReviewers = () => {
       }
    };
 
-   if (loading) {
-      return (
-         <div className="flex items-center justify-center min-h-screen bg-gray-50">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
-         </div>
-      );
-   }
+   if (loading) return <Loading />;
 
    return (
-      <div className="min-h-screen bg-gray-50 p-6 -m-8">
-         <div className="max-w-7xl mx-auto">
+      <div className="min-h-[calc(100vh-5rem)] bg-gray-50 px-7 py-8">
+         <div className="w-full">
             <div className="mb-8 flex items-center justify-between">
                <div>
-                  <h1 className="text-4xl font-bold text-gray-800">
+                  <h1 className="text-3xl font-bold text-slate-950">
                      Manage Reviewers
                   </h1>
-                  <p className="text-gray-600 mt-2">
-                     Add, view, and manage reviewer accounts
-                  </p>
+                  
                </div>
                <button
                   onClick={() => setShowAddModal(true)}
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl"
+                  className="flex items-center gap-2 bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-3 rounded font-semibold transition-all shadow-[0_18px_45px_rgba(15,23,42,0.08)] hover:shadow-[0_22px_55px_rgba(15,23,42,0.10)]"
                >
                   <UserPlus size={20} />
                   Add Reviewer
                </button>
             </div>
 
-            <div className="bg-white rounded-xl shadow-md p-6 mb-6 border border-gray-100">
+            <div className="bg-white rounded shadow-[0_18px_45px_rgba(15,23,42,0.06)] p-6 mb-6 border border-slate-200">
                <div className="flex items-center justify-between">
                   <div className="relative flex-1 max-w-md">
-                     <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                     <Search className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
                      <input
                         type="text"
                         placeholder="Search by name, email, organization..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 text-black pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full pl-10 text-black pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                      />
                   </div>
-                  <span className="text-gray-700 font-semibold">
+                  <span className="text-slate-700 font-semibold">
                      Total:{" "}
-                     <span className="text-blue-600">
+                     <span className="text-cyan-600">
                         {filteredReviewers.length}
                      </span>{" "}
                      reviewers
@@ -303,7 +296,7 @@ const ManageReviewers = () => {
                   filteredReviewers.map((reviewer) => (
                      <div
                         key={reviewer._id}
-                        className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden hover:shadow-xl transition-all"
+                        className="bg-white rounded shadow-[0_18px_45px_rgba(15,23,42,0.06)] border border-slate-200 overflow-hidden hover:shadow-[0_22px_55px_rgba(15,23,42,0.10)] transition-all"
                      >
                         <div className="p-6">
                            <div className="flex items-start justify-between mb-4">
@@ -312,18 +305,18 @@ const ManageReviewers = () => {
                                     <img
                                        src={reviewer.image}
                                        alt={reviewer.name}
-                                       className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+                                       className="w-16 h-16 rounded-full object-cover border-2 border-slate-200"
                                     />
                                  ) : (
-                                    <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
-                                       <User className="w-8 h-8 text-blue-600" />
+                                    <div className="w-16 h-16 rounded-full bg-cyan-100 flex items-center justify-center">
+                                       <User className="w-8 h-8 text-cyan-600" />
                                     </div>
                                  )}
                                  <div>
-                                    <h3 className="text-lg font-bold text-gray-900">
+                                    <h3 className="text-lg font-bold text-slate-950">
                                        {reviewer.name}
                                     </h3>
-                                    <p className="text-sm text-gray-500">
+                                    <p className="text-sm text-slate-500">
                                        {reviewer.designation || "Reviewer"}
                                     </p>
                                  </div>
@@ -346,14 +339,14 @@ const ManageReviewers = () => {
                                     {reviewer.isActive ? (
                                        <ToggleRight className="w-6 h-6 text-green-600" />
                                     ) : (
-                                       <ToggleLeft className="w-6 h-6 text-gray-400" />
+                                       <ToggleLeft className="w-6 h-6 text-slate-400" />
                                     )}
                                  </button>
                                  <button
                                     onClick={() =>
                                        handleDeleteReviewer(reviewer._id)
                                     }
-                                    className="p-1.5 hover:bg-red-50 rounded-lg transition-colors text-red-500 hover:text-red-700"
+                                    className="p-1.5 hover:bg-white rounded-lg transition-colors text-red-500 hover:text-red-700"
                                     title="Delete Reviewer"
                                  >
                                     <Trash2 className="w-5 h-5" />
@@ -362,21 +355,21 @@ const ManageReviewers = () => {
                            </div>
 
                            <div className="space-y-2 mb-4">
-                              <div className="flex items-center gap-2 text-sm text-gray-600">
-                                 <Mail className="w-4 h-4 text-gray-400" />
+                              <div className="flex items-center gap-2 text-sm text-slate-500">
+                                 <Mail className="w-4 h-4 text-slate-400" />
                                  <span className="truncate">
                                     {reviewer.email}
                                  </span>
                               </div>
                               {reviewer.phone && (
-                                 <div className="flex items-center gap-2 text-sm text-gray-600">
-                                    <Phone className="w-4 h-4 text-gray-400" />
+                                 <div className="flex items-center gap-2 text-sm text-slate-500">
+                                    <Phone className="w-4 h-4 text-slate-400" />
                                     <span>{reviewer.phone}</span>
                                  </div>
                               )}
                               {reviewer.organization && (
-                                 <div className="flex items-center gap-2 text-sm text-gray-600">
-                                    <Building className="w-4 h-4 text-gray-400" />
+                                 <div className="flex items-center gap-2 text-sm text-slate-500">
+                                    <Building className="w-4 h-4 text-slate-400" />
                                     <span className="truncate">
                                        {reviewer.organization}
                                     </span>
@@ -393,13 +386,13 @@ const ManageReviewers = () => {
                                           .map((spec, idx) => (
                                              <span
                                                 key={idx}
-                                                className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full"
+                                                className="bg-cyan-100 text-cyan-700 text-xs px-2 py-1 rounded-full"
                                              >
                                                 {spec}
                                              </span>
                                           ))}
                                        {reviewer.specialization.length > 2 && (
-                                          <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
+                                          <span className="bg-gray-100 text-slate-500 text-xs px-2 py-1 rounded-full">
                                              +
                                              {reviewer.specialization.length -
                                                 2}
@@ -409,19 +402,19 @@ const ManageReviewers = () => {
                                  </div>
                               )}
 
-                           <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                           <div className="flex items-center justify-between pt-4 border-t border-slate-200">
                               <span
                                  className={`px-3 py-1 rounded-full text-xs font-semibold ${
                                     reviewer.isActive
                                        ? "bg-green-100 text-green-700"
-                                       : "bg-gray-100 text-gray-600"
+                                       : "bg-gray-100 text-slate-500"
                                  }`}
                               >
                                  {reviewer.isActive ? "Active" : "Inactive"}
                               </span>
                               <button
                                  onClick={() => handleViewDetails(reviewer._id)}
-                                 className="flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-medium"
+                                 className="flex items-center gap-1 text-cyan-600 hover:text-cyan-700 text-sm font-medium"
                               >
                                  <Eye size={16} />
                                  View Details
@@ -431,7 +424,7 @@ const ManageReviewers = () => {
                      </div>
                   ))
                ) : (
-                  <div className="col-span-full text-center py-12 text-gray-500">
+                  <div className="col-span-full text-center py-12 text-slate-500">
                      No reviewers found
                   </div>
                )}
@@ -441,14 +434,14 @@ const ManageReviewers = () => {
          {/* Add Reviewer Modal */}
          {showAddModal && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-               <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                  <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between z-10">
-                     <h2 className="text-2xl font-bold text-gray-800">
+               <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                  <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex items-center justify-between z-10">
+                     <h2 className="text-2xl font-bold text-slate-950">
                         Add New Reviewer
                      </h2>
                      <button
                         onClick={() => setShowAddModal(false)}
-                        className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
+                        className="text-slate-400 hover:text-slate-500 transition-colors p-2 hover:bg-gray-100 rounded-lg"
                      >
                         <X size={24} />
                      </button>
@@ -457,7 +450,7 @@ const ManageReviewers = () => {
                   <form onSubmit={handleAddReviewer} className="p-6 space-y-4">
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                           <label className="block text-sm font-semibold text-gray-700 mb-2">
+                           <label className="block text-sm font-semibold text-slate-700 mb-2">
                               Full Name *
                            </label>
                            <input
@@ -466,13 +459,13 @@ const ManageReviewers = () => {
                               value={formData.name}
                               onChange={handleInputChange}
                               required
-                              className="w-full px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-4 py-2.5 border border-slate-300 text-slate-700 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                               placeholder="Enter full name"
                            />
                         </div>
 
                         <div>
-                           <label className="block text-sm font-semibold text-gray-700 mb-2">
+                           <label className="block text-sm font-semibold text-slate-700 mb-2">
                               Email *
                            </label>
                            <input
@@ -481,15 +474,15 @@ const ManageReviewers = () => {
                               value={formData.email}
                               onChange={handleInputChange}
                               required
-                              className="w-full px-4 py-2.5 text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-4 py-2.5 text-slate-700 border border-slate-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                               placeholder="Enter email"
                            />
                         </div>
 
                         <div>
-                           <label className="block text-sm font-semibold text-gray-700 mb-2">
+                           <label className="block text-sm font-semibold text-slate-700 mb-2">
                               Password{" "}
-                              <span className="text-gray-500 text-xs"></span>
+                              <span className="text-slate-500 text-xs"></span>
                            </label>
                            <input
                               type="password"
@@ -497,13 +490,13 @@ const ManageReviewers = () => {
                               value={formData.password}
                               onChange={handleInputChange}
                               minLength={8}
-                              className="w-full px-4 py-2.5 border text-gray-700 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-4 py-2.5 border text-slate-700 border-slate-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                               placeholder="Enter Password"
                            />
                         </div>
 
                         <div>
-                           <label className="block text-sm font-semibold text-gray-700 mb-2">
+                           <label className="block text-sm font-semibold text-slate-700 mb-2">
                               Phone
                            </label>
                            <input
@@ -511,13 +504,13 @@ const ManageReviewers = () => {
                               name="phone"
                               value={formData.phone}
                               onChange={handleInputChange}
-                              className="w-full px-4 py-2.5 border text-gray-700 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-4 py-2.5 border text-slate-700 border-slate-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                               placeholder="Enter phone number"
                            />
                         </div>
 
                         <div>
-                           <label className="block text-sm font-semibold text-gray-700 mb-2">
+                           <label className="block text-sm font-semibold text-slate-700 mb-2">
                               Designation
                            </label>
                            <input
@@ -525,13 +518,13 @@ const ManageReviewers = () => {
                               name="designation"
                               value={formData.designation}
                               onChange={handleInputChange}
-                              className="w-full px-4 py-2.5 border text-gray-700 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-4 py-2.5 border text-slate-700 border-slate-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                               placeholder="e.g. Professor, Associate Professor"
                            />
                         </div>
 
                         <div>
-                           <label className="block text-sm font-semibold text-gray-700 mb-2">
+                           <label className="block text-sm font-semibold text-slate-700 mb-2">
                               Organization
                            </label>
                            <input
@@ -539,20 +532,20 @@ const ManageReviewers = () => {
                               name="organization"
                               value={formData.organization}
                               onChange={handleInputChange}
-                              className="w-full px-4 py-2.5 border text-gray-700 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-4 py-2.5 border text-slate-700 border-slate-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                               placeholder="Enter organization"
                            />
                         </div>
 
                         <div>
-                           <label className="block text-sm font-semibold text-gray-700 mb-2">
+                           <label className="block text-sm font-semibold text-slate-700 mb-2">
                               Gender
                            </label>
                            <select
                               name="gender"
                               value={formData.gender}
                               onChange={handleInputChange}
-                              className="w-full px-4 py-2.5 text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-4 py-2.5 text-slate-700 border border-slate-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                            >
                               <option value="">Select gender</option>
                               <option value="Male">Male</option>
@@ -562,20 +555,20 @@ const ManageReviewers = () => {
                         </div>
 
                         <div>
-                           <label className="block text-sm font-semibold text-gray-700 mb-2">
+                           <label className="block text-sm font-semibold text-slate-700 mb-2">
                               Profile Image
                            </label>
                            <input
                               type="file"
                               accept="image/*"
                               onChange={handleImageChange}
-                              className="w-full px-4 py-2.5 text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-4 py-2.5 text-slate-700 border border-slate-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                            />
                         </div>
                      </div>
 
                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">
                            Specialization (comma-separated)
                         </label>
                         <input
@@ -583,13 +576,13 @@ const ManageReviewers = () => {
                            name="specialization"
                            value={formData.specialization}
                            onChange={handleInputChange}
-                           className="w-full px-4 py-2.5 text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           className="w-full px-4 py-2.5 text-slate-700 border border-slate-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                            placeholder="e.g. Machine Learning, AI, Data Science"
                         />
                      </div>
 
                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">
                            Address
                         </label>
                         <input
@@ -597,13 +590,13 @@ const ManageReviewers = () => {
                            name="address"
                            value={formData.address}
                            onChange={handleInputChange}
-                           className="w-full px-4 py-2.5 text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           className="w-full px-4 py-2.5 text-slate-700 border border-slate-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                            placeholder="Enter address"
                         />
                      </div>
 
                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">
                            Bio
                         </label>
                         <textarea
@@ -611,22 +604,22 @@ const ManageReviewers = () => {
                            value={formData.bio}
                            onChange={handleInputChange}
                            rows="3"
-                           className="w-full px-4 py-2.5 text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           className="w-full px-4 py-2.5 text-slate-700 border border-slate-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                            placeholder="Brief bio about the reviewer"
                         ></textarea>
                      </div>
 
-                     <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                     <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
                         <button
                            type="button"
                            onClick={() => setShowAddModal(false)}
-                           className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-medium transition-all"
+                           className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-slate-950 rounded font-medium transition-all"
                         >
                            Cancel
                         </button>
                         <button
                            type="submit"
-                           className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all flex items-center gap-2"
+                           className="px-6 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded font-medium transition-all flex items-center gap-2"
                         >
                            <UserPlus size={18} />
                            Add Reviewer
@@ -640,14 +633,14 @@ const ManageReviewers = () => {
          {/* Reviewer Details Modal */}
          {showDetailsModal && selectedReviewer && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-               <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-                  <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between z-10">
-                     <h2 className="text-2xl font-bold text-gray-800">
+               <div className="bg-white rounded-lg shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+                  <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex items-center justify-between z-10">
+                     <h2 className="text-2xl font-bold text-slate-950">
                         Reviewer Details
                      </h2>
                      <button
                         onClick={() => setShowDetailsModal(false)}
-                        className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
+                        className="text-slate-400 hover:text-slate-500 transition-colors p-2 hover:bg-gray-100 rounded-lg"
                      >
                         <X size={24} />
                      </button>
@@ -659,25 +652,25 @@ const ManageReviewers = () => {
                            <img
                               src={selectedReviewer.image}
                               alt={selectedReviewer.name}
-                              className="w-24 h-24 rounded-full object-cover border-4 border-gray-200"
+                              className="w-24 h-24 rounded-full object-cover border-4 border-slate-200"
                            />
                         ) : (
-                           <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center">
-                              <User className="w-12 h-12 text-blue-600" />
+                           <div className="w-24 h-24 rounded-full bg-cyan-100 flex items-center justify-center">
+                              <User className="w-12 h-12 text-cyan-600" />
                            </div>
                         )}
                         <div>
-                           <h3 className="text-2xl font-bold text-gray-900">
+                           <h3 className="text-2xl font-bold text-slate-950">
                               {selectedReviewer.name}
                            </h3>
-                           <p className="text-gray-600">
+                           <p className="text-slate-500">
                               {selectedReviewer.designation || "Reviewer"}
                            </p>
                            <span
                               className={`mt-2 inline-block px-3 py-1 rounded-full text-xs font-semibold ${
                                  selectedReviewer.isActive
                                     ? "bg-green-100 text-green-700"
-                                    : "bg-gray-100 text-gray-600"
+                                    : "bg-gray-100 text-slate-500"
                               }`}
                            >
                               {selectedReviewer.isActive
@@ -688,75 +681,75 @@ const ManageReviewers = () => {
                      </div>
 
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div className="bg-gray-50 rounded p-4 border border-slate-200">
                            <div className="flex items-center gap-2 mb-2">
-                              <Mail className="text-blue-600" size={18} />
-                              <p className="text-xs text-gray-500 font-semibold">
+                              <Mail className="text-cyan-600" size={18} />
+                              <p className="text-xs text-slate-500 font-semibold">
                                  EMAIL
                               </p>
                            </div>
-                           <p className="text-gray-900 font-medium break-all">
+                           <p className="text-slate-950 font-medium break-all">
                               {selectedReviewer.email}
                            </p>
                         </div>
 
                         {selectedReviewer.phone && (
-                           <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                           <div className="bg-gray-50 rounded p-4 border border-slate-200">
                               <div className="flex items-center gap-2 mb-2">
-                                 <Phone className="text-blue-600" size={18} />
-                                 <p className="text-xs text-gray-500 font-semibold">
+                                 <Phone className="text-cyan-600" size={18} />
+                                 <p className="text-xs text-slate-500 font-semibold">
                                     PHONE
                                  </p>
                               </div>
-                              <p className="text-gray-900 font-medium">
+                              <p className="text-slate-950 font-medium">
                                  {selectedReviewer.phone}
                               </p>
                            </div>
                         )}
 
                         {selectedReviewer.organization && (
-                           <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 md:col-span-2">
+                           <div className="bg-gray-50 rounded p-4 border border-slate-200 md:col-span-2">
                               <div className="flex items-center gap-2 mb-2">
                                  <Building
-                                    className="text-blue-600"
+                                    className="text-cyan-600"
                                     size={18}
                                  />
-                                 <p className="text-xs text-gray-500 font-semibold">
+                                 <p className="text-xs text-slate-500 font-semibold">
                                     ORGANIZATION
                                  </p>
                               </div>
-                              <p className="text-gray-900 font-medium">
+                              <p className="text-slate-950 font-medium">
                                  {selectedReviewer.organization}
                               </p>
                            </div>
                         )}
 
                         {selectedReviewer.address && (
-                           <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 md:col-span-2">
+                           <div className="bg-gray-50 rounded p-4 border border-slate-200 md:col-span-2">
                               <div className="flex items-center gap-2 mb-2">
                                  <Building
-                                    className="text-blue-600"
+                                    className="text-cyan-600"
                                     size={18}
                                  />
-                                 <p className="text-xs text-gray-500 font-semibold">
+                                 <p className="text-xs text-slate-500 font-semibold">
                                     ADDRESS
                                  </p>
                               </div>
-                              <p className="text-gray-900 font-medium">
+                              <p className="text-slate-950 font-medium">
                                  {selectedReviewer.address}
                               </p>
                            </div>
                         )}
 
                         {selectedReviewer.gender && (
-                           <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                           <div className="bg-gray-50 rounded p-4 border border-slate-200">
                               <div className="flex items-center gap-2 mb-2">
-                                 <User className="text-blue-600" size={18} />
-                                 <p className="text-xs text-gray-500 font-semibold">
+                                 <User className="text-cyan-600" size={18} />
+                                 <p className="text-xs text-slate-500 font-semibold">
                                     GENDER
                                  </p>
                               </div>
-                              <p className="text-gray-900 font-medium">
+                              <p className="text-slate-950 font-medium">
                                  {selectedReviewer.gender}
                               </p>
                            </div>
@@ -765,10 +758,10 @@ const ManageReviewers = () => {
 
                      {selectedReviewer.specialization &&
                         selectedReviewer.specialization.length > 0 && (
-                           <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                           <div className="bg-gray-50 rounded p-4 border border-slate-200">
                               <div className="flex items-center gap-2 mb-3">
-                                 <Award className="text-blue-600" size={18} />
-                                 <p className="text-xs text-gray-500 font-semibold">
+                                 <Award className="text-cyan-600" size={18} />
+                                 <p className="text-xs text-slate-500 font-semibold">
                                     SPECIALIZATION
                                  </p>
                               </div>
@@ -777,7 +770,7 @@ const ManageReviewers = () => {
                                     (spec, idx) => (
                                        <span
                                           key={idx}
-                                          className="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg text-sm font-medium"
+                                          className="bg-cyan-100 text-cyan-700 px-3 py-1 rounded-lg text-sm font-medium"
                                        >
                                           {spec}
                                        </span>
@@ -788,14 +781,14 @@ const ManageReviewers = () => {
                         )}
 
                      {selectedReviewer.bio && (
-                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div className="bg-gray-50 rounded p-4 border border-slate-200">
                            <div className="flex items-center gap-2 mb-3">
-                              <FileText className="text-blue-600" size={18} />
-                              <p className="text-xs text-gray-500 font-semibold">
+                              <FileText className="text-cyan-600" size={18} />
+                              <p className="text-xs text-slate-500 font-semibold">
                                  BIO
                               </p>
                            </div>
-                           <p className="text-gray-900 leading-relaxed whitespace-pre-wrap">
+                           <p className="text-slate-950 leading-relaxed whitespace-pre-wrap">
                               {selectedReviewer.bio}
                            </p>
                         </div>
@@ -803,13 +796,13 @@ const ManageReviewers = () => {
 
                      {selectedReviewer.assignedSubmissions &&
                         selectedReviewer.assignedSubmissions.length > 0 && (
-                           <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                           <div className="bg-gray-50 rounded p-4 border border-slate-200">
                               <div className="flex items-center gap-2 mb-3">
                                  <FileText
                                     className="text-purple-600"
                                     size={18}
                                  />
-                                 <p className="text-xs text-gray-500 font-semibold">
+                                 <p className="text-xs text-slate-500 font-semibold">
                                     ASSIGNED SUBMISSIONS
                                  </p>
                               </div>
@@ -820,10 +813,10 @@ const ManageReviewers = () => {
                         )}
                   </div>
 
-                  <div className="sticky bottom-0 bg-white border-t border-gray-200 p-6 flex justify-end">
+                  <div className="sticky bottom-0 bg-white border-t border-slate-200 p-6 flex justify-end">
                      <button
                         onClick={() => setShowDetailsModal(false)}
-                        className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-medium transition-all"
+                        className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-slate-950 rounded font-medium transition-all"
                      >
                         Close
                      </button>
@@ -836,3 +829,4 @@ const ManageReviewers = () => {
 };
 
 export default ManageReviewers;
+

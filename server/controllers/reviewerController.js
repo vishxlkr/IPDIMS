@@ -163,31 +163,20 @@ export const getDashboardStats = async (req, res) => {
       };
 
       const total = await submissionModel.countDocuments(query);
-      const pending = await submissionModel.countDocuments({
+      
+      const completed = await submissionModel.countDocuments({
          ...query,
-         status: { $in: ["Pending", "Under Review"] },
+         "feedback.reviewer": reviewerId
       });
-      const accepted = await submissionModel.countDocuments({
-         ...query,
-         status: "Accepted",
-      });
-      const rejected = await submissionModel.countDocuments({
-         ...query,
-         status: "Rejected",
-      });
-      const revisionRequested = await submissionModel.countDocuments({
-         ...query,
-         status: "Revision Requested",
-      });
+      
+      const pending = total - completed;
 
       res.json({
          success: true,
          stats: {
             total,
             pending,
-            accepted,
-            rejected,
-            revisionRequested,
+            completed,
          },
       });
    } catch (error) {

@@ -55,7 +55,6 @@ userRouter.get("/profile", authUser, getProfile);
 userRouter.post(
    "/update-profile",
    authUser,
-   upload.single("image"),
    updateProfile,
 );
 

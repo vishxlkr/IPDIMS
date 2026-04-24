@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import Loading from "../../components/Loading";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
@@ -130,65 +131,57 @@ const AdminAuthors = () => {
       }
    };
 
-   if (loading) {
-      return (
-         <div className="flex items-center justify-center min-h-screen bg-gray-50">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
-         </div>
-      );
-   }
+   if (loading) return <Loading />;
 
    return (
-      <div className="min-h-screen bg-gray-50 p-6 -m-8">
-         <div className="max-w-7xl mx-auto">
+      <div className="min-h-[calc(100vh-5rem)] bg-gray-50 px-7 py-8">
+         <div className="w-full">
             <div className="mb-8">
-               <h1 className="text-4xl font-bold text-gray-800">
+               <h1 className="text-3xl font-bold text-slate-950">
                   Manage Authors
                </h1>
-               <p className="text-gray-600 mt-2">
-                  View and manage all registered authors
-               </p>
+               
             </div>
 
-            <div className="bg-white rounded-xl shadow-md p-6 mb-6 border border-gray-100">
+            <div className="bg-white rounded shadow-[0_18px_45px_rgba(15,23,42,0.06)] p-6 mb-6 border border-slate-200">
                <div className="flex items-center justify-between">
                   <div className="relative flex-1 max-w-md">
-                     <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                     <Search className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
                      <input
                         type="text"
                         placeholder="Search by name, email, organization..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full text-black pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full text-black pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                      />
                   </div>
                </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+            <div className="bg-white rounded shadow-[0_18px_45px_rgba(15,23,42,0.06)] overflow-hidden border border-slate-200">
                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                     <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-transparent">
+                     <thead className="bg-white">
                         <tr>
-                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                           <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                               Name
                            </th>
-                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                           <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                               Email
                            </th>
-                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                           <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                               Organization
                            </th>
-                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                           <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                               Registered
                            </th>
-                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                           <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                               Actions
                            </th>
                         </tr>
                      </thead>
 
-                     <tbody className="bg-white divide-y divide-gray-200">
+                     <tbody className="bg-white divide-y divide-transparent">
                         {filteredAuthors.length > 0 ? (
                            filteredAuthors.map((author) => (
                               <tr
@@ -197,32 +190,24 @@ const AdminAuthors = () => {
                               >
                                  <td className="px-6 py-4">
                                     <div className="flex items-center gap-3">
-                                       {author.image ? (
-                                          <img
-                                             src={author.image}
-                                             alt={author.name}
-                                             className="w-10 h-10 rounded-full object-cover border border-gray-200"
-                                          />
-                                       ) : (
-                                          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                             <User className="w-5 h-5 text-blue-600" />
-                                          </div>
-                                       )}
-                                       <div className="text-sm font-medium text-gray-900">
+                                       <div className="w-10 h-10 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-700 font-bold text-lg border border-cyan-200">
+                                          {author.name ? author.name.charAt(0).toUpperCase() : 'U'}
+                                       </div>
+                                       <div className="text-sm font-medium text-slate-950">
                                           {author.name || "N/A"}
                                        </div>
                                     </div>
                                  </td>
 
-                                 <td className="px-6 py-4 text-sm text-gray-900">
+                                 <td className="px-6 py-4 text-sm text-slate-950">
                                     {author.email}
                                  </td>
 
-                                 <td className="px-6 py-4 text-sm text-gray-600">
+                                 <td className="px-6 py-4 text-sm text-slate-500">
                                     {author.organization || "N/A"}
                                  </td>
 
-                                 <td className="px-6 py-4 text-sm text-gray-600">
+                                 <td className="px-6 py-4 text-sm text-slate-500">
                                     {new Date(
                                        author.createdAt
                                     ).toLocaleDateString()}
@@ -234,7 +219,7 @@ const AdminAuthors = () => {
                                           onClick={() =>
                                              handleViewDetails(author._id)
                                           }
-                                          className="flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-medium px-3 py-1.5 hover:bg-blue-50 rounded-lg transition-colors"
+                                          className="flex items-center gap-1 text-cyan-600 hover:text-cyan-700 text-sm font-medium px-3 py-1.5 hover:bg-cyan-50 rounded-lg transition-colors"
                                        >
                                           <Eye size={16} />
                                           View
@@ -244,7 +229,7 @@ const AdminAuthors = () => {
                                           onClick={() =>
                                              handleDeleteAuthor(author._id)
                                           }
-                                          className="flex items-center gap-1 text-red-600 hover:text-red-700 text-sm font-medium px-3 py-1.5 hover:bg-red-50 rounded-lg transition-colors"
+                                          className="flex items-center gap-1 text-red-600 hover:text-red-700 text-sm font-medium px-3 py-1.5 hover:bg-white rounded-lg transition-colors"
                                        >
                                           <Trash2 className="w-5 h-5" />
                                        </button>
@@ -256,7 +241,7 @@ const AdminAuthors = () => {
                            <tr>
                               <td
                                  colSpan="6"
-                                 className="px-6 py-12 text-center text-gray-500"
+                                 className="px-6 py-12 text-center text-slate-500"
                               >
                                  No authors found
                               </td>
@@ -271,9 +256,9 @@ const AdminAuthors = () => {
          {/* ---- DETAILS MODAL ---- */}
          {showDetailsModal && selectedAuthor && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-               <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-                  <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between z-10">
-                     <h2 className="text-2xl font-bold text-gray-800">
+               <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                  <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex items-center justify-between z-10">
+                     <h2 className="text-2xl font-bold text-slate-950">
                         Author Details
                      </h2>
                      <button
@@ -281,7 +266,7 @@ const AdminAuthors = () => {
                            setShowDetailsModal(false);
                            setAuthorSubmissions([]);
                         }}
-                        className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
+                        className="text-slate-400 hover:text-slate-500 transition-colors p-2 hover:bg-gray-100 rounded-lg"
                      >
                         <X size={24} />
                      </button>
@@ -290,25 +275,25 @@ const AdminAuthors = () => {
                   <div className="p-6 space-y-6">
                      <div className="flex items-center gap-4">
                         <div>
-                           <h3 className="text-2xl font-bold text-gray-900">
+                           <h3 className="text-2xl font-bold text-slate-950">
                               {selectedAuthor.name}
                            </h3>
-                           <p className="text-gray-600">
+                           <p className="text-slate-500">
                               {selectedAuthor.email}
                            </p>
                         </div>
                      </div>
 
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                           <Mail className="text-blue-600 mb-1" size={18} />
+                        <div className="bg-gray-50 rounded p-4 border border-slate-200">
+                           <Mail className="text-cyan-600 mb-1" size={18} />
                            <p className="font-medium">{selectedAuthor.email}</p>
                         </div>
 
                         {selectedAuthor.organization && (
-                           <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                           <div className="bg-gray-50 rounded p-4 border border-slate-200">
                               <Building
-                                 className="text-blue-600 mb-1"
+                                 className="text-cyan-600 mb-1"
                                  size={18}
                               />
                               <p className="font-medium">
@@ -319,8 +304,8 @@ const AdminAuthors = () => {
                      </div>
 
                      {/* Submissions will show here */}
-                     <div className="border border-gray-200 rounded-xl p-4">
-                        <h3 className="text-lg font-bold text-gray-700 mb-3">
+                     <div className="border border-slate-200 rounded p-4">
+                        <h3 className="text-lg font-bold text-slate-700 mb-3">
                            Submissions
                         </h3>
 
@@ -341,7 +326,7 @@ const AdminAuthors = () => {
                                              ? "bg-green-100 text-green-700"
                                              : sub.status === "Rejected"
                                              ? "bg-red-100 text-red-700"
-                                             : "bg-blue-100 text-blue-700"
+                                             : "bg-cyan-100 text-cyan-700"
                                        }`}
                                     >
                                        {sub.status}
@@ -350,7 +335,7 @@ const AdminAuthors = () => {
                               </div>
                            ))
                         ) : (
-                           <p className="text-gray-500">No submissions yet</p>
+                           <p className="text-slate-500">No submissions yet</p>
                         )}
                      </div>
                   </div>
@@ -362,3 +347,4 @@ const AdminAuthors = () => {
 };
 
 export default AdminAuthors;
+

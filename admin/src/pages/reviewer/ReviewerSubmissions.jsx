@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import Loading from "../../components/Loading";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
@@ -303,13 +304,7 @@ const ReviewerSubmissions = () => {
       }
    };
 
-   if (loading) {
-      return (
-         <div className="flex items-center justify-center min-h-screen bg-gray-50">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
-         </div>
-      );
-   }
+   if (loading) return <Loading />;
 
    const isFormDirty = () => {
       // If initialFormState is not set yet, assume false to disable button
@@ -328,24 +323,14 @@ const ReviewerSubmissions = () => {
       );
    };
 
-   if (loading) {
-      return (
-         <div className="flex items-center justify-center min-h-screen bg-gray-50">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-         </div>
-      );
-   }
-
    return (
-      <div className="min-h-screen bg-gray-50 p-6 -m-8">
-         <div className="max-w-7xl mx-auto">
+      <div className="min-h-[calc(100vh-5rem)] bg-gray-50 px-7 py-8">
+         <div className="w-full">
             <div className="mb-8">
-               <h1 className="text-4xl font-bold text-gray-800">
+               <h1 className="text-3xl font-bold text-slate-950">
                   Assigned Submissions
                </h1>
-               <p className="text-gray-600 mt-2">
-                  Review and provide feedback on assigned manuscripts
-               </p>
+               
             </div>
 
             {/* Search and Filter */}

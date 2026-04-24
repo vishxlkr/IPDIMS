@@ -330,8 +330,7 @@ export const updateProfile = async (req, res) => {
          !personalUrl &&
          !organization &&
          !address &&
-         !bio &&
-         !imageFile
+         !bio
       ) {
          return res.json({
             success: false,
@@ -352,19 +351,6 @@ export const updateProfile = async (req, res) => {
 
       // Update user data in DB
       await userModel.findByIdAndUpdate(userId, updateData, { new: true });
-
-      // Handle image upload if provided
-      if (imageFile) {
-         const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
-            resource_type: "image",
-         });
-         const imageURL = imageUpload.secure_url;
-         await userModel.findByIdAndUpdate(
-            userId,
-            { image: imageURL },
-            { new: true },
-         );
-      }
 
       res.json({ success: true, message: "Profile updated successfully" });
    } catch (error) {

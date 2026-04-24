@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { AppContext } from "../../context/AppContext";
+import Loading from "../../components/Loading";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
@@ -30,10 +31,7 @@ const ProfilePage = () => {
       organization: "",
       address: "",
       bio: "",
-      image: "",
    });
-
-   const [imageFile, setImageFile] = useState(null);
 
    useEffect(() => {
       if (userData)
@@ -46,23 +44,12 @@ const ProfilePage = () => {
             organization: userData.organization || "",
             address: userData.address || "",
             bio: userData.bio || "",
-            image: userData.image || "",
          });
    }, [userData]);
 
    const handleChange = (e) => {
       const { name, value } = e.target;
       setFormData({ ...formData, [name]: value });
-   };
-
-   const handleImageChange = (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () =>
-         setFormData({ ...formData, image: reader.result });
-      reader.readAsDataURL(file);
    };
 
    const handleSubmit = async (e) => {
@@ -72,10 +59,8 @@ const ProfilePage = () => {
       try {
          const payload = new FormData();
          Object.keys(formData).forEach((key) => {
-            if (key !== "image") payload.append(key, formData[key]);
+            payload.append(key, formData[key]);
          });
-
-         if (imageFile) payload.append("image", imageFile);
 
          const { data } = await axios.post(
             `${backendUrl}/api/user/update-profile`,
@@ -92,7 +77,6 @@ const ProfilePage = () => {
             toast.success("Profile updated successfully!");
             getUserData();
             setIsEditing(false);
-            setImageFile(null);
          } else {
             toast.error(data.message);
          }
@@ -105,7 +89,6 @@ const ProfilePage = () => {
 
    const handleCancel = () => {
       setIsEditing(false);
-      setImageFile(null);
       setFormData({
          name: userData.name || "",
          phone: userData.phone || "",
@@ -115,16 +98,10 @@ const ProfilePage = () => {
          organization: userData.organization || "",
          address: userData.address || "",
          bio: userData.bio || "",
-         image: userData.image || "",
       });
    };
 
-   if (loading)
-      return (
-         <div className="flex items-center justify-center min-h-screen">
-            <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-600"></div>
-         </div>
-      );
+   if (loading) return <Loading />;
 
    return (
       <div className="min-h-screen bg-gray-50 p-6 -m-8">
@@ -139,16 +116,9 @@ const ProfilePage = () => {
                <div className="bg-linear-to-r from-blue-600 to-yellow-700 p-6">
                   <div className="flex items-center justify-between">
                      <div className="flex items-center gap-4">
-                        {/* Profile Image */}
-                        <div className="w-24 h-24 rounded-full overflow-hidden bg-white shadow-lg">
-                           <img
-                              src={
-                                 formData.image ||
-                                 "https://via.placeholder.com/150"
-                              }
-                              alt="Profile"
-                              className="w-full h-full object-cover"
-                           />
+                        {/* Profile Initial */}
+                        <div className="w-24 h-24 rounded-full bg-white shadow-lg flex items-center justify-center text-4xl font-bold text-blue-600 border-4 border-blue-100">
+                           {formData.name ? formData.name.charAt(0).toUpperCase() : 'U'}
                         </div>
 
                         <div>
@@ -198,21 +168,6 @@ const ProfilePage = () => {
                   onSubmit={handleSubmit}
                   className="p-6 space-y-6"
                >
-                  {/* Image Upload */}
-                  {isEditing && (
-                     <div className="flex justify-center">
-                        <label className="bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-blue-700">
-                           Change Image
-                           <input
-                              type="file"
-                              accept="image/*"
-                              onChange={handleImageChange}
-                              className="hidden"
-                           />
-                        </label>
-                     </div>
-                  )}
-
                   {/* INFO GRID */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                      {/* NAME */}

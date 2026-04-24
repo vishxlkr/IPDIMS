@@ -1,23 +1,29 @@
 import React, { useContext } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { AdminContext } from "../context/AdminContext";
 import { ReviewerContext } from "../context/ReviewerContext";
-import { Home, FileText, Users, User } from "lucide-react";
+import { Home, FileText, Users, User, UserPlus } from "lucide-react";
 
 const Sidebar = () => {
    const { aToken } = useContext(AdminContext);
    const { rToken } = useContext(ReviewerContext);
 
    const linkClasses = ({ isActive }) =>
-      `flex items-center gap-3 py-3 px-4 rounded-lg transition ${
+      `flex items-center gap-4 px-6 py-4 text-[15px] font-medium transition-colors ${
          isActive
-            ? "bg-blue-600 text-white"
-            : "text-gray-300 hover:bg-gray-700 hover:text-white"
+            ? "bg-[#1c2233] text-white border-l-4 border-white"
+            : "text-slate-400 hover:bg-[#1c2233] hover:text-white border-l-4 border-transparent"
       }`;
 
    return (
-      <aside className="fixed left-0 top-16 w-64 h-[calc(100vh-4rem)] bg-[#0b0f19] border-r border-gray-800 p-4 overflow-y-auto">
-         <div className="flex flex-col gap-2">
+      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[280px] flex-col bg-[#222736] text-white shadow-xl lg:flex">
+         <div className="flex h-[72px] shrink-0 items-center bg-[#0dcaf0] px-6">
+            <span className="text-[16px] font-bold tracking-widest text-white uppercase">
+               {aToken ? "ADMINISTRATION" : "REVIEWER WORKSPACE"}
+            </span>
+         </div>
+
+         <nav className="flex flex-1 flex-col gap-1 overflow-y-auto py-4">
             {aToken && (
                <>
                   <NavLink to="/admin/dashboard" className={linkClasses}>
@@ -33,7 +39,7 @@ const Sidebar = () => {
                      <User size={20} /> Authors
                   </NavLink>
                   <NavLink to="/admin/all-registration" className={linkClasses}>
-                     <User size={20} /> All Registration
+                     <UserPlus size={20} /> All Registration
                   </NavLink>
                </>
             )}
@@ -51,7 +57,7 @@ const Sidebar = () => {
                   </NavLink>
                </>
             )}
-         </div>
+         </nav>
       </aside>
    );
 };

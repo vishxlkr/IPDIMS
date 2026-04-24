@@ -13,10 +13,6 @@ const userSchema = new mongoose.Schema(
       organization: { type: String, default: "" },
       address: { type: String, default: "" },
       bio: { type: String, default: "" },
-      image: {
-         type: String,
-         default: "",
-      },
       isVerified: {
          type: Boolean,
          default: false,

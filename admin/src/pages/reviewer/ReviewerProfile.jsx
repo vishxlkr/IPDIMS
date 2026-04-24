@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import Loading from "../../components/Loading";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
@@ -104,44 +105,38 @@ const ReviewerProfile = () => {
       setIsEditing(false);
    };
 
-   if (loading) {
-      return (
-         <div className="flex items-center justify-center min-h-screen bg-gray-50">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
-         </div>
-      );
-   }
+   if (loading) return <Loading />;
 
    if (!profile) {
       return (
          <div className="flex items-center justify-center min-h-screen bg-gray-50">
             <div className="text-center">
-               <p className="text-xl text-gray-600">Profile not found</p>
+               <p className="text-xl text-slate-500">Profile not found</p>
             </div>
          </div>
       );
    }
 
    return (
-      <div className="min-h-screen bg-gray-50 p-6 -m-8">
-         <div className="max-w-7xl mx-auto">
+      <div className="min-h-[calc(100vh-5rem)] bg-gray-50 px-7 py-8">
+         <div className="w-full">
             {/* Header - Consistent with Dashboard and Submissions */}
             <div className="mb-8">
-               <h1 className="text-4xl font-bold text-gray-800">
+               <h1 className="text-3xl font-bold text-slate-950">
                   Reviewer Profile
                </h1>
-               <p className="text-gray-600 mt-2">
+               <p className="text-slate-500 mt-2">
                   Manage your personal information and preferences
                </p>
             </div>
 
             {/* Profile Header Card */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 mb-8">
+            <div className="bg-white rounded shadow-[0_18px_45px_rgba(15,23,42,0.06)] overflow-hidden border border-slate-200 mb-8">
                {/* Gradient Header */}
-               <div className="bg-linear-to-r from-blue-600 to-yellow-700 p-6">
+               <div className="bg-linear-to-r from-cyan-600 to-cyan-400 p-6">
                   <div className="flex items-center justify-between">
                      <div className="flex items-center gap-4">
-                        <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-md">
+                        <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-[0_18px_45px_rgba(15,23,42,0.06)]">
                            {profile.image ? (
                               <img
                                  src={profile.image}
@@ -149,14 +144,14 @@ const ReviewerProfile = () => {
                                  className="w-20 h-20 rounded-full object-cover"
                               />
                            ) : (
-                              <User className="w-10 h-10 text-blue-600" />
+                              <User className="w-10 h-10 text-cyan-600" />
                            )}
                         </div>
                         <div>
                            <h2 className="text-2xl font-bold text-white">
                               {profile.name}
                            </h2>
-                           <p className="text-blue-100 mt-1 flex items-center gap-2">
+                           <p className="text-cyan-50 mt-1 flex items-center gap-2">
                               <Shield size={16} />
                               Reviewer
                            </p>
@@ -166,7 +161,7 @@ const ReviewerProfile = () => {
                      {!isEditing ? (
                         <button
                            onClick={() => setIsEditing(true)}
-                           className="bg-white text-blue-600 px-5 py-2.5 rounded-lg font-medium hover:bg-blue-50 transition-colors flex items-center gap-2"
+                           className="bg-white text-cyan-600 px-5 py-2.5 rounded-lg font-medium hover:bg-cyan-50 transition-colors flex items-center gap-2"
                         >
                            <Edit2 size={18} />
                            Edit Profile
@@ -175,14 +170,14 @@ const ReviewerProfile = () => {
                         <div className="flex gap-2">
                            <button
                               onClick={handleUpdateProfile}
-                              className="bg-white text-green-600 px-5 py-2.5 rounded-lg font-medium hover:bg-green-50 transition-colors flex items-center gap-2"
+                              className="bg-white text-green-600 px-5 py-2.5 rounded-lg font-medium hover:bg-white transition-colors flex items-center gap-2"
                            >
                               <Save size={18} />
                               Save
                            </button>
                            <button
                               onClick={handleCancelEdit}
-                              className="bg-white text-red-600 px-5 py-2.5 rounded-lg font-medium hover:bg-red-50 transition-colors flex items-center gap-2"
+                              className="bg-white text-red-600 px-5 py-2.5 rounded-lg font-medium hover:bg-white transition-colors flex items-center gap-2"
                            >
                               <X size={18} />
                               Cancel
@@ -196,10 +191,10 @@ const ReviewerProfile = () => {
                <div className="p-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
                      {/* Name Field */}
-                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors">
+                     <div className="bg-gray-50 rounded p-4 border border-slate-200 hover:border-slate-300 transition-colors">
                         <div className="flex items-center gap-2 mb-3">
-                           <User className="w-5 h-5 text-blue-600" />
-                           <p className="text-xs text-gray-500 font-semibold uppercase">
+                           <User className="w-5 h-5 text-cyan-600" />
+                           <p className="text-xs text-slate-500 font-semibold uppercase">
                               Full Name
                            </p>
                         </div>
@@ -209,39 +204,39 @@ const ReviewerProfile = () => {
                               name="name"
                               value={formData.name}
                               onChange={handleInputChange}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none"
                               placeholder="Enter your name"
                            />
                         ) : (
-                           <p className="text-gray-900 font-semibold">
+                           <p className="text-slate-950 font-semibold">
                               {profile.name}
                            </p>
                         )}
                      </div>
 
                      {/* Email Field */}
-                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors">
+                     <div className="bg-gray-50 rounded p-4 border border-slate-200 hover:border-slate-300 transition-colors">
                         <div className="flex items-center gap-2 mb-3">
-                           <Mail className="w-5 h-5 text-blue-600" />
-                           <p className="text-xs text-gray-500 font-semibold uppercase">
+                           <Mail className="w-5 h-5 text-cyan-600" />
+                           <p className="text-xs text-slate-500 font-semibold uppercase">
                               Email Address
                            </p>
                         </div>
-                        <p className="text-gray-900 font-semibold break-all">
+                        <p className="text-slate-950 font-semibold break-all">
                            {profile.email}
                         </p>
                         {isEditing && (
-                           <p className="text-xs text-gray-400 mt-2">
+                           <p className="text-xs text-slate-400 mt-2">
                               Email cannot be changed
                            </p>
                         )}
                      </div>
 
                      {/* Phone Field */}
-                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors">
+                     <div className="bg-gray-50 rounded p-4 border border-slate-200 hover:border-slate-300 transition-colors">
                         <div className="flex items-center gap-2 mb-3">
-                           <Phone className="w-5 h-5 text-blue-600" />
-                           <p className="text-xs text-gray-500 font-semibold uppercase">
+                           <Phone className="w-5 h-5 text-cyan-600" />
+                           <p className="text-xs text-slate-500 font-semibold uppercase">
                               Phone Number
                            </p>
                         </div>
@@ -251,21 +246,21 @@ const ReviewerProfile = () => {
                               name="phone"
                               value={formData.phone}
                               onChange={handleInputChange}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none"
                               placeholder="Enter phone number"
                            />
                         ) : (
-                           <p className="text-gray-900 font-semibold">
+                           <p className="text-slate-950 font-semibold">
                               {profile.phone || "Not provided"}
                            </p>
                         )}
                      </div>
 
                      {/* Affiliation Field */}
-                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors">
+                     <div className="bg-gray-50 rounded p-4 border border-slate-200 hover:border-slate-300 transition-colors">
                         <div className="flex items-center gap-2 mb-3">
-                           <Building className="w-5 h-5 text-blue-600" />
-                           <p className="text-xs text-gray-500 font-semibold uppercase">
+                           <Building className="w-5 h-5 text-cyan-600" />
+                           <p className="text-xs text-slate-500 font-semibold uppercase">
                               Affiliation/Organization
                            </p>
                         </div>
@@ -275,11 +270,11 @@ const ReviewerProfile = () => {
                               name="affiliation"
                               value={formData.affiliation}
                               onChange={handleInputChange}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none"
                               placeholder="Enter your organization"
                            />
                         ) : (
-                           <p className="text-gray-900 font-semibold">
+                           <p className="text-slate-950 font-semibold">
                               {profile.affiliation ||
                                  profile.organization ||
                                  "Not provided"}
@@ -289,14 +284,14 @@ const ReviewerProfile = () => {
 
                      {/* Designation */}
                      {profile.designation && (
-                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors">
+                        <div className="bg-gray-50 rounded p-4 border border-slate-200 hover:border-slate-300 transition-colors">
                            <div className="flex items-center gap-2 mb-3">
-                              <BookOpen className="w-5 h-5 text-blue-600" />
-                              <p className="text-xs text-gray-500 font-semibold uppercase">
+                              <BookOpen className="w-5 h-5 text-cyan-600" />
+                              <p className="text-xs text-slate-500 font-semibold uppercase">
                                  Designation
                               </p>
                            </div>
-                           <p className="text-gray-900 font-semibold">
+                           <p className="text-slate-950 font-semibold">
                               {profile.designation}
                            </p>
                         </div>
@@ -304,14 +299,14 @@ const ReviewerProfile = () => {
 
                      {/* Gender */}
                      {profile.gender && (
-                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors">
+                        <div className="bg-gray-50 rounded p-4 border border-slate-200 hover:border-slate-300 transition-colors">
                            <div className="flex items-center gap-2 mb-3">
-                              <User className="w-5 h-5 text-blue-600" />
-                              <p className="text-xs text-gray-500 font-semibold uppercase">
+                              <User className="w-5 h-5 text-cyan-600" />
+                              <p className="text-xs text-slate-500 font-semibold uppercase">
                                  Gender
                               </p>
                            </div>
-                           <p className="text-gray-900 font-semibold">
+                           <p className="text-slate-950 font-semibold">
                               {profile.gender}
                            </p>
                         </div>
@@ -321,10 +316,10 @@ const ReviewerProfile = () => {
                   {/* Specialization */}
                   {profile.specialization &&
                      profile.specialization.length > 0 && (
-                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors mb-6">
+                        <div className="bg-gray-50 rounded p-4 border border-slate-200 hover:border-slate-300 transition-colors mb-6">
                            <div className="flex items-center gap-2 mb-3">
-                              <BookOpen className="w-5 h-5 text-blue-600" />
-                              <p className="text-xs text-gray-500 font-semibold uppercase">
+                              <BookOpen className="w-5 h-5 text-cyan-600" />
+                              <p className="text-xs text-slate-500 font-semibold uppercase">
                                  Specialization
                               </p>
                            </div>
@@ -332,7 +327,7 @@ const ReviewerProfile = () => {
                               {profile.specialization.map((spec, idx) => (
                                  <span
                                     key={idx}
-                                    className="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium"
+                                    className="bg-cyan-100 text-cyan-700 px-4 py-2 rounded-lg text-sm font-medium"
                                  >
                                     {spec}
                                  </span>
@@ -343,14 +338,14 @@ const ReviewerProfile = () => {
 
                   {/* Bio */}
                   {profile.bio && (
-                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors mb-6">
+                     <div className="bg-gray-50 rounded p-4 border border-slate-200 hover:border-slate-300 transition-colors mb-6">
                         <div className="flex items-center gap-2 mb-3">
-                           <User className="w-5 h-5 text-blue-600" />
-                           <p className="text-xs text-gray-500 font-semibold uppercase">
+                           <User className="w-5 h-5 text-cyan-600" />
+                           <p className="text-xs text-slate-500 font-semibold uppercase">
                               Bio
                            </p>
                         </div>
-                        <p className="text-gray-900 leading-relaxed whitespace-pre-wrap">
+                        <p className="text-slate-950 leading-relaxed whitespace-pre-wrap">
                            {profile.bio}
                         </p>
                      </div>
@@ -358,14 +353,14 @@ const ReviewerProfile = () => {
 
                   {/* Address */}
                   {profile.address && (
-                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors mb-6">
+                     <div className="bg-gray-50 rounded p-4 border border-slate-200 hover:border-slate-300 transition-colors mb-6">
                         <div className="flex items-center gap-2 mb-3">
-                           <Building className="w-5 h-5 text-blue-600" />
-                           <p className="text-xs text-gray-500 font-semibold uppercase">
+                           <Building className="w-5 h-5 text-cyan-600" />
+                           <p className="text-xs text-slate-500 font-semibold uppercase">
                               Address
                            </p>
                         </div>
-                        <p className="text-gray-900 leading-relaxed">
+                        <p className="text-slate-950 leading-relaxed">
                            {profile.address}
                         </p>
                      </div>
@@ -376,19 +371,19 @@ const ReviewerProfile = () => {
             {/* Stats Cards Grid - Similar to Dashboard */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                {/* Account Information Card */}
-               <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+               <div className="bg-white rounded shadow-[0_18px_45px_rgba(15,23,42,0.06)] p-6 ">
                   <div className="flex items-center gap-3 mb-4">
-                     <Calendar className="w-6 h-6 text-blue-600" />
-                     <h3 className="text-lg font-semibold text-gray-800">
+                     <Calendar className="w-6 h-6 text-cyan-600" />
+                     <h3 className="text-lg font-semibold text-slate-950">
                         Account Information
                      </h3>
                   </div>
                   <div className="space-y-4">
                      <div>
-                        <p className="text-xs text-gray-500 font-semibold uppercase mb-1">
+                        <p className="text-xs text-slate-500 font-semibold uppercase mb-1">
                            Member Since
                         </p>
-                        <p className="text-gray-900 font-semibold">
+                        <p className="text-slate-950 font-semibold">
                            {new Date(profile.createdAt).toLocaleDateString(
                               "en-US",
                               {
@@ -400,7 +395,7 @@ const ReviewerProfile = () => {
                         </p>
                      </div>
                      <div>
-                        <p className="text-xs text-gray-500 font-semibold uppercase mb-1">
+                        <p className="text-xs text-slate-500 font-semibold uppercase mb-1">
                            Account Status
                         </p>
                         <span
@@ -418,19 +413,19 @@ const ReviewerProfile = () => {
 
                {/* Assigned Submissions Card */}
                {profile.assignedSubmissions && (
-                  <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+                  <div className="bg-white rounded shadow-[0_18px_45px_rgba(15,23,42,0.06)] p-6 ">
                      <div className="flex items-center gap-3 mb-4">
-                        <BookOpen className="w-6 h-6 text-blue-600" />
-                        <h3 className="text-lg font-semibold text-gray-800">
+                        <BookOpen className="w-6 h-6 text-cyan-600" />
+                        <h3 className="text-lg font-semibold text-slate-950">
                            Assigned Submissions
                         </h3>
                      </div>
-                     <p className="text-4xl font-bold text-gray-800">
+                     <p className="text-3xl font-bold text-slate-950">
                         {Array.isArray(profile.assignedSubmissions)
                            ? profile.assignedSubmissions.length
                            : 0}
                      </p>
-                     <p className="text-sm text-gray-600 mt-2">
+                     <p className="text-sm text-slate-500 mt-2">
                         Total submissions assigned for review
                      </p>
                   </div>
@@ -439,7 +434,7 @@ const ReviewerProfile = () => {
 
             {/* Edit Information Note */}
             {isEditing && (
-               <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+               <div className="bg-white border border-slate-200 rounded p-4">
                   <p className="text-sm text-yellow-800">
                      <strong>Note:</strong> Only Name, Phone, and Affiliation
                      can be edited. For changes to other fields, please contact
@@ -453,3 +448,4 @@ const ReviewerProfile = () => {
 };
 
 export default ReviewerProfile;
+

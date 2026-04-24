@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import Loading from "../../components/Loading";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
@@ -163,13 +164,7 @@ const ReviewerSubmissions = () => {
       }
    };
 
-   if (loading) {
-      return (
-         <div className="flex items-center justify-center min-h-screen bg-gray-50">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
-         </div>
-      );
-   }
+   if (loading) return <Loading />;
 
    return (
       <div className="min-h-screen bg-gray-50 p-6 -m-8">

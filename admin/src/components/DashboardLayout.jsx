@@ -1,7 +1,7 @@
-import React, { useContext } from "react";
 import { Outlet } from "react-router-dom";
 import { AdminContext } from "../context/AdminContext";
 import { ReviewerContext } from "../context/ReviewerContext";
+import { useContext } from "react";
 
 const DashboardLayout = () => {
    const { aToken } = useContext(AdminContext);
@@ -12,9 +12,11 @@ const DashboardLayout = () => {
    }
 
    return (
-      <div className="ml-64 mt-16 min-h-screen bg-gray-900 text-white p-8">
-         <Outlet />
-      </div>
+      <main className="min-h-screen bg-[#f4f7f6] pt-[72px] lg:ml-[280px]">
+         <div className="p-8">
+            <Outlet />
+         </div>
+      </main>
    );
 };
 

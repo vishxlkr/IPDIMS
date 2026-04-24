@@ -12,10 +12,8 @@ const DashboardLayout = () => {
    }
 
    return (
-      <main className="min-h-screen bg-[#f4f7f6] pt-[72px] lg:ml-[280px]">
-         <div className="p-8">
-            <Outlet />
-         </div>
+      <main className="min-h-screen bg-slate-50 pt-[72px] text-slate-950 lg:ml-[280px]">
+         <Outlet />
       </main>
    );
 };

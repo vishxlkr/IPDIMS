@@ -125,9 +125,7 @@ const ReviewerProfile = () => {
                <h1 className="text-3xl font-bold text-slate-950">
                   Reviewer Profile
                </h1>
-               <p className="text-slate-500 mt-2">
-                  Manage your personal information and preferences
-               </p>
+               
             </div>
 
             {/* Profile Header Card */}

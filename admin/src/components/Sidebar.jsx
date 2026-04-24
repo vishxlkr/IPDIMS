@@ -18,9 +18,12 @@ const Sidebar = () => {
    return (
       <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[280px] flex-col bg-[#222736] text-white shadow-xl lg:flex">
          <div className="flex h-[72px] shrink-0 items-center bg-[#0dcaf0] px-6">
-            <span className="text-[16px] font-bold tracking-widest text-white uppercase">
-               {aToken ? "ADMINISTRATION" : "REVIEWER WORKSPACE"}
-            </span>
+            <h1
+            className="cursor-pointer text-[22px] font-bold text-white "
+            
+         >
+            IPDIMS
+         </h1>
          </div>
 
          <nav className="flex flex-1 flex-col gap-1 overflow-y-auto py-4">

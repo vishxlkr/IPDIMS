@@ -5,8 +5,11 @@ import { toast } from "react-toastify";
 // eslint-disable-next-line react-refresh/only-export-components
 export const AppContext = createContext();
 
+const normalizeBackendUrl = (value) =>
+   (value || "https://ipdims-server.onrender.com").trim().replace(/\/+$/, "");
+
 const AppContextProvider = ({ children }) => {
-   const backendUrl = import.meta.env.VITE_BACKEND_URL;
+   const backendUrl = normalizeBackendUrl(import.meta.env.VITE_BACKEND_URL);
 
    const [token, setToken] = useState(localStorage.getItem("token") || "");
    const [userData, setUserData] = useState(null);

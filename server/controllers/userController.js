@@ -66,12 +66,21 @@ export const signup = async (req, res) => {
       // Send OTP email
       const htmlContent = getOTPEmail(otp);
       const message = `Your OTP for registration is: ${otp}. It expires in 10 minutes.`;
-      await sendEmail({
-         email: normalizedEmail,
-         subject: "IPDIMS - Verify Your Account",
-         message,
-         html: htmlContent,
-      });
+      try {
+         await sendEmail({
+            email: normalizedEmail,
+            subject: "IPDIMS - Verify Your Account",
+            message,
+            html: htmlContent,
+         });
+      } catch (emailError) {
+         console.error("Signup OTP email failed:", emailError.message);
+         return res.status(502).json({
+            success: false,
+            message:
+               "Unable to send OTP email right now. Please verify email configuration and try again.",
+         });
+      }
 
       res.status(200).json({
          success: true,
@@ -229,11 +238,20 @@ export const forgotPassword = async (req, res) => {
       await user.save();
 
       const message = `Your OTP for password reset is: ${otp}. It expires in 10 minutes.`;
-      await sendEmail({
-         email: normalizedEmail,
-         subject: "Password Reset OTP",
-         message,
-      });
+      try {
+         await sendEmail({
+            email: normalizedEmail,
+            subject: "Password Reset OTP",
+            message,
+         });
+      } catch (emailError) {
+         console.error("Password reset OTP email failed:", emailError.message);
+         return res.status(502).json({
+            success: false,
+            message:
+               "Unable to send OTP email right now. Please verify email configuration and try again.",
+         });
+      }
 
       res.status(200).json({
          success: true,

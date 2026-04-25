@@ -43,7 +43,10 @@ const AdminAuthors = () => {
          });
 
          if (data.success) {
-            setAuthors(data.users || []);
+            const verifiedUsers = (data.users || []).filter(
+               (user) => user?.isVerified === true,
+            );
+            setAuthors(verifiedUsers);
          } else {
             toast.error(data.message || "Failed to fetch authors");
          }
@@ -65,7 +68,7 @@ const AdminAuthors = () => {
                author.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                author.organization
                   ?.toLowerCase()
-                  .includes(searchTerm.toLowerCase())
+                  .includes(searchTerm.toLowerCase()),
          );
       }
 
@@ -78,7 +81,7 @@ const AdminAuthors = () => {
             `${backendUrl}/api/admin/user/${authorId}`,
             {
                headers: { atoken },
-            }
+            },
          );
 
          if (data.success) {
@@ -98,7 +101,7 @@ const AdminAuthors = () => {
             `${backendUrl}/api/admin/user/${authorId}/submissions`,
             {
                headers: { atoken },
-            }
+            },
          );
 
          if (data.success) {
@@ -117,7 +120,7 @@ const AdminAuthors = () => {
       try {
          const { data } = await axios.delete(
             `${backendUrl}/api/admin/user/${authorId}`,
-            { headers: { atoken } }
+            { headers: { atoken } },
          );
 
          if (data.success) {
@@ -140,7 +143,6 @@ const AdminAuthors = () => {
                <h1 className="text-3xl font-bold text-slate-950">
                   Manage Authors
                </h1>
-               
             </div>
 
             <div className="bg-white rounded shadow-[0_18px_45px_rgba(15,23,42,0.06)] p-6 mb-6 border border-slate-200">
@@ -191,7 +193,11 @@ const AdminAuthors = () => {
                                  <td className="px-6 py-4">
                                     <div className="flex items-center gap-3">
                                        <div className="w-10 h-10 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-700 font-bold text-lg border border-cyan-200">
-                                          {author.name ? author.name.charAt(0).toUpperCase() : 'U'}
+                                          {author.name
+                                             ? author.name
+                                                  .charAt(0)
+                                                  .toUpperCase()
+                                             : "U"}
                                        </div>
                                        <div className="text-sm font-medium text-slate-950">
                                           {author.name || "N/A"}
@@ -209,7 +215,7 @@ const AdminAuthors = () => {
 
                                  <td className="px-6 py-4 text-sm text-slate-500">
                                     {new Date(
-                                       author.createdAt
+                                       author.createdAt,
                                     ).toLocaleDateString()}
                                  </td>
 
@@ -325,8 +331,8 @@ const AdminAuthors = () => {
                                           sub.status === "Accepted"
                                              ? "bg-green-100 text-green-700"
                                              : sub.status === "Rejected"
-                                             ? "bg-red-100 text-red-700"
-                                             : "bg-cyan-100 text-cyan-700"
+                                               ? "bg-red-100 text-red-700"
+                                               : "bg-cyan-100 text-cyan-700"
                                        }`}
                                     >
                                        {sub.status}
@@ -347,4 +353,3 @@ const AdminAuthors = () => {
 };
 
 export default AdminAuthors;
-

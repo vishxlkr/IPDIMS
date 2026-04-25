@@ -36,7 +36,7 @@ const Login = () => {
          toast.error(data.message);
          return { success: false };
       } catch (error) {
-         toast.error(error.message);
+         toast.error(error.response?.data?.message || error.message);
          return { success: false };
       } finally {
          setLoading(false);
@@ -64,7 +64,7 @@ const Login = () => {
          toast.error(data.message);
          return { success: false };
       } catch (error) {
-         toast.error(error.message);
+         toast.error(error.response?.data?.message || error.message);
          return { success: false };
       } finally {
          setLoading(false);
@@ -83,7 +83,7 @@ const Login = () => {
          toast.error(data.message);
          return { success: false };
       } catch (error) {
-         toast.error(error.message);
+         toast.error(error.response?.data?.message || error.message);
          return { success: false };
       } finally {
          setLoading(false);
@@ -113,7 +113,7 @@ const Login = () => {
          toast.error(data.message);
          return { success: false };
       } catch (error) {
-         toast.error(error.message);
+         toast.error(error.response?.data?.message || error.message);
          return { success: false };
       } finally {
          setLoading(false);
@@ -133,7 +133,7 @@ const Login = () => {
          toast.error(data.message);
          return { success: false };
       } catch (error) {
-         toast.error(error.message);
+         toast.error(error.response?.data?.message || error.message);
          return { success: false };
       } finally {
          setLoading(false);
@@ -278,7 +278,7 @@ const Login = () => {
                      <div className="w-full">
                         <p>Enter OTP</p>
                         <p className="mt-1 text-xs text-gray-500">
-                           OTP sent to {email}
+                           OTP is been sent to {email}
                         </p>
                         <input
                            type="text"

@@ -277,6 +277,9 @@ const Login = () => {
                   {step === "otp" && (
                      <div className="w-full">
                         <p>Enter OTP</p>
+                        <p className="mt-1 text-xs text-gray-500">
+                           OTP sent to {email}
+                        </p>
                         <input
                            type="text"
                            value={otp}

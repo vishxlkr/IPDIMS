@@ -13,6 +13,8 @@ import { v2 as cloudinary } from "cloudinary";
 const generateOTP = () =>
    Math.floor(100000 + Math.random() * 900000).toString();
 
+const normalizeEmail = (value) => value.trim().toLowerCase();
+
 // Generate JWT token
 const generateToken = (id) =>
    jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
@@ -21,15 +23,16 @@ const generateToken = (id) =>
 export const signup = async (req, res) => {
    try {
       const { name, email, password } = req.body;
+      const normalizedEmail = normalizeEmail(email || "");
 
-      if (!name || !email || !password) {
+      if (!name || !normalizedEmail || !password) {
          return res.status(400).json({
             success: false,
             message: "Name, email, and password are required.",
          });
       }
 
-      let user = await userModel.findOne({ email });
+      let user = await userModel.findOne({ email: normalizedEmail });
 
       if (user && user.isVerified) {
          return res.status(400).json({
@@ -52,7 +55,7 @@ export const signup = async (req, res) => {
       } else {
          user = new userModel({
             name,
-            email,
+            email: normalizedEmail,
             password: hashedPassword,
             otp,
             otpExpires,
@@ -64,7 +67,7 @@ export const signup = async (req, res) => {
       const htmlContent = getOTPEmail(otp);
       const message = `Your OTP for registration is: ${otp}. It expires in 10 minutes.`;
       await sendEmail({
-         email: user.email,
+         email: normalizedEmail,
          subject: "IPDIMS - Verify Your Account",
          message,
          html: htmlContent,
@@ -87,8 +90,9 @@ export const signup = async (req, res) => {
 export const verifyOtp = async (req, res) => {
    try {
       const { email, otp } = req.body;
+      const normalizedEmail = normalizeEmail(email || "");
 
-      if (!email || !otp) {
+      if (!normalizedEmail || !otp) {
          return res.status(400).json({
             success: false,
             message: "Email and OTP are required.",
@@ -96,7 +100,7 @@ export const verifyOtp = async (req, res) => {
       }
 
       const user = await userModel.findOne({
-         email,
+         email: normalizedEmail,
          otp: otp.toString(),
          otpExpires: { $gt: Date.now() },
       });
@@ -147,15 +151,16 @@ export const verifyOtp = async (req, res) => {
 export const login = async (req, res) => {
    try {
       const { email, password } = req.body;
+      const normalizedEmail = normalizeEmail(email || "");
 
-      if (!email || !password) {
+      if (!normalizedEmail || !password) {
          return res.status(400).json({
             success: false,
             message: "Email and password are required.",
          });
       }
 
-      const user = await userModel.findOne({ email });
+      const user = await userModel.findOne({ email: normalizedEmail });
       if (!user) {
          return res.status(401).json({
             success: false,
@@ -198,15 +203,19 @@ export const login = async (req, res) => {
 export const forgotPassword = async (req, res) => {
    try {
       const { email } = req.body;
+      const normalizedEmail = normalizeEmail(email || "");
 
-      if (!email) {
+      if (!normalizedEmail) {
          return res.status(400).json({
             success: false,
             message: "Email is required.",
          });
       }
 
-      const user = await userModel.findOne({ email, isVerified: true });
+      const user = await userModel.findOne({
+         email: normalizedEmail,
+         isVerified: true,
+      });
       if (!user) {
          return res.status(404).json({
             success: false,
@@ -221,7 +230,7 @@ export const forgotPassword = async (req, res) => {
 
       const message = `Your OTP for password reset is: ${otp}. It expires in 10 minutes.`;
       await sendEmail({
-         email: user.email,
+         email: normalizedEmail,
          subject: "Password Reset OTP",
          message,
       });
@@ -243,8 +252,9 @@ export const forgotPassword = async (req, res) => {
 export const resetPassword = async (req, res) => {
    try {
       const { email, otp, newPassword } = req.body;
+      const normalizedEmail = normalizeEmail(email || "");
 
-      if (!email || !otp || !newPassword) {
+      if (!normalizedEmail || !otp || !newPassword) {
          return res.status(400).json({
             success: false,
             message: "Email, OTP, and new password are required.",
@@ -252,7 +262,7 @@ export const resetPassword = async (req, res) => {
       }
 
       const user = await userModel.findOne({
-         email,
+         email: normalizedEmail,
       });
 
       if (!user) {

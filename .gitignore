@@ -11,8 +11,18 @@ client/build/
 client/dist/
 server/dist/
 
-# Environment files
-/.env
+# Environment and secret files
+.env
+.env.*
+*.env
+*.env.*
+!*.env.example
+!*.env.sample
+client/.env
+client/.env.*
+admin/.env
+admin/.env.*
+server/.env
 server/.env.*
 
 # Logs

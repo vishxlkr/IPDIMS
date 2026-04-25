@@ -18,9 +18,7 @@ const Sidebar = () => {
    return (
       <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[280px] flex-col bg-[#2e3449] text-white shadow-xl lg:flex">
          <div className="flex h-[72px] shrink-0 items-center bg-accent px-6">
-            <h1 className="cursor-pointer text-[22px] font-bold text-white ">
-               IPDIMS
-            </h1>
+            <h1 className="text-[22px] font-bold text-white ">IPDIMS</h1>
          </div>
 
          <nav className="flex flex-1 flex-col gap-1 overflow-y-auto py-4">
@@ -53,7 +51,7 @@ const Sidebar = () => {
                      <FileText size={25} /> Assigned Submissions
                   </NavLink>
                   <NavLink to="/reviewer/profile" className={linkClasses}>
-                     <User size={25} /> My Profile
+                     <User size={25} /> Profile
                   </NavLink>
                </>
             )}

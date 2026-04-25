@@ -41,7 +41,7 @@ const ReviewerProfile = () => {
             `${backendUrl}/api/reviewer/profile`,
             {
                headers: { rtoken },
-            }
+            },
          );
 
          if (data.success) {
@@ -78,7 +78,7 @@ const ReviewerProfile = () => {
             formData,
             {
                headers: { rtoken },
-            }
+            },
          );
 
          if (data.success) {
@@ -91,7 +91,7 @@ const ReviewerProfile = () => {
       } catch (error) {
          console.error("Error updating profile:", error);
          toast.error(
-            error.response?.data?.message || "Failed to update profile"
+            error.response?.data?.message || "Failed to update profile",
          );
       }
    };
@@ -122,10 +122,7 @@ const ReviewerProfile = () => {
          <div className="w-full">
             {/* Header - Consistent with Dashboard and Submissions */}
             <div className="mb-8">
-               <h1 className="text-3xl font-bold text-slate-950">
-                  Reviewer Profile
-               </h1>
-               
+               <h1 className="text-3xl font-bold text-slate-950">Profile</h1>
             </div>
 
             {/* Profile Header Card */}
@@ -388,7 +385,7 @@ const ReviewerProfile = () => {
                                  year: "numeric",
                                  month: "long",
                                  day: "numeric",
-                              }
+                              },
                            )}
                         </p>
                      </div>
@@ -446,4 +443,3 @@ const ReviewerProfile = () => {
 };
 
 export default ReviewerProfile;
-

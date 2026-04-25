@@ -26,7 +26,7 @@ const Navbar = () => {
 
    return (
       <nav className="fixed left-0 right-0 top-0 z-30 flex h-[72px] items-center justify-between border-b border-slate-200 bg-white px-6 shadow-[0_2px_4px_rgba(0,0,0,0.02)] lg:left-[280px] lg:px-8">
-         <h1 className="cursor-pointer text-[22px] font-bold text-slate-800 transition ">
+         <h1 className=" text-[22px] font-bold text-slate-800 transition ">
             {aToken ? "Admin" : rToken ? "Reviewer" : "Guest"}
          </h1>
 

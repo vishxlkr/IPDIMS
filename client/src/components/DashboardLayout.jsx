@@ -6,7 +6,7 @@ const DashboardLayout = () => {
    return (
       <div className="bg-slate-50 min-h-screen">
          {/* BELOW NAVBAR */}
-         <div className="flex pt-16">
+         <div className="flex">
             {/* Sidebar */}
             <Sidebar />
 

@@ -104,14 +104,12 @@ const ProfilePage = () => {
    if (loading) return <Loading />;
 
    return (
-      <div className="min-h-screen bg-gray-50 p-6 -m-8">
-         <div className="max-w-7xl mx-auto">
-            <h1 className="text-4xl font-bold text-gray-900 mb-8">
-               My Profile
-            </h1>
+      <div className="min-h-[calc(100vh-4rem)] bg-gray-50 px-7 py-6">
+         <div className="w-full">
+            <h1 className="text-3xl font-bold text-gray-900 mb-8">Profile</h1>
 
             {/* Card */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
+            <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 w-full">
                {/* Gradient Header like Reviewer UI */}
                <div className="bg-linear-to-r from-cyan-600 to-cyan-400 p-6">
                   <div className="flex items-center justify-between">
@@ -165,95 +163,103 @@ const ProfilePage = () => {
                </div>
 
                {/* FORM BODY */}
-               <form
-                  id="profileForm"
-                  onSubmit={handleSubmit}
-                  className="p-6 space-y-6"
-               >
-                  {/* INFO GRID */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                     {/* NAME */}
-                     <ProfileField
-                        icon={<User size={20} className="text-blue-600" />}
-                        label="Full Name"
-                        editing={isEditing}
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                     />
-
-                     {/* EMAIL */}
-                     <StaticField
-                        icon={<Mail size={20} className="text-blue-600" />}
-                        label="Email"
-                        value={userData.email}
-                     />
-
-                     {/* PHONE */}
-                     <ProfileField
-                        icon={<Phone size={20} className="text-blue-600" />}
-                        label="Phone Number"
-                        editing={isEditing}
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                     />
-
-                     <ProfileField
-                        icon={<Briefcase size={20} className="text-blue-600" />}
-                        label="Designation"
-                        editing={isEditing}
-                        name="designation"
-                        value={formData.designation}
-                        onChange={handleChange}
-                     />
-
-                     <ProfileField
-                        icon={<Building size={20} className="text-blue-600" />}
-                        label="Organization"
-                        editing={isEditing}
-                        name="organization"
-                        value={formData.organization}
-                        onChange={handleChange}
-                     />
-
-                     <ProfileField
-                        icon={<Link2 size={20} className="text-blue-600" />}
-                        label="Personal URL"
-                        editing={isEditing}
-                        name="personalUrl"
-                        value={formData.personalUrl}
-                        onChange={handleChange}
-                     />
-
-                     <ProfileField
-                        icon={<MapPin size={20} className="text-blue-600" />}
-                        label="Address"
-                        editing={isEditing}
-                        name="address"
-                        value={formData.address}
-                        onChange={handleChange}
-                     />
-                  </div>
-
-                  {/* BIO */}
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                     <p className="text-xs text-gray-600 font-semibold">Bio</p>
-                     {isEditing ? (
-                        <textarea
-                           name="bio"
-                           value={formData.bio}
+               <div className="overflow-x-auto">
+                  <form
+                     id="profileForm"
+                     onSubmit={handleSubmit}
+                     className="p-6 space-y-6 min-w-full"
+                  >
+                     {/* INFO GRID */}
+                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        {/* NAME */}
+                        <ProfileField
+                           icon={<User size={20} className="text-blue-600" />}
+                           label="Full Name"
+                           editing={isEditing}
+                           name="name"
+                           value={formData.name}
                            onChange={handleChange}
-                           rows="3"
-                           className="mt-1 w-full bg-white border border-gray-300 rounded-lg p-3 text-sm"
                         />
-                     ) : (
-                        <p className="text-gray-800 mt-1 whitespace-pre-wrap">
-                           {formData.bio || "No bio added"}
+
+                        {/* EMAIL */}
+                        <StaticField
+                           icon={<Mail size={20} className="text-blue-600" />}
+                           label="Email"
+                           value={userData.email}
+                        />
+
+                        {/* PHONE */}
+                        <ProfileField
+                           icon={<Phone size={20} className="text-blue-600" />}
+                           label="Phone Number"
+                           editing={isEditing}
+                           name="phone"
+                           value={formData.phone}
+                           onChange={handleChange}
+                        />
+
+                        <ProfileField
+                           icon={
+                              <Briefcase size={20} className="text-blue-600" />
+                           }
+                           label="Designation"
+                           editing={isEditing}
+                           name="designation"
+                           value={formData.designation}
+                           onChange={handleChange}
+                        />
+
+                        <ProfileField
+                           icon={
+                              <Building size={20} className="text-blue-600" />
+                           }
+                           label="Organization"
+                           editing={isEditing}
+                           name="organization"
+                           value={formData.organization}
+                           onChange={handleChange}
+                        />
+
+                        <ProfileField
+                           icon={<Link2 size={20} className="text-blue-600" />}
+                           label="Personal URL"
+                           editing={isEditing}
+                           name="personalUrl"
+                           value={formData.personalUrl}
+                           onChange={handleChange}
+                        />
+
+                        <ProfileField
+                           icon={<MapPin size={20} className="text-blue-600" />}
+                           label="Address"
+                           editing={isEditing}
+                           name="address"
+                           value={formData.address}
+                           onChange={handleChange}
+                        />
+                     </div>
+
+                     {/* BIO */}
+                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <p className="text-xs text-gray-600 font-semibold">
+                           Bio
                         </p>
-                     )}
-                  </div>
-               </form>
+                        {isEditing ? (
+                           <textarea
+                              name="bio"
+                              value={formData.bio}
+                              onChange={handleChange}
+                              rows="3"
+                              className="mt-1 w-full bg-white border border-gray-300 rounded-lg p-3 text-sm"
+                           />
+                        ) : (
+                           <p className="text-gray-800 mt-1 whitespace-pre-wrap">
+                              {formData.bio || "No bio added"}
+                           </p>
+                        )}
+                     </div>
+                  </form>
+               </div>
             </div>
          </div>
       </div>

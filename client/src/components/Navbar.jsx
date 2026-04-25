@@ -1,5 +1,3 @@
-
-
 import React, { useState, useContext } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -94,7 +92,7 @@ const Navbar = () => {
                      >
                         <div className="flex items-center space-x-2 bg-white/5 hover:bg-white/10 p-1 rounded-full transition-all duration-300 border border-white/5 hover:border-white/20">
                            <div className="w-8 h-8 rounded-full bg-linear-to-r from-blue-500 to-blue-700 flex items-center justify-center text-white  text-lg transition-transform duration-300 group-hover:scale-105 group-hover:ring-2 ring-white/30">
-                              {userData?.name?.charAt(0).toUpperCase() || 'U'}
+                              {userData?.name?.charAt(0).toUpperCase() || "U"}
                            </div>
                         </div>
 
@@ -170,7 +168,7 @@ const Navbar = () => {
                ) : (
                   <div className="flex flex-col items-center space-y-4">
                      <div className="w-12 h-12 rounded-full bg-linear-to-r from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-xl border-2 border-white/20">
-                        {userData?.name?.charAt(0).toUpperCase() || 'U'}
+                        {userData?.name?.charAt(0).toUpperCase() || "U"}
                      </div>
                      <p
                         onClick={() => {

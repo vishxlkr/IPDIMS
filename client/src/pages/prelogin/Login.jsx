@@ -10,7 +10,7 @@ const Login = () => {
       useContext(AppContext);
 
    const navigate = useNavigate();
-   const adminUrl = import.meta.env.VITE_ADMIN_URL;
+   // const adminUrl = import.meta.env.VITE_ADMIN_URL;
 
    const [step, setStep] = useState("login");
    const [purpose, setPurpose] = useState("");

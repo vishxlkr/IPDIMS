@@ -12,7 +12,7 @@ const Login = () => {
    const [email, setEmail] = useState("");
    const [password, setPassword] = useState("");
 
-   const adminUrl = import.meta.env.VITE_CLIENT_URL + "login"; // URL for author login (client app)
+   // const adminUrl = import.meta.env.VITE_CLIENT_URL + "login"; // URL for author login (client app)
 
    const onSubmitHandler = async (event) => {
       event.preventDefault();

@@ -12,11 +12,7 @@ client/dist/
 server/dist/
 
 # Environment files
-.env
-.env.*
-client/.env
-server/.env
-client/.env.*
+/.env
 server/.env.*
 
 # Logs

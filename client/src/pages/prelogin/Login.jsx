@@ -354,7 +354,7 @@ const Login = () => {
                </div>
 
                {/* SWITCH BUTTON */}
-               <div className="min-w-[340px] sm:min-w-96 mt-4">
+               {/* <div className="min-w-[340px] sm:min-w-96 mt-4">
                   <button
                      type="button"
                      onClick={() => (window.location.href = adminUrl)}
@@ -362,7 +362,7 @@ const Login = () => {
                   >
                      Go To Admin Login
                   </button>
-               </div>
+               </div> */}
             </form>{" "}
          </div>
       </div>

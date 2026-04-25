@@ -106,7 +106,7 @@ const Login = () => {
                </div>
 
                {/* NEW BUTTON BOX */}
-               <div className="min-w-[340px] sm:min-w-96 mt-4">
+               {/* <div className="min-w-[340px] sm:min-w-96 mt-4">
                   <button
                      type="button"
                      onClick={() => (window.location.href = adminUrl)}
@@ -114,8 +114,8 @@ const Login = () => {
                   >
                      Go To Author Login
                   </button>
-               </div>
-            </form>{" "}
+               </div> */}
+            </form>
          </div>
       </div>
    );

@@ -10,6 +10,8 @@ const AdminRegistrations = () => {
    const [loading, setLoading] = useState(true);
    const [showModal, setShowModal] = useState(false);
    const [selectedRegistration, setSelectedRegistration] = useState(null);
+   const [reviewReason, setReviewReason] = useState("");
+   const [reviewSubmitting, setReviewSubmitting] = useState(false);
 
    const { backendUrl } = useContext(AdminContext);
    const atoken = localStorage.getItem("aToken");
@@ -21,7 +23,7 @@ const AdminRegistrations = () => {
             `${backendUrl}/api/admin/registrations`,
             {
                headers: { atoken },
-            }
+            },
          );
 
          if (data.success) {
@@ -49,7 +51,7 @@ const AdminRegistrations = () => {
       try {
          const { data } = await axios.delete(
             `${backendUrl}/api/admin/registrations/${id}`,
-            { headers: { atoken } }
+            { headers: { atoken } },
          );
 
          if (data.success) {
@@ -60,9 +62,62 @@ const AdminRegistrations = () => {
          }
       } catch (error) {
          toast.error(
-            error.response?.data?.message || "Error deleting registration"
+            error.response?.data?.message || "Error deleting registration",
          );
       }
+   };
+
+   const handleRegistrationReview = async (approved) => {
+      if (!selectedRegistration?._id) return;
+
+      if (!approved && !reviewReason.trim()) {
+         toast.error("Please enter reason for non-approval");
+         return;
+      }
+
+      try {
+         setReviewSubmitting(true);
+
+         const { data } = await axios.put(
+            `${backendUrl}/api/admin/registrations/${selectedRegistration._id}/approval`,
+            {
+               approved,
+               reason: approved ? "" : reviewReason.trim(),
+            },
+            { headers: { atoken } },
+         );
+
+         if (data.success) {
+            if (data.emailSent === false) {
+               toast.warning(
+                  data.message ||
+                     "Registration updated, but email notification failed",
+               );
+            } else {
+               toast.success(
+                  data.message || "Registration updated successfully",
+               );
+            }
+            setShowModal(false);
+            setSelectedRegistration(null);
+            setReviewReason("");
+            await fetchRegistrations();
+         } else {
+            toast.error(data.message || "Failed to update registration");
+         }
+      } catch (error) {
+         toast.error(
+            error.response?.data?.message || "Failed to update registration",
+         );
+      } finally {
+         setReviewSubmitting(false);
+      }
+   };
+
+   const closeRegistrationModal = () => {
+      setShowModal(false);
+      setSelectedRegistration(null);
+      setReviewReason("");
    };
 
    if (loading) return <Loading />;
@@ -74,7 +129,6 @@ const AdminRegistrations = () => {
                <h1 className="text-3xl font-bold text-slate-950">
                   Registrations
                </h1>
-               
             </div>
 
             {/* Registrations Table */}
@@ -99,7 +153,7 @@ const AdminRegistrations = () => {
                               Amount Paid
                            </th>
                            <th className="px-6 py-4 text-left font-semibold text-xs text-slate-500 uppercase tracking-wider">
-                              Proof
+                              Status
                            </th>
                            <th className="px-6 py-4 text-left font-semibold text-xs text-slate-500 uppercase tracking-wider">
                               Actions
@@ -138,14 +192,19 @@ const AdminRegistrations = () => {
                                  </td>
 
                                  <td className="px-6 py-4">
-                                    <a
-                                       href={reg.paymentProof}
-                                       target="_blank"
-                                       rel="noopener noreferrer"
-                                       className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800"
-                                    >
-                                       <Download size={18} /> File
-                                    </a>
+                                    {reg.approved ? (
+                                       <span className="inline-flex items-center rounded-full bg-green-100 text-green-700 px-3 py-1 text-xs font-semibold">
+                                          Approved
+                                       </span>
+                                    ) : reg.rejectionReason ? (
+                                       <span className="inline-flex items-center rounded-full bg-red-100 text-red-700 px-3 py-1 text-xs font-semibold">
+                                          Not Approved
+                                       </span>
+                                    ) : (
+                                       <span className="inline-flex items-center rounded-full bg-amber-100 text-amber-700 px-3 py-1 text-xs font-semibold">
+                                          Pending
+                                       </span>
+                                    )}
                                  </td>
 
                                  {/*  ACTION BUTTONS */}
@@ -154,6 +213,9 @@ const AdminRegistrations = () => {
                                        <button
                                           onClick={() => {
                                              setSelectedRegistration(reg);
+                                             setReviewReason(
+                                                reg.rejectionReason || "",
+                                             );
                                              setShowModal(true);
                                           }}
                                           className="flex items-center gap-1 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-medium"
@@ -193,13 +255,15 @@ const AdminRegistrations = () => {
          {showModal && selectedRegistration && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                  <div className="flex justify-between items-center px-6 py-4 border-b bg-indigo-600 text-white rounded-t-2xl">
+                  <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b bg-indigo-600 text-white rounded-t-2xl">
                      <h2 className="text-xl font-bold">Registration Details</h2>
                      <button
-                        onClick={() => setShowModal(false)}
-                        className="text-white hover:bg-white/20 rounded-full p-2"
+                        type="button"
+                        onClick={closeRegistrationModal}
+                        className="rounded-lg p-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                        aria-label="Close registration details"
                      >
-                        <X size={18} />
+                        <X size={22} />
                      </button>
                   </div>
 
@@ -268,17 +332,67 @@ const AdminRegistrations = () => {
                            rel="noopener noreferrer"
                            className="mt-3 inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium"
                         >
-                           View / Download File
+                           View Trasaction Photo
                         </a>
+                     </div>
+
+                     <div className="bg-gray-50 rounded p-4 border space-y-3">
+                        <p className="text-xs text-slate-500 font-semibold">
+                           APPROVAL STATUS
+                        </p>
+                        <p className="text-sm font-medium text-slate-900">
+                           {selectedRegistration.approved
+                              ? "Approved"
+                              : selectedRegistration.rejectionReason
+                                ? "Not Approved"
+                                : "Pending"}
+                        </p>
+
+                        {!selectedRegistration.approved && (
+                           <div>
+                              <label
+                                 htmlFor="reviewReason"
+                                 className="block text-xs font-semibold text-slate-500 mb-2"
+                              >
+                                 Reason for non-approval
+                              </label>
+                              <textarea
+                                 id="reviewReason"
+                                 value={reviewReason}
+                                 onChange={(e) =>
+                                    setReviewReason(e.target.value)
+                                 }
+                                 rows={4}
+                                 placeholder="Write reason if registration is not approved"
+                                 className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                              />
+                           </div>
+                        )}
                      </div>
                   </div>
 
-                  <div className="px-6 py-4 border-t bg-gray-100 rounded-b-2xl text-right">
+                  <div className="px-6 py-4 border-t bg-gray-100 rounded-b-2xl flex flex-col sm:flex-row justify-end gap-3">
                      <button
-                        onClick={() => setShowModal(false)}
-                        className="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium"
+                        onClick={() => handleRegistrationReview(false)}
+                        disabled={
+                           reviewSubmitting || selectedRegistration.approved
+                        }
+                        className="px-5 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium"
                      >
-                        Close
+                        {reviewSubmitting
+                           ? "Submitting..."
+                           : "Not Approve & Send Mail"}
+                     </button>
+                     <button
+                        onClick={() => handleRegistrationReview(true)}
+                        disabled={
+                           reviewSubmitting || selectedRegistration.approved
+                        }
+                        className="px-5 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium"
+                     >
+                        {reviewSubmitting
+                           ? "Submitting..."
+                           : "Approve & Send Mail"}
                      </button>
                   </div>
                </div>
@@ -289,4 +403,3 @@ const AdminRegistrations = () => {
 };
 
 export default AdminRegistrations;
-

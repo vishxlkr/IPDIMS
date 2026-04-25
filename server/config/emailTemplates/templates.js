@@ -279,3 +279,69 @@ export const getReviewerRegistrationEmail = (reviewerName, email, password) => {
       content,
    );
 };
+
+export const getRegistrationApprovalEmail = (name, registration) => {
+   const content = `
+      <p>Hello <strong>${name}</strong>,</p>
+      <h2>Your Conference Registration Is Approved</h2>
+      <p>Your submitted registration has been reviewed and approved by the admin team.</p>
+
+      <div class="info-box">
+         <div class="info-row">
+            <span class="info-label">Paper ID:</span>
+            <span class="info-value">#${registration.paperId}</span>
+         </div>
+         <div class="info-row">
+            <span class="info-label">Paper Title:</span>
+            <span class="info-value font-semibold">${registration.paperTitle}</span>
+         </div>
+         <div class="info-row">
+            <span class="info-label">Category:</span>
+            <span class="info-value">${registration.registrationCategory}</span>
+         </div>
+         <div class="info-row">
+            <span class="info-label">Amount Paid:</span>
+            <span class="info-value">₹ ${registration.amountPaid}</span>
+         </div>
+      </div>
+
+      <p>Thank you for completing your registration. We look forward to your participation.</p>
+      <div class="btn-container">
+         <a href="${process.env.CLIENT_URL || "http://localhost:5173"}/dashboard" class="btn">Open Dashboard</a>
+      </div>
+      <br />
+      <p>Best regards,<br />Team IPDIMS</p>
+   `;
+
+   return baseEmailTemplate("Conference Registration Approved", content);
+};
+
+export const getRegistrationRejectionEmail = (name, registration, reason) => {
+   const content = `
+      <p>Hello <strong>${name}</strong>,</p>
+      <h2>Your Conference Registration Was Not Approved</h2>
+      <p>Your registration submission has been reviewed, but it could not be approved at this time.</p>
+
+      <div class="info-box">
+         <div class="info-row">
+            <span class="info-label">Paper ID:</span>
+            <span class="info-value">#${registration.paperId}</span>
+         </div>
+         <div class="info-row">
+            <span class="info-label">Paper Title:</span>
+            <span class="info-value font-semibold">${registration.paperTitle}</span>
+         </div>
+      </div>
+
+      <div style="background-color: #fef2f2; border-left: 4px solid #dc2626; padding: 12px; margin: 24px 0;">
+         <p style="margin-top: 0; font-weight: bold; color: #991b1b; font-size: 12px; text-transform: uppercase;">Reason for non-approval</p>
+         <p style="margin-bottom: 0; color: #450a0a; line-height: 1.5; word-break: break-word; white-space: pre-wrap;">${reason}</p>
+      </div>
+
+      <p>Please update your registration/payment details if needed and contact the support team for help.</p>
+      <br />
+      <p>Best regards,<br />Team IPDIMS</p>
+   `;
+
+   return baseEmailTemplate("Conference Registration Update", content);
+};

@@ -11,6 +11,8 @@ import {
    getStatusUpdateEmail,
    getFeedbackSentToAuthorEmail,
    getReviewerRegistrationEmail,
+   getRegistrationApprovalEmail,
+   getRegistrationRejectionEmail,
 } from "../config/emailTemplates/templates.js";
 import registrationModel from "../models/registrationModel.js";
 
@@ -848,6 +850,111 @@ export const deleteRegistration = async (req, res) => {
       res.status(500).json({
          success: false,
          message: "Server error while deleting registration",
+         error: error.message,
+      });
+   }
+};
+
+//  Approve or reject a registration by ID and send notification email
+export const updateRegistrationApproval = async (req, res) => {
+   try {
+      const { id } = req.params;
+      const { approved, reason } = req.body;
+
+      if (!validator.isMongoId(id)) {
+         return res.status(400).json({
+            success: false,
+            message: "Invalid registration id",
+         });
+      }
+
+      const normalizedApproved =
+         typeof approved === "boolean"
+            ? approved
+            : approved === "true"
+              ? true
+              : approved === "false"
+                ? false
+                : null;
+
+      const normalizedReason = typeof reason === "string" ? reason.trim() : "";
+
+      if (normalizedApproved === null) {
+         return res.status(400).json({
+            success: false,
+            message: "approved must be a boolean value (true/false)",
+         });
+      }
+
+      if (!normalizedApproved && !normalizedReason) {
+         return res.status(400).json({
+            success: false,
+            message: "Reason is required when registration is not approved",
+         });
+      }
+
+      const updatePayload = {
+         approved: normalizedApproved,
+         rejectionReason: normalizedApproved ? "" : normalizedReason,
+         approvalReviewedAt: new Date(),
+      };
+
+      const registration = await registrationModel.findByIdAndUpdate(
+         id,
+         { $set: updatePayload },
+         { new: true },
+      );
+
+      if (!registration) {
+         return res.status(404).json({
+            success: false,
+            message: "Registration not found",
+         });
+      }
+
+      let emailSent = true;
+
+      try {
+         const emailHtml = normalizedApproved
+            ? getRegistrationApprovalEmail(registration.name, registration)
+            : getRegistrationRejectionEmail(
+                 registration.name,
+                 registration,
+                 registration.rejectionReason,
+              );
+
+         await sendEmail({
+            email: registration.email,
+            subject: normalizedApproved
+               ? "IPDIMS Registration Approved"
+               : "IPDIMS Registration Not Approved",
+            message: normalizedApproved
+               ? `Your registration for paper #${registration.paperId} has been approved.`
+               : `Your registration for paper #${registration.paperId} was not approved. Reason: ${registration.rejectionReason}`,
+            html: emailHtml,
+         });
+      } catch (emailError) {
+         emailSent = false;
+         console.error("❌ Registration approval email error:", emailError);
+      }
+
+      return res.status(200).json({
+         success: true,
+         message: normalizedApproved
+            ? emailSent
+               ? "Registration approved and email sent"
+               : "Registration approved, but email could not be sent"
+            : emailSent
+              ? "Registration marked as not approved and email sent"
+              : "Registration marked as not approved, but email could not be sent",
+         emailSent,
+         registration,
+      });
+   } catch (error) {
+      console.error("❌ Update registration approval error:", error);
+      return res.status(500).json({
+         success: false,
+         message: "Server error while updating registration approval",
          error: error.message,
       });
    }

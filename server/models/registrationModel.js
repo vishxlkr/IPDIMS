@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-// do changes later
 const registrationSchema = new mongoose.Schema(
    {
       paperId: { type: Number, required: true, unique: true },
@@ -16,6 +15,9 @@ const registrationSchema = new mongoose.Schema(
       paymentDate: { type: String, required: true },
       transactionRefNo: { type: String, required: true },
       paymentProof: { type: String, required: true },
+      approved: { type: Boolean, default: false },
+      rejectionReason: { type: String, default: "" },
+      approvalReviewedAt: { type: Date },
       accommodationRequired: { type: String },
       foodPreference: { type: String },
       additionalNotes: { type: String },

@@ -22,6 +22,7 @@ import {
    loginAdmin,
    markFeedbackSeen,
    notifyAuthor,
+   updateRegistrationApproval,
    updateReviewerStatus,
 } from "../controllers/adminController.js";
 
@@ -66,6 +67,11 @@ adminRouter.delete("/user/:id", authAdmin, deleteAuthor);
 // all registrations
 adminRouter.get("/registrations", authAdmin, getAllRegistrations);
 adminRouter.delete("/registrations/:id", authAdmin, deleteRegistration);
+adminRouter.put(
+   "/registrations/:id/approval",
+   authAdmin,
+   updateRegistrationApproval,
+);
 adminRouter.get("/registration/user/:userId", authAdmin, getRegistrationByUser);
 adminRouter.put("/mark-feedback-seen/:id", authAdmin, markFeedbackSeen);
 

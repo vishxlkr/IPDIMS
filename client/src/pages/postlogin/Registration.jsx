@@ -324,7 +324,7 @@ const Registration = () => {
          );
 
          if (res.data.success) {
-            toast.success("✅ Registration Successful!");
+            toast.success("Registration Successful!");
 
             // Reset form
             setFormData({

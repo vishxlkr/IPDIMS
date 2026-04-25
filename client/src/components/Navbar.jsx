@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useRef, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import logo from "../assets/logo.png";
@@ -10,6 +10,26 @@ const Navbar = () => {
 
    const [menuOpen, setMenuOpen] = useState(false);
    const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+   const profileMenuRef = useRef(null);
+
+   useEffect(() => {
+      const handleOutsideClick = (event) => {
+         if (
+            profileMenuRef.current &&
+            !profileMenuRef.current.contains(event.target)
+         ) {
+            setProfileMenuOpen(false);
+         }
+      };
+
+      document.addEventListener("mousedown", handleOutsideClick);
+      document.addEventListener("touchstart", handleOutsideClick);
+
+      return () => {
+         document.removeEventListener("mousedown", handleOutsideClick);
+         document.removeEventListener("touchstart", handleOutsideClick);
+      };
+   }, []);
 
    const handleLogoClick = () => {
       navigate("/");
@@ -86,9 +106,11 @@ const Navbar = () => {
                      </NavLink>
                   ) : (
                      <div
+                        ref={profileMenuRef}
                         className="relative cursor-pointer group"
                         onMouseEnter={() => setProfileMenuOpen(true)}
                         onMouseLeave={() => setProfileMenuOpen(false)}
+                        onClick={() => setProfileMenuOpen((prev) => !prev)}
                      >
                         <div className="flex items-center space-x-2 bg-white/5 hover:bg-white/10 p-1 rounded-full transition-all duration-300 border border-white/5 hover:border-white/20">
                            <div className="w-8 h-8 rounded-full bg-linear-to-r from-blue-500 to-blue-700 flex items-center justify-center text-white  text-lg transition-transform duration-300 group-hover:scale-105 group-hover:ring-2 ring-white/30">
@@ -98,6 +120,7 @@ const Navbar = () => {
 
                         {/* Dropdown Menu */}
                         <div
+                           onClick={(e) => e.stopPropagation()}
                            className={`absolute right-0 mt-3 w-44 bg-white text-black rounded-xl shadow-2xl flex flex-col z-50 transition-all duration-300 border border-gray-100 origin-top-right ${
                               profileMenuOpen
                                  ? "opacity-100 visible scale-100 translate-y-0"

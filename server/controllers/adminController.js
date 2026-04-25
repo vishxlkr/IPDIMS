@@ -69,11 +69,13 @@ export const addReviewer = async (req, res) => {
          });
       }
 
-      // Generate password as email + # + month + year
+      // If password is empty, generate as emailId + # + MM + YYYY
       const now = new Date();
-      const month = now.getMonth() + 1; // 1-12
+      const month = String(now.getMonth() + 1).padStart(2, "0");
       const year = now.getFullYear();
-      const finalPassword = `${email}#${month}${year}`;
+      const emailId = email.split("@")[0];
+      const generatedPassword = `${emailId}#${month}${year}`;
+      const finalPassword = password?.trim() ? password : generatedPassword;
 
       // Hash password
       const salt = await bcrypt.genSalt(10);

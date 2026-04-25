@@ -20,6 +20,19 @@ import {
 } from "lucide-react";
 import { AdminContext } from "../../context/AdminContext";
 
+const emptyReviewerForm = {
+   name: "",
+   email: "",
+   phone: "",
+   password: "",
+   designation: "",
+   organization: "",
+   specialization: "",
+   bio: "",
+   gender: "",
+   address: "",
+};
+
 const ManageReviewers = () => {
    const [reviewers, setReviewers] = useState([]);
    const [filteredReviewers, setFilteredReviewers] = useState([]);
@@ -28,18 +41,7 @@ const ManageReviewers = () => {
    const [showAddModal, setShowAddModal] = useState(false);
    const [showDetailsModal, setShowDetailsModal] = useState(false);
    const [selectedReviewer, setSelectedReviewer] = useState(null);
-   const [formData, setFormData] = useState({
-      name: "",
-      email: "",
-      phone: "",
-      password: "",
-      designation: "",
-      organization: "",
-      specialization: "",
-      bio: "",
-      gender: "",
-      address: "",
-   });
+   const [formData, setFormData] = useState(emptyReviewerForm);
    const [imageFile, setImageFile] = useState(null);
 
    // const backendUrl = "http://localhost:4000";
@@ -53,6 +55,21 @@ const ManageReviewers = () => {
    useEffect(() => {
       filterReviewers();
    }, [searchTerm, reviewers]);
+
+   const resetAddReviewerForm = () => {
+      setFormData(emptyReviewerForm);
+      setImageFile(null);
+   };
+
+   const openAddModal = () => {
+      resetAddReviewerForm();
+      setShowAddModal(true);
+   };
+
+   const closeAddModal = () => {
+      setShowAddModal(false);
+      resetAddReviewerForm();
+   };
 
    const fetchReviewers = async () => {
       try {
@@ -224,20 +241,7 @@ const ManageReviewers = () => {
 
          if (data.success) {
             toast.success("Reviewer added successfully!");
-            setShowAddModal(false);
-            setFormData({
-               name: "",
-               email: "",
-               phone: "",
-               password: "",
-               designation: "",
-               organization: "",
-               specialization: "",
-               bio: "",
-               gender: "",
-               address: "",
-            });
-            setImageFile(null);
+            closeAddModal();
             fetchReviewers();
          } else {
             toast.error(data.message || "Failed to add reviewer");
@@ -260,7 +264,7 @@ const ManageReviewers = () => {
                   </h1>
                </div>
                <button
-                  onClick={() => setShowAddModal(true)}
+                  onClick={openAddModal}
                   className="flex items-center gap-2 bg-accent hover:bg-cyan-700 text-white px-6 py-3 rounded font-semibold transition-all shadow-[0_18px_45px_rgba(15,23,42,0.08)] hover:shadow-[0_22px_55px_rgba(15,23,42,0.10)]"
                >
                   <UserPlus size={20} />
@@ -439,14 +443,30 @@ const ManageReviewers = () => {
                         Add New Reviewer
                      </h2>
                      <button
-                        onClick={() => setShowAddModal(false)}
+                        onClick={closeAddModal}
                         className="text-slate-400 hover:text-slate-500 transition-colors p-2 hover:bg-gray-100 rounded-lg"
                      >
                         <X size={24} />
                      </button>
                   </div>
 
-                  <form onSubmit={handleAddReviewer} className="p-6 space-y-4">
+                  <form
+                     onSubmit={handleAddReviewer}
+                     autoComplete="off"
+                     className="p-6 space-y-4"
+                  >
+                     <input
+                        type="text"
+                        name="prevent_autofill_user"
+                        autoComplete="username"
+                        className="hidden"
+                     />
+                     <input
+                        type="password"
+                        name="prevent_autofill_pass"
+                        autoComplete="current-password"
+                        className="hidden"
+                     />
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                            <label className="block text-sm font-semibold text-slate-700 mb-2">
@@ -470,8 +490,10 @@ const ManageReviewers = () => {
                            <input
                               type="email"
                               name="email"
+                              id="reviewer-email"
                               value={formData.email}
                               onChange={handleInputChange}
+                              autoComplete="off"
                               required
                               className="w-full px-4 py-2.5 text-slate-700 border border-slate-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                               placeholder="Enter email"
@@ -486,8 +508,10 @@ const ManageReviewers = () => {
                            <input
                               type="password"
                               name="password"
+                              id="reviewer-password"
                               value={formData.password}
                               onChange={handleInputChange}
+                              autoComplete="new-password"
                               minLength={8}
                               className="w-full px-4 py-2.5 border text-slate-700 border-slate-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                               placeholder="Enter Password"
@@ -611,7 +635,7 @@ const ManageReviewers = () => {
                      <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
                         <button
                            type="button"
-                           onClick={() => setShowAddModal(false)}
+                           onClick={closeAddModal}
                            className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-slate-950 rounded font-medium transition-all"
                         >
                            Cancel

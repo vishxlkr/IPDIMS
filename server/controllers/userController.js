@@ -22,17 +22,17 @@ const generateToken = (id) =>
 // signup
 export const signup = async (req, res) => {
    try {
-      const { name, email, password } = req.body;
-      const normalizedEmail = normalizeEmail(email || "");
+      let { name, email, password } = req.body;
+      email = normalizeEmail(email || "");
 
-      if (!name || !normalizedEmail || !password) {
+      if (!name || !email || !password) {
          return res.status(400).json({
             success: false,
             message: "Name, email, and password are required.",
          });
       }
 
-      let user = await userModel.findOne({ email: normalizedEmail });
+      let user = await userModel.findOne({ email });
 
       if (user && user.isVerified) {
          return res.status(400).json({
@@ -55,7 +55,7 @@ export const signup = async (req, res) => {
       } else {
          user = new userModel({
             name,
-            email: normalizedEmail,
+            email,
             password: hashedPassword,
             otp,
             otpExpires,
@@ -68,7 +68,7 @@ export const signup = async (req, res) => {
       const message = `Your OTP for registration is: ${otp}. It expires in 10 minutes.`;
       try {
          await sendEmail({
-            email: normalizedEmail,
+            email,
             subject: "IPDIMS - Verify Your Account",
             message,
             html: htmlContent,
@@ -98,10 +98,10 @@ export const signup = async (req, res) => {
 // verify otp
 export const verifyOtp = async (req, res) => {
    try {
-      const { email, otp } = req.body;
-      const normalizedEmail = normalizeEmail(email || "");
+      let { email, otp } = req.body;
+      email = normalizeEmail(email || "");
 
-      if (!normalizedEmail || !otp) {
+      if (!email || !otp) {
          return res.status(400).json({
             success: false,
             message: "Email and OTP are required.",
@@ -109,7 +109,7 @@ export const verifyOtp = async (req, res) => {
       }
 
       const user = await userModel.findOne({
-         email: normalizedEmail,
+         email,
          otp: otp.toString(),
          otpExpires: { $gt: Date.now() },
       });
@@ -159,21 +159,22 @@ export const verifyOtp = async (req, res) => {
 // login
 export const login = async (req, res) => {
    try {
-      const { email, password } = req.body;
-      const normalizedEmail = normalizeEmail(email || "");
+      let { email, password } = req.body;
+      email = normalizeEmail(email || "");
 
-      if (!normalizedEmail || !password) {
+      if (!email || !password) {
          return res.status(400).json({
             success: false,
             message: "Email and password are required.",
          });
       }
 
-      const user = await userModel.findOne({ email: normalizedEmail });
+      const user = await userModel.findOne({ email });
       if (!user) {
-         return res.status(401).json({
+         return res.status(400).json({
             success: false,
-            message: "Invalid email or password.",
+            message:
+               "Account does not exist. Please signup to create an account.",
          });
       }
 
@@ -211,10 +212,10 @@ export const login = async (req, res) => {
 // forgot password
 export const forgotPassword = async (req, res) => {
    try {
-      const { email } = req.body;
-      const normalizedEmail = normalizeEmail(email || "");
+      let { email } = req.body;
+      email = normalizeEmail(email || "");
 
-      if (!normalizedEmail) {
+      if (!email) {
          return res.status(400).json({
             success: false,
             message: "Email is required.",
@@ -222,7 +223,7 @@ export const forgotPassword = async (req, res) => {
       }
 
       const user = await userModel.findOne({
-         email: normalizedEmail,
+         email,
          isVerified: true,
       });
       if (!user) {
@@ -240,7 +241,7 @@ export const forgotPassword = async (req, res) => {
       const message = `Your OTP for password reset is: ${otp}. It expires in 10 minutes.`;
       try {
          await sendEmail({
-            email: normalizedEmail,
+            email,
             subject: "Password Reset OTP",
             message,
          });
@@ -269,10 +270,10 @@ export const forgotPassword = async (req, res) => {
 // reset password
 export const resetPassword = async (req, res) => {
    try {
-      const { email, otp, newPassword } = req.body;
-      const normalizedEmail = normalizeEmail(email || "");
+      let { email, otp, newPassword } = req.body;
+      email = normalizeEmail(email || "");
 
-      if (!normalizedEmail || !otp || !newPassword) {
+      if (!email || !otp || !newPassword) {
          return res.status(400).json({
             success: false,
             message: "Email, OTP, and new password are required.",
@@ -280,7 +281,7 @@ export const resetPassword = async (req, res) => {
       }
 
       const user = await userModel.findOne({
-         email: normalizedEmail,
+         email,
       });
 
       if (!user) {

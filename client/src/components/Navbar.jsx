@@ -190,7 +190,7 @@ const Navbar = () => {
                   </NavLink>
                ) : (
                   <div className="flex flex-col items-center space-y-4">
-                     <div className="w-12 h-12 rounded-full bg-linear-to-r from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-xl border-2 border-white/20">
+                     <div className="w-12 h-12 rounded-full bg-linear-to-r from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-xl border-2 border-white/20 select-none">
                         {userData?.name?.charAt(0).toUpperCase() || "U"}
                      </div>
                      <p

@@ -52,7 +52,7 @@ export default function App() {
                      token ? <DashboardLayout /> : <Navigate to="/login" />
                   }
                >
-                  <Route index element={<Navigate to="profile" />} />
+                  <Route index element={<Navigate to="submissions" />} />
                   <Route path="profile" element={<MyProfile />} />
                   <Route path="submissions" element={<MySubmissions />} />
                </Route>

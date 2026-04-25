@@ -435,87 +435,99 @@ const AdminSubmissions = () => {
 
             {/* Statistics Cards */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-               <div className="bg-white rounded-xl shadow-md p-4 border-l-4 border-yellow-500">
+               <div className="bg-white border border-slate-200 rounded p-6 hover:shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition-all">
                   <div className="flex items-center justify-between">
                      <div>
-                        <p className="text-xs text-gray-500 font-semibold uppercase">
+                        <p className="text-sm font-medium text-slate-500 mb-1">
                            Pending
                         </p>
-                        <p className="text-2xl font-bold text-gray-800">
+                        <p className="text-3xl font-bold text-slate-950">
                            {stats.pending}
                         </p>
                      </div>
-                     <Clock className="w-8 h-8 text-yellow-500" />
+                     <div className="bg-amber-100 p-4 rounded-full">
+                        <Clock className="w-8 h-8 text-yellow-600" />
+                     </div>
                   </div>
                </div>
 
-               <div className="bg-white rounded-xl shadow-md p-4 border-l-4 border-blue-500">
+               <div className="bg-cyan-50 border border-cyan-200 rounded p-6 hover:shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition-all">
                   <div className="flex items-center justify-between">
                      <div>
-                        <p className="text-xs text-gray-500 font-semibold uppercase">
+                        <p className="text-sm font-medium text-slate-500 mb-1">
                            Under Review
                         </p>
-                        <p className="text-2xl font-bold text-gray-800">
+                        <p className="text-3xl font-bold text-slate-950">
                            {stats.underReview}
                         </p>
                      </div>
-                     <FileEdit className="w-8 h-8 text-blue-500" />
+                     <div className="bg-cyan-100 p-4 rounded-full">
+                        <FileEdit className="w-8 h-8 text-cyan-600" />
+                     </div>
                   </div>
                </div>
 
-               <div className="bg-white rounded-xl shadow-md p-4 border-l-4 border-green-500">
+               <div className="bg-white border border-slate-200 rounded p-6 hover:shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition-all">
                   <div className="flex items-center justify-between">
                      <div>
-                        <p className="text-xs text-gray-500 font-semibold uppercase">
+                        <p className="text-sm font-medium text-slate-500 mb-1">
                            Accepted
                         </p>
-                        <p className="text-2xl font-bold text-gray-800">
+                        <p className="text-3xl font-bold text-slate-950">
                            {stats.accepted}
                         </p>
                      </div>
-                     <CheckCircle className="w-8 h-8 text-green-500" />
+                     <div className="bg-green-100 p-4 rounded-full">
+                        <CheckCircle className="w-8 h-8 text-green-600" />
+                     </div>
                   </div>
                </div>
 
-               <div className="bg-white rounded-xl shadow-md p-4 border-l-4 border-red-500">
+               <div className="bg-white border border-slate-200 rounded p-6 hover:shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition-all">
                   <div className="flex items-center justify-between">
                      <div>
-                        <p className="text-xs text-gray-500 font-semibold uppercase">
+                        <p className="text-sm font-medium text-slate-500 mb-1">
                            Rejected
                         </p>
-                        <p className="text-2xl font-bold text-gray-800">
+                        <p className="text-3xl font-bold text-slate-950">
                            {stats.rejected}
                         </p>
                      </div>
-                     <XCircle className="w-8 h-8 text-red-500" />
+                     <div className="bg-red-100 p-4 rounded-full">
+                        <XCircle className="w-8 h-8 text-red-600" />
+                     </div>
                   </div>
                </div>
 
-               <div className="bg-white rounded-xl shadow-md p-4 border-l-4 border-orange-500">
+               <div className="bg-white border border-slate-200 rounded p-6 hover:shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition-all">
                   <div className="flex items-center justify-between">
                      <div>
-                        <p className="text-xs text-gray-500 font-semibold uppercase">
+                        <p className="text-sm font-medium text-slate-500 mb-1">
                            Revision Req
                         </p>
-                        <p className="text-2xl font-bold text-gray-800">
+                        <p className="text-3xl font-bold text-slate-950">
                            {stats.revisionRequested}
                         </p>
                      </div>
-                     <AlertCircle className="w-8 h-8 text-orange-500" />
+                     <div className="bg-orange-100 p-4 rounded-full">
+                        <AlertCircle className="w-8 h-8 text-orange-600" />
+                     </div>
                   </div>
                </div>
 
-               <div className="bg-white rounded-xl shadow-md p-4 border-l-4 border-purple-500">
+               <div className="bg-white border border-slate-200 rounded p-6 hover:shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition-all">
                   <div className="flex items-center justify-between">
                      <div>
-                        <p className="text-xs text-gray-500 font-semibold uppercase">
+                        <p className="text-sm font-medium text-slate-500 mb-1">
                            Unassigned
                         </p>
-                        <p className="text-2xl font-bold text-gray-800">
+                        <p className="text-3xl font-bold text-slate-950">
                            {stats.unassigned}
                         </p>
                      </div>
-                     <UserCheck className="w-8 h-8 text-purple-500" />
+                     <div className="bg-purple-100 p-4 rounded-full">
+                        <UserCheck className="w-8 h-8 text-purple-600" />
+                     </div>
                   </div>
                </div>
             </div>

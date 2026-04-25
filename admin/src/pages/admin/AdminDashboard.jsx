@@ -91,16 +91,21 @@ const AdminDashboard = () => {
       }
    };
 
-   const StatCard = ({ icon, title, value, valueClass, iconClass, bgColor }) => (
+   const StatCard = ({
+      icon,
+      title,
+      value,
+      valueClass,
+      iconClass,
+      bgColor,
+   }) => (
       <div className="bg-white rounded shadow-[0_18px_45px_rgba(15,23,42,0.06)] p-6 hover:shadow-[0_18px_45px_rgba(15,23,42,0.08)] transition-all border border-slate-200">
          <div className="flex items-center justify-between">
             <div>
                <p className="text-slate-500 text-sm font-medium mb-1">
                   {title}
                </p>
-               <p className={`text-3xl font-bold ${valueClass}`}>
-                  {value}
-               </p>
+               <p className={`text-3xl font-bold ${valueClass}`}>{value}</p>
             </div>
             <div className={`${bgColor} p-4 rounded-full`}>
                {React.createElement(icon, {
@@ -120,42 +125,6 @@ const AdminDashboard = () => {
                <h1 className="text-3xl font-bold text-slate-950">
                   Admin Dashboard
                </h1>
-               
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-               <StatCard
-                  icon={Users}
-                  title="Total Authors"
-                  value={stats.totalUsers}
-                  valueClass="text-blue-500"
-                  iconClass="text-blue-500"
-                  bgColor="bg-cyan-100"
-               />
-               <StatCard
-                  icon={FileText}
-                  title="Total Submissions"
-                  value={stats.totalSubmissions}
-                  valueClass="text-violet-500"
-                  iconClass="text-violet-500"
-                  bgColor="bg-purple-100"
-               />
-               <StatCard
-                  icon={UserCheck}
-                  title="Total Reviewers"
-                  value={stats.totalReviewers}
-                  valueClass="text-emerald-500"
-                  iconClass="text-emerald-500"
-                  bgColor="bg-green-100"
-               />
-               <StatCard
-                  icon={CheckCircle}
-                  title="Active Reviewers"
-                  value={stats.activeReviewers}
-                  valueClass="text-amber-500"
-                  iconClass="text-amber-500"
-                  bgColor="bg-amber-100"
-               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -219,6 +188,9 @@ const AdminDashboard = () => {
                      <thead className="bg-white">
                         <tr>
                            <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                              Paper ID
+                           </th>
+                           <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                               Title
                            </th>
                            <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -239,6 +211,11 @@ const AdminDashboard = () => {
                                  key={submission._id}
                                  className="hover:bg-gray-50 transition-colors"
                               >
+                                 <td className="px-6 py-4">
+                                    <div className="text-sm font-bold text-slate-700">
+                                       {submission.paperId ?? "-"}
+                                    </div>
+                                 </td>
                                  <td className="px-6 py-4">
                                     <div className="text-sm font-medium text-slate-950 max-w-xs truncate">
                                        {submission.title || "Untitled"}

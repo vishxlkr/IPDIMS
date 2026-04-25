@@ -9,7 +9,6 @@ import {
    XCircle,
    AlertCircle,
    TrendingUp,
-   Eye,
 } from "lucide-react";
 import { AdminContext } from "../../context/AdminContext";
 
@@ -80,10 +79,7 @@ const ReviewerDashboard = () => {
       <div className="min-h-[calc(100vh-5rem)] bg-gray-50 px-7 py-8">
          <div className="w-full">
             <div className="mb-8">
-               <h1 className="text-3xl font-bold text-slate-950">
-                  Dashboard
-               </h1>
-               
+               <h1 className="text-3xl font-bold text-slate-950">Dashboard</h1>
             </div>
 
             {/* Statistics Cards */}
@@ -167,9 +163,6 @@ const ReviewerDashboard = () => {
                            <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                               Date Assigned
                            </th>
-                           <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                              Action
-                           </th>
                         </tr>
                      </thead>
                      <tbody className="bg-white divide-y divide-transparent">
@@ -224,15 +217,6 @@ const ReviewerDashboard = () => {
                                     {new Date(
                                        submission.createdAt,
                                     ).toLocaleDateString()}
-                                 </td>
-                                 <td className="px-6 py-4">
-                                    <button
-                                       onClick={handleViewAllSubmissions}
-                                       className="p-2 text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"
-                                       title="View Details"
-                                    >
-                                       <Eye className="w-5 h-5" />
-                                    </button>
                                  </td>
                               </tr>
                            ))
@@ -499,4 +483,3 @@ export default ReviewerDashboard;
 // };
 
 // export default ReviewerDashboard;
-

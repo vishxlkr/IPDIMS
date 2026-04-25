@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect } from "react";
-import { toast } from "react-toastify";
 import axios from "axios";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const ReviewerContext = createContext();
 
 const ReviewerContextProvider = (props) => {

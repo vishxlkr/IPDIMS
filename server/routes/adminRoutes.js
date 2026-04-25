@@ -62,7 +62,6 @@ adminRouter.get("/users", authAdmin, getAllUsers);
 adminRouter.get("/user/:id", authAdmin, getUserById);
 adminRouter.get("/user/:id/submissions", authAdmin, getUserSubmissions);
 adminRouter.delete("/user/:id", authAdmin, deleteAuthor);
-adminRouter.get("/user/:id/submissions", authAdmin, getUserSubmissions);
 
 // all registrations
 adminRouter.get("/registrations", authAdmin, getAllRegistrations);

@@ -1,4 +1,5 @@
 import { createContext } from "react";
+// eslint-disable-next-line react-refresh/only-export-components
 export const AppContext = createContext();
 
 const AppContextProvider = (props) => {
@@ -12,23 +13,7 @@ const AppContextProvider = (props) => {
       return age;
    };
 
-   const months = [
-      "",
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-   ];
-
-   const value = { calculateAge, slotDateFormat, currency };
+   const value = { calculateAge, currency };
 
    return (
       <AppContext.Provider value={value}>{props.children}</AppContext.Provider>

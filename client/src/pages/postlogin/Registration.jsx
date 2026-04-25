@@ -260,19 +260,15 @@ import registrationDetail from "../../assets/registrationDetail.jpg";
 import Loading from "../../components/Loading";
 
 const Registration = () => {
-   const { token, loading, setLoading } = useContext(AppContext);
+   const { token, loading, setLoading, backendUrl } = useContext(AppContext);
    const navigate = useNavigate();
    const location = useLocation();
-
-   const backendUrl = "http://localhost:4000";
 
    useEffect(() => {
       if (!token) {
          navigate("/login", { state: { from: location.pathname } });
       }
    }, [token, navigate, location]);
-
-   if (!token) return null; // prevents flicker
 
    const [formData, setFormData] = useState({
       paperTitle: "",
@@ -355,6 +351,8 @@ const Registration = () => {
          setLoading(false);
       }
    };
+
+   if (!token) return null; // prevents flicker
 
    return (
       <div className="bg-black text-white min-h-screen py-12 px-6 md:px-16 font-sans">

@@ -43,7 +43,6 @@ const ReviewerSubmissions = () => {
    const [feedbackText, setFeedbackText] = useState(""); // This will be "Comments to the Author"
    const [confidentialComments, setConfidentialComments] = useState("");
    const [decision, setDecision] = useState("Under Review");
-   const [rating, setRating] = useState(""); // Will hold "Overall Recommendation" like Accept/Reject for now or numerical
    const [isBestPaper, setIsBestPaper] = useState("No");
 
    const [scores, setScores] = useState({
@@ -282,7 +281,6 @@ const ReviewerSubmissions = () => {
             setShowReviewModal(false);
             setFeedbackText("");
             setDecision("Under Review");
-            setRating("");
             setConfidentialComments("");
             setIsBestPaper("No");
             setScores({
@@ -330,7 +328,6 @@ const ReviewerSubmissions = () => {
                <h1 className="text-3xl font-bold text-slate-950">
                   Assigned Submissions
                </h1>
-               
             </div>
 
             {/* Search and Filter */}

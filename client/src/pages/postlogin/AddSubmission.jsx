@@ -7,7 +7,8 @@ import "react-toastify/dist/ReactToastify.css";
 import Loading from "../../components/Loading"; // import your Loading component
 
 const AddSubmission = () => {
-   const { token, userData, loading, setLoading } = useContext(AppContext);
+   const { token, userData, loading, setLoading, backendUrl } =
+      useContext(AppContext);
    const navigate = useNavigate();
    const location = useLocation();
 
@@ -31,8 +32,6 @@ const AddSubmission = () => {
       }
    }, [token, userData, navigate, location]);
 
-   if (!token || !userData) return null;
-
    const handleSubmit = async (e) => {
       e.preventDefault();
       setLoading(true);
@@ -49,7 +48,7 @@ const AddSubmission = () => {
          if (attachment) formData.append("attachment", attachment);
 
          const res = await axios.post(
-            "http://localhost:4000/api/user/add-submission",
+            `${backendUrl}/api/user/add-submission`,
             formData,
             {
                headers: {
@@ -84,9 +83,7 @@ const AddSubmission = () => {
       }
    }, [userData]);
 
-   useEffect(() => {
-      console.log("Organization:", authorOrganization);
-   }, [authorOrganization]);
+   if (!token || !userData) return null;
 
    return (
       <div className="bg-black text-white min-h-screen py-12 px-6 md:px-16 font-sans relative">

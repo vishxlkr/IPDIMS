@@ -188,7 +188,7 @@ const Login = () => {
 
    useEffect(() => {
       if (token) navigate("/");
-   }, [token]);
+   }, [token, navigate]);
 
    // ================= UI =================
 

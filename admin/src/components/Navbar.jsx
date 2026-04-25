@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-import { useNavigate } from "react-router-dom";
 import { AdminContext } from "../context/AdminContext";
 import { ReviewerContext } from "../context/ReviewerContext";
 import { LogOut } from "lucide-react";
@@ -7,7 +6,6 @@ import { LogOut } from "lucide-react";
 const Navbar = () => {
    const { aToken, setAToken } = useContext(AdminContext);
    const { rToken, setRToken } = useContext(ReviewerContext);
-   const navigate = useNavigate();
 
    const logout = () => {
       const clientUrl =

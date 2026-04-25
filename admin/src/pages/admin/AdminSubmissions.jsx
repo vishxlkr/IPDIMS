@@ -594,7 +594,7 @@ const AdminSubmissions = () => {
                      </thead>
                      <tbody className="bg-white divide-y divide-gray-200">
                         {filteredSubmissions.length > 0 ? (
-                           filteredSubmissions.map((submission, index) => {
+                           filteredSubmissions.map((submission) => {
                               // const paperNumber = ... (unused if using paperId)
                               return (
                                  <tr

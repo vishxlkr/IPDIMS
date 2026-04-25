@@ -57,18 +57,12 @@ const ProfilePage = () => {
       setIsSaving(true);
 
       try {
-         const payload = new FormData();
-         Object.keys(formData).forEach((key) => {
-            payload.append(key, formData[key]);
-         });
-
          const { data } = await axios.post(
             `${backendUrl}/api/user/update-profile`,
-            payload,
+            formData,
             {
                headers: {
                   Authorization: `Bearer ${token}`,
-                  "Content-Type": "multipart/form-data",
                },
             },
          );

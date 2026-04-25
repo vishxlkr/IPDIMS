@@ -52,11 +52,10 @@ userRouter.get("/my-submissions", authUser, getUserSubmissions);
 userRouter.get("/profile", authUser, getProfile);
 
 // Update user profile
-userRouter.post(
-   "/update-profile",
-   authUser,
-   updateProfile,
-);
+userRouter.post("/update-profile", authUser, upload.none(), updateProfile);
+
+// Keep PUT for REST-style clients while preserving existing POST behavior
+userRouter.put("/update-profile", authUser, upload.none(), updateProfile);
 
 // routes for registration and payment
 userRouter.post(

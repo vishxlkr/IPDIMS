@@ -57,7 +57,8 @@ export const getReviewerProfile = async (req, res) => {
 export const updateReviewerProfile = async (req, res) => {
    try {
       const reviewerId = req.user.id;
-      const { name, affiliation, phone } = req.body;
+      const body = req.body || {};
+      const { name, affiliation, phone } = body;
 
       const updatedReviewer = await reviewerModel
          .findByIdAndUpdate(
@@ -163,12 +164,12 @@ export const getDashboardStats = async (req, res) => {
       };
 
       const total = await submissionModel.countDocuments(query);
-      
+
       const completed = await submissionModel.countDocuments({
          ...query,
-         "feedback.reviewer": reviewerId
+         "feedback.reviewer": reviewerId,
       });
-      
+
       const pending = total - completed;
 
       res.json({

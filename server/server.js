@@ -11,33 +11,13 @@ import reviewerRouter from "./routes/reviewerRoutes.js";
 const app = express();
 
 // middlewares
-app.disable("x-powered-by");
-
 // app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-const allowedOrigins = (process.env.CORS_ORIGINS || "")
-   .split(",")
-   .map((origin) => origin.trim())
-   .filter(Boolean);
-
 app.use(
    cors({
-      origin(origin, callback) {
-         // Allow non-browser clients and local/dev setups where origins are unset.
-         if (!origin || allowedOrigins.length === 0) {
-            callback(null, true);
-            return;
-         }
-
-         if (allowedOrigins.includes(origin)) {
-            callback(null, true);
-            return;
-         }
-
-         callback(new Error("CORS origin not allowed"));
-      },
+      origin: true,
       credentials: true,
    }),
 );

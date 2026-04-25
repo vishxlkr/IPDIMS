@@ -337,6 +337,7 @@ export const updateProfile = async (req, res) => {
       const userId = req.user.id;
       console.log("Updating profile for user:", userId);
 
+      const body = req.body || {};
       const {
          name,
          phone,
@@ -346,21 +347,25 @@ export const updateProfile = async (req, res) => {
          organization,
          address,
          bio,
-      } = req.body;
+      } = body;
 
-      const imageFile = req.file;
+      // Check if at least one updatable field is present in request body.
+      const allowedFields = [
+         "name",
+         "phone",
+         "gender",
+         "designation",
+         "personalUrl",
+         "organization",
+         "address",
+         "bio",
+      ];
 
-      // Check if at least one field is provided
-      if (
-         !name &&
-         !phone &&
-         !gender &&
-         !designation &&
-         !personalUrl &&
-         !organization &&
-         !address &&
-         !bio
-      ) {
+      const hasAnyField = allowedFields.some((field) =>
+         Object.prototype.hasOwnProperty.call(body, field),
+      );
+
+      if (!hasAnyField) {
          return res.json({
             success: false,
             message: "No data provided to update",
@@ -369,14 +374,22 @@ export const updateProfile = async (req, res) => {
 
       // Prepare an object with only the fields that exist
       const updateData = {};
-      if (name) updateData.name = name;
-      if (phone) updateData.phone = phone;
-      if (gender) updateData.gender = gender;
-      if (designation) updateData.designation = designation;
-      if (personalUrl) updateData.personalUrl = personalUrl;
-      if (organization) updateData.organization = organization;
-      if (address) updateData.address = address;
-      if (bio) updateData.bio = bio;
+      if (Object.prototype.hasOwnProperty.call(body, "name"))
+         updateData.name = name;
+      if (Object.prototype.hasOwnProperty.call(body, "phone"))
+         updateData.phone = phone;
+      if (Object.prototype.hasOwnProperty.call(body, "gender"))
+         updateData.gender = gender;
+      if (Object.prototype.hasOwnProperty.call(body, "designation"))
+         updateData.designation = designation;
+      if (Object.prototype.hasOwnProperty.call(body, "personalUrl"))
+         updateData.personalUrl = personalUrl;
+      if (Object.prototype.hasOwnProperty.call(body, "organization"))
+         updateData.organization = organization;
+      if (Object.prototype.hasOwnProperty.call(body, "address"))
+         updateData.address = address;
+      if (Object.prototype.hasOwnProperty.call(body, "bio"))
+         updateData.bio = bio;
 
       // Update user data in DB
       await userModel.findByIdAndUpdate(userId, updateData, { new: true });

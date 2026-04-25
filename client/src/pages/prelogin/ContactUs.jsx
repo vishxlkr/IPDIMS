@@ -9,7 +9,7 @@ const ContactUs = () => {
          designation: "Associate Professor",
          dept: "Department of Industrial Design",
          institute: "National Institute of Technology, Rourkela",
-         phone: "0661 2462855(o)",
+         phone: "661 2462855",
       },
       {
          name: "Prof. Dayal R Parhi",
@@ -17,7 +17,7 @@ const ContactUs = () => {
          designation: "Professor (HAG)",
          dept: "Department of Mechanical Engineering",
          institute: "National Institute of Technology, Rourkela",
-         phone: "0661 2465140",
+         phone: "661 2465140",
       },
       {
          name: "Prof. Mohit Lal",
@@ -25,15 +25,15 @@ const ContactUs = () => {
          designation: "Assistant Professor",
          dept: "Department of Industrial Design",
          institute: "National Institute of Technology, Rourkela",
-         phone: "0661 2462856(o)",
+         phone: "661 2462856",
       },
       {
-         name: "Prof. Dibya P Jean",
+         name: "Prof. Dibya P Jena",
          role: "Coordinator, IPDIMS",
          designation: "Associate Professor & Head of the Department",
          dept: "Department of Industrial Design",
          institute: "National Institute of Technology, Rourkela",
-         phone: "0661 2462855(o)",
+         phone: "661 2462855",
       },
    ];
 

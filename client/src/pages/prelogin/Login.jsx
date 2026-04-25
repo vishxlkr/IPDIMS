@@ -147,7 +147,7 @@ const Login = () => {
 
       if (step === "login") {
          const res = await login();
-         if (res.success) navigate("/");
+         if (res.success) navigate("/home");
       }
 
       if (step === "signup") {
@@ -169,7 +169,7 @@ const Login = () => {
       if (step === "otp") {
          const res = await verifyOtp();
          if (res.success) {
-            if (purpose === "signup") navigate("/");
+            if (purpose === "signup") navigate("/home");
             else setStep("newPassword");
          }
       }
@@ -187,7 +187,7 @@ const Login = () => {
    };
 
    useEffect(() => {
-      if (token) navigate("/");
+      if (token) navigate("/home");
    }, [token, navigate]);
 
    // ================= UI =================

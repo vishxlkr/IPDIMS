@@ -33,7 +33,8 @@ export default function App() {
          <div className="pt-16">
             <Routes>
                {/* Public */}
-               <Route path="/" element={<Home />} />
+               <Route path="/" element={<Navigate to="/home" replace />} />
+               <Route path="/home" element={<Home />} />
                <Route
                   path="/login"
                   element={token ? <Navigate to="/dashboard" /> : <Login />}

@@ -32,7 +32,7 @@ const Navbar = () => {
    }, []);
 
    const handleLogoClick = () => {
-      navigate("/");
+      navigate("/home");
       window.scrollTo(0, 0);
    };
 
@@ -43,11 +43,11 @@ const Navbar = () => {
       setProfileMenuOpen(false);
       setMenuOpen(false);
       toast.success("Logged out successfully");
-      navigate("/");
+      navigate("/home");
    };
 
    const navLinks = [
-      { path: "/", label: "Home" },
+      { path: "/home", label: "Home" },
       { path: "/submission", label: "Submission" },
       { path: "/important-dates", label: "Important Dates" },
       { path: "/registration", label: "Registration" },

@@ -16,8 +16,8 @@ const Sidebar = () => {
       }`;
 
    return (
-      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[280px] flex-col bg-[#222736] text-white shadow-xl lg:flex">
-         <div className="flex h-[72px] shrink-0 items-center bg-[#15a9c7] px-6">
+      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[280px] flex-col bg-[#2e3449] text-white shadow-xl lg:flex">
+         <div className="flex h-[72px] shrink-0 items-center bg-accent px-6">
             <h1 className="cursor-pointer text-[22px] font-bold text-white ">
                IPDIMS
             </h1>

@@ -12,7 +12,7 @@ const Sidebar = () => {
       }`;
 
    return (
-      <aside className="fixed left-0 top-16 z-40 h-[calc(100vh-4rem)] w-[280px] bg-[#222736] text-white border-r border-slate-800 overflow-y-auto">
+      <aside className="fixed left-0 top-16 z-40 h-[calc(100vh-4rem)] w-[280px] bg-[#2e3449] text-white border-r border-slate-800 overflow-y-auto">
          {/* Workspace Label */}
 
          {/* Navigation */}

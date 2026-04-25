@@ -8,21 +8,22 @@ import Loading from "../../components/Loading";
 const Login = () => {
    const { token, setToken, setUserData, backendUrl, loading, setLoading } =
       useContext(AppContext);
-   const navigate = useNavigate();
 
+   const navigate = useNavigate();
    const adminUrl = import.meta.env.VITE_ADMIN_URL;
 
-   const [step, setStep] = useState("login"); // login | signup | reset | otp | newPassword
+   const [step, setStep] = useState("login");
    const [purpose, setPurpose] = useState("");
+
    const [name, setName] = useState("");
    const [email, setEmail] = useState("");
    const [password, setPassword] = useState("");
    const [confirmPassword, setConfirmPassword] = useState("");
    const [otp, setOtp] = useState("");
 
-   // ---------- AUTH FUNCTIONS ----------
+   // ================= AUTH FUNCTIONS =================
 
-   const signup = async (name, email, password) => {
+   const signup = async () => {
       try {
          setLoading(true);
          const { data } = await axios.post(`${backendUrl}/api/user/signup`, {
@@ -30,6 +31,7 @@ const Login = () => {
             email,
             password,
          });
+
          if (data.success) return { success: true };
          toast.error(data.message);
          return { success: false };
@@ -41,44 +43,7 @@ const Login = () => {
       }
    };
 
-   const verifyOtp = async (email, otp) => {
-      try {
-         setLoading(true);
-         const { data } = await axios.post(
-            `${backendUrl}/api/user/verify-otp`,
-            {
-               email,
-               otp,
-            },
-         );
-
-         // ✅ Only signup should set token, not reset
-         if (data.success && purpose === "signup") {
-            const tokenValue = data.user?.token;
-            localStorage.setItem("token", tokenValue);
-            setToken(tokenValue);
-            setUserData(data.user); //
-            toast.success(data.message);
-            return { success: true, user: data.user };
-         }
-
-         // ✅ If password reset, only verify OTP and move to next step
-         if (data.success && purpose === "reset") {
-            toast.success("OTP verified successfully!");
-            return { success: true };
-         }
-
-         toast.error(data.message);
-         return { success: false };
-      } catch (error) {
-         toast.error(error.response?.data?.message || error.message);
-         return { success: false };
-      } finally {
-         setLoading(false);
-      }
-   };
-
-   const login = async (email, password) => {
+   const login = async () => {
       try {
          setLoading(true);
          const { data } = await axios.post(`${backendUrl}/api/user/login`, {
@@ -93,7 +58,7 @@ const Login = () => {
             setToken(tokenValue);
             setUserData(data.user);
             toast.success("Login successful!");
-            return { success: true, user: data.user };
+            return { success: true };
          }
 
          toast.error(data.message);
@@ -106,19 +71,15 @@ const Login = () => {
       }
    };
 
-   const forgotPassword = async (email) => {
+   const forgotPassword = async () => {
       try {
          setLoading(true);
          const { data } = await axios.post(
             `${backendUrl}/api/user/forgot-password`,
-            {
-               email,
-            },
+            { email },
          );
-         if (data.success) {
-            toast.success("OTP sent for password reset!");
-            return { success: true };
-         }
+
+         if (data.success) return { success: true };
          toast.error(data.message);
          return { success: false };
       } catch (error) {
@@ -129,85 +90,98 @@ const Login = () => {
       }
    };
 
-   const resetPassword = async (email, otp, newPassword) => {
+   const verifyOtp = async () => {
       try {
          setLoading(true);
          const { data } = await axios.post(
-            `${backendUrl}/api/user/reset-password`,
-            {
-               email,
-               otp,
-               newPassword, //  Key must be newPassword (matches backend)
-            },
+            `${backendUrl}/api/user/verify-otp`,
+            { email, otp },
          );
 
-         if (data.success) {
-            toast.success("Password updated successfully!");
+         if (data.success && purpose === "signup") {
+            const tokenValue = data.user?.token;
+            localStorage.setItem("token", tokenValue);
+            setToken(tokenValue);
+            setUserData(data.user);
+            return { success: true };
+         }
+
+         if (data.success && purpose === "reset") {
             return { success: true };
          }
 
          toast.error(data.message);
          return { success: false };
       } catch (error) {
-         toast.error(error.response?.data?.message || error.message);
+         toast.error(error.message);
          return { success: false };
       } finally {
          setLoading(false);
       }
    };
 
-   // ---------- HANDLE SUBMIT FLOW ----------
+   const resetPassword = async () => {
+      try {
+         setLoading(true);
+         const { data } = await axios.post(
+            `${backendUrl}/api/user/reset-password`,
+            { email, otp, newPassword: password },
+         );
+
+         if (data.success) return { success: true };
+
+         toast.error(data.message);
+         return { success: false };
+      } catch (error) {
+         toast.error(error.message);
+         return { success: false };
+      } finally {
+         setLoading(false);
+      }
+   };
+
+   // ================= HANDLE SUBMIT =================
 
    const handleSubmit = async (e) => {
       e.preventDefault();
 
+      if (step === "login") {
+         const res = await login();
+         if (res.success) navigate("/");
+      }
+
       if (step === "signup") {
-         const res = await signup(name, email, password);
+         const res = await signup();
          if (res.success) {
             setPurpose("signup");
             setStep("otp");
          }
-      } else if (step === "login") {
-         const res = await login(email, password);
-         if (res.success) {
-            setUserData(res.user);
-            navigate("/");
-         }
-      } else if (step === "reset") {
-         const res = await forgotPassword(email);
+      }
+
+      if (step === "reset") {
+         const res = await forgotPassword();
          if (res.success) {
             setPurpose("reset");
             setStep("otp");
          }
-      } else if (step === "otp") {
-         const res = await verifyOtp(email, otp);
+      }
+
+      if (step === "otp") {
+         const res = await verifyOtp();
          if (res.success) {
-            if (purpose === "signup") {
-               navigate("/");
-            } else if (purpose === "reset") {
-               setStep("newPassword"); // ✅ Move to new password screen
-            }
+            if (purpose === "signup") navigate("/");
+            else setStep("newPassword");
          }
-      } else if (step === "newPassword") {
+      }
+
+      if (step === "newPassword") {
          if (password !== confirmPassword)
             return toast.error("Passwords do not match!");
 
-         const res = await resetPassword(email, otp, password);
+         const res = await resetPassword();
          if (res.success) {
-            // ✅ Clear all state to prevent useEffect redirecting to "/"
-            setEmail("");
-            setPassword("");
-            setConfirmPassword("");
-            setOtp("");
-            setPurpose("");
+            toast.success("Password updated!");
             setStep("login");
-
-            localStorage.removeItem("token");
-            setToken(null);
-            setUserData(null);
-
-            toast.success("Password changed successfully. Please login.");
-            navigate("/login", { replace: true });
          }
       }
    };
@@ -216,162 +190,179 @@ const Login = () => {
       if (token) navigate("/");
    }, [token]);
 
+   // ================= UI =================
+
    return (
-      <form
-         onSubmit={handleSubmit}
-         className="min-h-[80vh] flex items-center justify-center"
-      >
-         <div className="flex flex-col items-center">
-            <div className="flex flex-col gap-3 m-auto items-start p-8 min-w-[340px] sm:min-w-96 bg-white border rounded-xl text-zinc-600 text-sm shadow-xl relative">
-               {loading && <Loading />}
+      <div className="min-h-screen flex items-center justify-center">
+         <div className="-mt-16">
+            <form
+               onSubmit={handleSubmit}
+               className="min-h-[calc(100vh-4rem)] mt-16 flex flex-col items-center justify-center gap-4"
+            >
+               <div className="flex flex-col gap-3 items-start p-8 min-w-[340px] sm:min-w-[24rem] border rounded-xl text-[#5E5E5E] text-sm shadow-lg relative">
+                  {loading && <Loading />}
 
-               <p className="text-2xl font-semibold">
-                  {step === "login"
-                     ? "Login"
-                     : step === "signup"
-                       ? "Sign Up"
-                       : step === "reset"
-                         ? "Reset Password"
-                         : step === "otp"
-                           ? "Enter OTP"
-                           : "Set New Password"}
-               </p>
-
-               {step === "signup" && (
-                  <input
-                     type="text"
-                     placeholder="Full Name"
-                     className="border p-2 w-full rounded"
-                     value={name}
-                     onChange={(e) => setName(e.target.value)}
-                     required
-                  />
-               )}
-
-               {step !== "otp" && step !== "newPassword" && (
-                  <input
-                     type="email"
-                     placeholder="Email"
-                     className="border p-2 w-full rounded"
-                     value={email}
-                     onChange={(e) => setEmail(e.target.value)}
-                     required
-                  />
-               )}
-
-               {(step === "login" ||
-                  step === "signup" ||
-                  step === "newPassword") && (
-                  <input
-                     type="password"
-                     placeholder={
-                        step === "newPassword" ? "New Password" : "Password"
-                     }
-                     className="border p-2 w-full rounded"
-                     value={password}
-                     onChange={(e) => setPassword(e.target.value)}
-                     required
-                  />
-               )}
-
-               {step === "newPassword" && (
-                  <input
-                     type="password"
-                     placeholder="Confirm Password"
-                     className="border p-2 w-full rounded"
-                     value={confirmPassword}
-                     onChange={(e) => setConfirmPassword(e.target.value)}
-                     required
-                  />
-               )}
-
-               {step === "otp" && (
-                  <input
-                     type="text"
-                     placeholder="Enter OTP"
-                     className="border p-2 w-full rounded"
-                     value={otp}
-                     onChange={(e) => setOtp(e.target.value)}
-                     required
-                  />
-               )}
-
-               <button
-                  type="submit"
-                  className="bg-primary text-white w-full py-2 rounded-md mt-2"
-               >
-                  {step === "login"
-                     ? "Login"
-                     : step === "signup"
-                       ? "Sign Up"
-                       : step === "reset"
-                         ? "Send OTP"
-                         : step === "otp"
-                           ? "Verify OTP"
-                           : "Save Password"}
-               </button>
-
-               <div className="w-full mt-2 text-sm">
-                  {step === "login" && (
-                     <>
-                        <p>
-                           Forgot password?{" "}
-                           <span
-                              onClick={() => setStep("reset")}
-                              className="text-primary underline cursor-pointer"
-                           >
-                              Reset
-                           </span>
-                        </p>
-                        <p>
-                           New user?{" "}
-                           <span
-                              onClick={() => setStep("signup")}
-                              className="text-primary underline cursor-pointer"
-                           >
-                              Sign Up
-                           </span>
-                        </p>
-                     </>
-                  )}
+                  <p className="text-2xl font-semibold m-auto">
+                     <span>
+                        {step === "login"
+                           ? "Login"
+                           : step === "signup"
+                             ? "Sign Up"
+                             : step === "reset"
+                               ? "Reset"
+                               : step === "otp"
+                                 ? "OTP"
+                                 : "New Password"}
+                     </span>
+                  </p>
 
                   {step === "signup" && (
-                     <p>
-                        Already have an account?{" "}
-                        <span
-                           onClick={() => setStep("login")}
-                           className="text-primary underline cursor-pointer"
-                        >
-                           Login
-                        </span>
-                     </p>
+                     <div className="w-full">
+                        <p>Name</p>
+                        <input
+                           type="text"
+                           value={name}
+                           onChange={(e) => setName(e.target.value)}
+                           className="border border-[#DADADA] rounded w-full p-2 mt-1"
+                           required
+                        />
+                     </div>
                   )}
 
-                  {step === "reset" && (
-                     <p>
-                        Back to{" "}
-                        <span
-                           onClick={() => setStep("login")}
-                           className="text-primary underline cursor-pointer"
-                        >
-                           Login
-                        </span>
-                     </p>
+                  {step !== "otp" && step !== "newPassword" && (
+                     <div className="w-full">
+                        <p>Email</p>
+                        <input
+                           type="email"
+                           value={email}
+                           onChange={(e) => setEmail(e.target.value)}
+                           className="border border-[#DADADA] rounded w-full p-2 mt-1"
+                           required
+                        />
+                     </div>
                   )}
+
+                  {(step === "login" ||
+                     step === "signup" ||
+                     step === "newPassword") && (
+                     <div className="w-full">
+                        <p>
+                           {step === "newPassword"
+                              ? "New Password"
+                              : "Password"}
+                        </p>
+                        <input
+                           type="password"
+                           value={password}
+                           onChange={(e) => setPassword(e.target.value)}
+                           className="border border-[#DADADA] rounded w-full p-2 mt-1"
+                           required
+                        />
+                     </div>
+                  )}
+
+                  {step === "newPassword" && (
+                     <div className="w-full">
+                        <p>Confirm Password</p>
+                        <input
+                           type="password"
+                           value={confirmPassword}
+                           onChange={(e) => setConfirmPassword(e.target.value)}
+                           className="border border-[#DADADA] rounded w-full p-2 mt-1"
+                           required
+                        />
+                     </div>
+                  )}
+
+                  {step === "otp" && (
+                     <div className="w-full">
+                        <p>Enter OTP</p>
+                        <input
+                           type="text"
+                           value={otp}
+                           onChange={(e) => setOtp(e.target.value)}
+                           className="border border-[#DADADA] rounded w-full p-2 mt-1"
+                           required
+                        />
+                     </div>
+                  )}
+
+                  <button className="bg-primary text-white w-full py-2 rounded-md text-base mt-2">
+                     {step === "login"
+                        ? "Login"
+                        : step === "signup"
+                          ? "Sign Up"
+                          : step === "reset"
+                            ? "Send OTP"
+                            : step === "otp"
+                              ? "Verify OTP"
+                              : "Save Password"}
+                  </button>
+
+                  {/* LINKS */}
+                  <div className="w-full mt-2 text-sm">
+                     {step === "login" && (
+                        <>
+                           <p>
+                              Forgot password?{" "}
+                              <span
+                                 onClick={() => setStep("reset")}
+                                 className="text-primary underline cursor-pointer"
+                              >
+                                 Reset
+                              </span>
+                           </p>
+                           <p>
+                              New user?{" "}
+                              <span
+                                 onClick={() => setStep("signup")}
+                                 className="text-primary underline cursor-pointer"
+                              >
+                                 Sign Up
+                              </span>
+                           </p>
+                        </>
+                     )}
+
+                     {step === "signup" && (
+                        <p>
+                           Already have an account?{" "}
+                           <span
+                              onClick={() => setStep("login")}
+                              className="text-primary underline cursor-pointer"
+                           >
+                              Login
+                           </span>
+                        </p>
+                     )}
+
+                     {step === "reset" && (
+                        <p>
+                           Back to{" "}
+                           <span
+                              onClick={() => setStep("login")}
+                              className="text-primary underline cursor-pointer"
+                           >
+                              Login
+                           </span>
+                        </p>
+                     )}
+                  </div>
                </div>
-            </div>
 
-            <div className="min-w-[340px] sm:min-w-96 mt-4">
-               <button
-                  type="button"
-                  onClick={() => (window.location.href = adminUrl)}
-                  className="bg-gray-800 border border-gray-600 text-white w-full py-2 rounded-lg hover:bg-gray-900 transition"
-               >
-                  Go To Admin Panel
-               </button>
-            </div>
+               {/* SWITCH BUTTON */}
+               <div className="min-w-[340px] sm:min-w-96 mt-4">
+                  <button
+                     type="button"
+                     onClick={() => (window.location.href = adminUrl)}
+                     className="bg-gray-800 border border-gray-600 text-white w-full py-2 rounded-lg hover:bg-gray-900 transition"
+                  >
+                     Go To Admin Login
+                  </button>
+               </div>
+            </form>{" "}
          </div>
-      </form>
+      </div>
    );
 };
 

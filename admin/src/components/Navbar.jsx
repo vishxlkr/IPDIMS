@@ -1,15 +1,15 @@
 import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { AdminContext } from "../context/AdminContext";
 import { ReviewerContext } from "../context/ReviewerContext";
 import { LogOut } from "lucide-react";
 
 const Navbar = () => {
+   const navigate = useNavigate();
    const { aToken, setAToken } = useContext(AdminContext);
    const { rToken, setRToken } = useContext(ReviewerContext);
 
    const logout = () => {
-      const clientUrl =
-         import.meta.env.VITE_CLIENT_URL || "http://localhost:5173";
       if (aToken) {
          setAToken("");
          localStorage.removeItem("aToken");
@@ -19,7 +19,7 @@ const Navbar = () => {
          localStorage.removeItem("rToken");
       }
 
-      window.location.assign(clientUrl);
+      navigate("/login");
    };
 
    return (

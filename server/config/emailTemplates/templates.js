@@ -32,7 +32,7 @@ export const getAuthorSubmissionSuccessEmail = (name, submissionData) => {
    const content = `
       <p>Hello <strong>${name}</strong>,</p>
       <h2>Submission Received</h2>
-      <p>We have successfully received your manuscript. Our editorial team will review it shortly. You can track the status of your submission via your author dashboard.</p>
+      <p>We have successfully received your manuscript. Our editorial team will review it shortly. You can track the status of your submission via your dashboard.</p>
       
       <div class="info-box">
          <div class="info-row">
@@ -43,17 +43,11 @@ export const getAuthorSubmissionSuccessEmail = (name, submissionData) => {
             <span class="info-label">Event:</span>
             <span class="info-value">${submissionData.eventName}</span>
          </div>
-         <div class="info-row">
-            <span class="info-label">Keywords:</span>
-            <span class="info-value">${submissionData.keywords.join(", ")}</span>
-         </div>
       </div>
       
       <p>Thank you for submitting your work to IPDIMS.</p>
       
-      <div class="btn-container">
-         <a href="${process.env.CLIENT_URL || "http://localhost:5173"}/dashboard/submissions" class="btn">View Submissions</a>
-      </div>
+      
       <br />
       <p>Best regards,<br />Team IPDIMS</p>
    `;

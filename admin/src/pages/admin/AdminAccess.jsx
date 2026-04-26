@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 const AdminAccess = () => {
    const [searchParams] = useSearchParams();
-   const { setAToken, aToken } = useContext(AdminContext);
+   const { setAToken } = useContext(AdminContext);
    const navigate = useNavigate();
 
    useEffect(() => {
@@ -13,35 +13,42 @@ const AdminAccess = () => {
       const submissionId = searchParams.get("submissionId");
       const action = searchParams.get("action");
 
-      if (token) {
-         if (token !== aToken) {
-            // Set token
-            localStorage.setItem("aToken", token);
-            setAToken(token);
+      if (!token) {
+         toast.error("Invalid or missing magic link. Please login manually.");
+         navigate("/login");
+         return;
+      }
+
+      try {
+         // Set token to localStorage and context immediately
+         localStorage.setItem("aToken", token);
+         setAToken(token);
+
+         // Show success message and navigate
+         toast.success("Magic link authenticated successfully!");
+
+         if (submissionId && action === "assign") {
+            navigate(
+               `/admin/submissions?action=assign&submissionId=${submissionId}`,
+            );
          } else {
-            // Token is set, ready to redirect
-            toast.success("Logged in successfully as Admin.");
-            if (submissionId && action === "assign") {
-               navigate(
-                  `/admin/submissions?action=assign&submissionId=${submissionId}`,
-               );
-            } else {
-               navigate("/admin/submissions");
-            }
+            navigate("/admin/submissions");
          }
-      } else {
+      } catch (error) {
+         console.error("Error processing magic link:", error);
+         toast.error("Failed to process magic link. Please try again.");
          navigate("/login");
       }
-   }, [searchParams, setAToken, navigate, aToken]);
+   }, []); // Empty dependency array - run once on mount
 
    return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
          <div className="text-center">
             <h2 className="text-xl font-semibold text-gray-700">
-               Authenticating Admin...
+               Authenticating...
             </h2>
             <p className="text-gray-500 mt-2">
-               Please wait while we verify your access.
+               Processing your secure magic link. Please wait...
             </p>
          </div>
       </div>

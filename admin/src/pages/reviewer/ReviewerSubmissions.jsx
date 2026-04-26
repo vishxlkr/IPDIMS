@@ -17,6 +17,7 @@ import {
    Calendar,
    MessageSquare,
    Send,
+   Loader,
 } from "lucide-react";
 import { AdminContext } from "../../context/AdminContext";
 
@@ -38,6 +39,7 @@ const ReviewerSubmissions = () => {
    const [selectedSubmission, setSelectedSubmission] = useState(null);
    const [showDetailsModal, setShowDetailsModal] = useState(false);
    const [showReviewModal, setShowReviewModal] = useState(false);
+   const [submittingReview, setSubmittingReview] = useState(false);
 
    // Review Form State
    const [feedbackText, setFeedbackText] = useState(""); // This will be "Comments to the Author"
@@ -54,8 +56,6 @@ const ReviewerSubmissions = () => {
    });
 
    const [initialFormState, setInitialFormState] = useState(null);
-
-   const [feedbacks, setFeedbacks] = useState([]);
 
    // Create new plugin instance
    const defaultLayoutPluginInstance = defaultLayoutPlugin();
@@ -151,10 +151,6 @@ const ReviewerSubmissions = () => {
          );
 
          if (data.success) {
-            const sortedFeedbacks = (data.submission.feedback || []).sort(
-               (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
-            );
-            setFeedbacks(sortedFeedbacks);
             setSelectedSubmission(data.submission);
             setShowDetailsModal(true);
          }
@@ -263,6 +259,8 @@ const ReviewerSubmissions = () => {
          return;
       }
 
+      setSubmittingReview(true);
+
       try {
          const { data } = await axios.post(
             `${backendUrl}/api/reviewer/submissions/${selectedSubmission._id}/review`,
@@ -299,6 +297,8 @@ const ReviewerSubmissions = () => {
          toast.error(
             error.response?.data?.message || "Failed to submit review",
          );
+      } finally {
+         setSubmittingReview(false);
       }
    };
 
@@ -622,32 +622,6 @@ const ReviewerSubmissions = () => {
                            </div>
                         )
                      )}
-
-                     {/* Previous Reviewer Feedback */}
-                     {feedbacks.length > 0 && (
-                        <div className="bg-gray-50 p-4 rounded-xl border">
-                           <h4 className="text-lg font-semibold text-gray-900">
-                              Previous Feedback
-                           </h4>
-                           {feedbacks.map((fb, idx) => (
-                              <div
-                                 key={idx}
-                                 className="bg-white p-3 rounded-lg border shadow-sm mb-2"
-                              >
-                                 <p className="text-sm text-gray-700">
-                                    {fb.comment}
-                                 </p>
-                                 <p className="text-xs text-gray-500 mt-1">
-                                    Recommendation:{" "}
-                                    <strong>{fb.recommendation}</strong>
-                                 </p>
-                                 <p className="text-xs text-gray-400">
-                                    {new Date(fb.createdAt).toLocaleString()}
-                                 </p>
-                              </div>
-                           ))}
-                        </div>
-                     )}
                   </div>
 
                   <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 flex justify-end">
@@ -870,14 +844,19 @@ const ReviewerSubmissions = () => {
                      </button>
                      <button
                         onClick={handleSubmitReview}
-                        disabled={!isFormDirty()}
+                        disabled={submittingReview || !isFormDirty()}
                         className={`px-6 py-2.5 font-medium rounded-lg flex items-center gap-2 shadow-md transition-all ${
-                           isFormDirty()
+                           isFormDirty() && !submittingReview
                               ? "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg"
                               : "bg-gray-300 text-gray-500 cursor-not-allowed"
                         }`}
                      >
-                        <Send size={18} /> Submit Review
+                        {submittingReview ? (
+                           <Loader size={18} className="animate-spin" />
+                        ) : (
+                           <Send size={18} />
+                        )}{" "}
+                        {submittingReview ? "Submitting..." : "Submit Review"}
                      </button>
                   </div>
                </div>

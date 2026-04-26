@@ -21,7 +21,7 @@ import MySubmissions from "./pages/postlogin/MySubmissions";
 import AddSubmission from "./pages/postlogin/AddSubmission";
 
 export default function App() {
-   const { token } = useContext(AppContext);
+   const { token, userData } = useContext(AppContext);
 
    return (
       <>
@@ -37,7 +37,7 @@ export default function App() {
                <Route path="/home" element={<Home />} />
                <Route
                   path="/login"
-                  element={token ? <Navigate to="/dashboard" /> : <Login />}
+                  element={userData ? <Navigate to="/dashboard" /> : <Login />}
                />
                <Route path="/submission" element={<Submission />} />
                <Route path="/important-dates" element={<ImportantDates />} />
@@ -50,7 +50,7 @@ export default function App() {
                <Route
                   path="/dashboard"
                   element={
-                     token ? <DashboardLayout /> : <Navigate to="/login" />
+                     userData ? <DashboardLayout /> : <Navigate to="/login" />
                   }
                >
                   <Route index element={<Navigate to="submissions" />} />
@@ -60,7 +60,9 @@ export default function App() {
 
                <Route
                   path="/add-submission"
-                  element={token ? <AddSubmission /> : <Navigate to="/login" />}
+                  element={
+                     userData ? <AddSubmission /> : <Navigate to="/login" />
+                  }
                />
             </Routes>
          </div>

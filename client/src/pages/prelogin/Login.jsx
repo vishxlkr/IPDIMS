@@ -6,8 +6,15 @@ import axios from "axios";
 import Loading from "../../components/Loading";
 
 const Login = () => {
-   const { token, setToken, setUserData, backendUrl, loading, setLoading } =
-      useContext(AppContext);
+   const {
+      token,
+      setToken,
+      userData,
+      setUserData,
+      backendUrl,
+      loading,
+      setLoading,
+   } = useContext(AppContext);
 
    const navigate = useNavigate();
    // const adminUrl = import.meta.env.VITE_ADMIN_URL;
@@ -147,7 +154,7 @@ const Login = () => {
 
       if (step === "login") {
          const res = await login();
-         if (res.success) navigate("/home");
+         if (res.success) navigate("/dashboard");
       }
 
       if (step === "signup") {
@@ -169,7 +176,7 @@ const Login = () => {
       if (step === "otp") {
          const res = await verifyOtp();
          if (res.success) {
-            if (purpose === "signup") navigate("/home");
+            if (purpose === "signup") navigate("/dashboard");
             else setStep("newPassword");
          }
       }
@@ -187,8 +194,8 @@ const Login = () => {
    };
 
    useEffect(() => {
-      if (token) navigate("/home");
-   }, [token, navigate]);
+      if (userData) navigate("/dashboard");
+   }, [userData, navigate]);
 
    // ================= UI =================
 

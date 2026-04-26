@@ -268,7 +268,12 @@ export const getAllSubmissions = async (req, res) => {
          .find()
          .sort({ needsAdminAction: -1, updatedAt: -1 }) // Admin Sort
          .populate("author", "name email affiliation") // optional, if author is referenced
-         .populate("reviewers", "name email");
+         .populate("reviewers", "name email")
+         .populate({
+            path: "feedback.reviewer",
+            model: "reviewer",
+            select: "name email",
+         });
 
       // Debug log to verify usage of endpoint and sorting
       console.log(
@@ -341,6 +346,11 @@ export const getSubmissionById = async (req, res) => {
 export const assignSubmission = async (req, res) => {
    try {
       const { submissionId, reviewerIds } = req.body;
+      console.log("Received reviewerIds:", reviewerIds);
+      console.log(
+         "ReviewerIds types:",
+         reviewerIds.map((r) => typeof r),
+      );
 
       if (!submissionId || !reviewerIds || !Array.isArray(reviewerIds)) {
          return res.status(400).json({
@@ -357,7 +367,83 @@ export const assignSubmission = async (req, res) => {
             .json({ success: false, message: "Submission not found" });
       }
 
+      console.log(
+         "Submission reviewers before processing:",
+         submission.reviewers,
+      );
+      console.log("Submission reviewers type:", typeof submission.reviewers);
+      if (submission.reviewers && submission.reviewers.length > 0) {
+         console.log("First reviewer:", submission.reviewers[0]);
+         console.log("First reviewer type:", typeof submission.reviewers[0]);
+         console.log("First reviewer _id:", submission.reviewers[0]._id);
+         console.log(
+            "First reviewer _id type:",
+            typeof submission.reviewers[0]._id,
+         );
+      }
+      const oldReviewers = (submission.reviewers || [])
+         .map((r) => {
+            const idStr = typeof r === "string" ? r : r.toString();
+            return idStr.trim();
+         })
+         .filter((id) => id); // Remove empty strings
+      console.log("Old reviewers:", oldReviewers);
+      console.log("New reviewers:", newReviewers);
+      console.log("Added reviewers:", addedReviewers);
+
+      // Step 4: Send email ONLY to added ones (if any)
+      if (addedReviewers.length > 0) {
+         const reviewersToNotify = await reviewerModel.find({
+            _id: { $in: addedReviewers },
+         });
+
+         for (const reviewer of reviewersToNotify) {
+            try {
+               const token = jwt.sign(
+                  { id: reviewer._id, role: "reviewer" },
+                  process.env.JWT_SECRET,
+                  { expiresIn: "7d" },
+               );
+
+               const adminUrl =
+                  process.env.ADMIN_URL || "http://localhost:5174";
+               const magicLink = `${adminUrl}/reviewer-access?token=${token}&submissionId=${submissionId}`;
+
+               const subject = "IPDIMS - New Paper Assigned For Review";
+               const message = `New Paper Assigned: ${submission.title}`;
+               const htmlContent = getReviewerAssignmentEmail(
+                  reviewer.name,
+                  submission,
+                  magicLink,
+               );
+
+               await sendEmail({
+                  email: reviewer.email,
+                  subject: subject,
+                  message: message,
+                  html: htmlContent,
+               });
+
+               console.log(
+                  "Email sent to newly added reviewer:",
+                  reviewer.email,
+               );
+            } catch (emailErr) {
+               console.error(
+                  `Failed to send reviewer email to ${reviewer.email}:`,
+                  emailErr.message,
+               );
+            }
+         }
+      }
+
+      // Step 5: Update DB
       submission.reviewers = reviewerIds;
+
+      // Remove feedbacks from reviewers no longer assigned
+      submission.feedback = submission.feedback.filter((f) =>
+         reviewerIds.some((r) => r.toString() === f.reviewer.toString()),
+      );
 
       if (submission.status === "Pending" && reviewerIds.length > 0) {
          submission.status = "Under Review";
@@ -403,45 +489,14 @@ export const assignSubmission = async (req, res) => {
          .populate("author", "name email organization")
          .populate("reviewers", "name email organization");
 
-      // Send email to newly assigned reviewers
-      const newReviewers = await reviewerModel.find({
-         _id: { $in: reviewerIds },
+      res.status(200).json({
+         success: true,
+         message:
+            addedReviewers.length > 0
+               ? `Reviewers assigned successfully. ${addedReviewers.length} new reviewer(s) notified.`
+               : "Reviewers assigned successfully. No new notifications sent.",
+         submission: populatedSubmission,
       });
-
-      for (const reviewer of newReviewers) {
-         try {
-            const token = jwt.sign(
-               { id: reviewer._id, role: "reviewer" },
-               process.env.JWT_SECRET,
-               { expiresIn: "7d" },
-            );
-
-            const adminUrl = process.env.ADMIN_URL || "http://localhost:5174";
-            const magicLink = `${adminUrl}/reviewer-access?token=${token}&submissionId=${submissionId}`;
-
-            const subject = "IPDIMS - New Paper Assigned For Review";
-            const message = `New Paper Assigned: ${submission.title}`;
-            const htmlContent = getReviewerAssignmentEmail(
-               reviewer.name,
-               submission,
-               magicLink,
-            );
-
-            await sendEmail({
-               email: reviewer.email,
-               subject: subject,
-               message: message,
-               html: htmlContent,
-            });
-
-            console.log("Email sent to reviewer:", reviewer.email);
-         } catch (emailErr) {
-            console.error(
-               `Failed to send reviewer email to ${reviewer.email}:`,
-               emailErr.message,
-            );
-         }
-      }
 
       res.status(200).json({
          success: true,

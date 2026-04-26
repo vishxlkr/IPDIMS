@@ -25,6 +25,7 @@ import {
    Calendar,
    MessageSquare,
    Bell,
+   CheckCircle,
 } from "lucide-react";
 import { AdminContext } from "../../context/AdminContext";
 
@@ -45,6 +46,7 @@ const AdminSubmissions = () => {
    const [showAssignModal, setShowAssignModal] = useState(false);
    const [showFeedbackModal, setShowFeedbackModal] = useState(false);
    const [selectedReviewers, setSelectedReviewers] = useState([]);
+   const [initialSelectedReviewers, setInitialSelectedReviewers] = useState([]);
    const [feedbacks, setFeedbacks] = useState([]);
    const [newFeedbackFlags, setNewFeedbackFlags] = useState({});
    const [tempStatus, setTempStatus] = useState("");
@@ -291,13 +293,34 @@ const AdminSubmissions = () => {
       const currentReviewerIds =
          submission.reviewers?.map((r) => r._id || r) || [];
       setSelectedReviewers(currentReviewerIds);
+      setInitialSelectedReviewers(currentReviewerIds);
       setReviewerSearchTerm("");
       setShowAssignModal(true);
+   };
+
+   const hasChanges = () => {
+      if (selectedReviewers.length !== initialSelectedReviewers.length) {
+         return true;
+      }
+      // Check if any reviewer IDs differ
+      const currentSet = new Set(selectedReviewers);
+      const initialSet = new Set(initialSelectedReviewers);
+      for (let id of currentSet) {
+         if (!initialSet.has(id)) {
+            return true;
+         }
+      }
+      return false;
    };
 
    const handleAssignReviewer = async () => {
       if (!selectedSubmission) {
          toast.error("No submission selected");
+         return;
+      }
+
+      if (!hasChanges()) {
+         toast.info("No changes made");
          return;
       }
       // Note: allow empty array to unassign
@@ -1350,9 +1373,9 @@ const AdminSubmissions = () => {
                      </button>
                      <button
                         onClick={handleAssignReviewer}
-                        disabled={isAssigning}
+                        disabled={isAssigning || !hasChanges()}
                         className={`px-5 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2 shadow-sm ${
-                           isAssigning
+                           isAssigning || !hasChanges()
                               ? "bg-gray-400 cursor-not-allowed text-white"
                               : "bg-blue-600 hover:bg-blue-700 text-white"
                         }`}

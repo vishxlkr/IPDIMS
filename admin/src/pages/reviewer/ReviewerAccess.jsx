@@ -5,33 +5,40 @@ import { toast } from "react-toastify";
 
 const ReviewerAccess = () => {
    const [searchParams] = useSearchParams();
-   const { setRToken, rToken } = useContext(ReviewerContext);
+   const { setRToken } = useContext(ReviewerContext);
    const navigate = useNavigate();
 
    useEffect(() => {
       const token = searchParams.get("token");
       const submissionId = searchParams.get("submissionId");
 
-      if (token) {
-         if (token !== rToken) {
-            // Set token
-            localStorage.setItem("rToken", token);
-            setRToken(token);
+      if (!token) {
+         toast.error("Invalid or missing magic link. Please login manually.");
+         navigate("/login");
+         return;
+      }
+
+      try {
+         // Set token to localStorage and context immediately
+         localStorage.setItem("rToken", token);
+         setRToken(token);
+
+         // Show success message and navigate
+         toast.success("Magic link authenticated successfully!");
+
+         if (submissionId) {
+            navigate(
+               `/reviewer/submissions?action=review&submissionId=${submissionId}`,
+            );
          } else {
-            // Token is set, ready to redirect
-            toast.success("Logged in successfully.");
-            if (submissionId) {
-               navigate(
-                  `/reviewer/submissions?action=review&submissionId=${submissionId}`,
-               );
-            } else {
-               navigate("/reviewer/submissions");
-            }
+            navigate("/reviewer/submissions");
          }
-      } else {
+      } catch (error) {
+         console.error("Error processing magic link:", error);
+         toast.error("Failed to process magic link. Please try again.");
          navigate("/login");
       }
-   }, [searchParams, setRToken, navigate, rToken]);
+   }, []); // Empty dependency array - run once on mount
 
    return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -40,7 +47,7 @@ const ReviewerAccess = () => {
                Authenticating...
             </h2>
             <p className="text-gray-500 mt-2">
-               Please wait while we verify your access.
+               Processing your secure magic link. Please wait...
             </p>
          </div>
       </div>

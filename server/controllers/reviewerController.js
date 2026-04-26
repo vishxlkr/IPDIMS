@@ -249,6 +249,14 @@ export const submitReview = async (req, res) => {
       submission.needsAdminAction = true;
       submission.needsReviewerAction = false;
 
+      // Ensure no duplicate feedbacks from the same reviewer
+      submission.feedback = submission.feedback.filter(
+         (f, index, arr) =>
+            arr.findIndex(
+               (f2) => f2.reviewer.toString() === f.reviewer.toString(),
+            ) === index,
+      );
+
       submission.updatedAt = new Date();
       await submission.save();
 

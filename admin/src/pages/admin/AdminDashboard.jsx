@@ -3,26 +3,23 @@ import Loading from "../../components/Loading";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
-   Users,
-   FileText,
-   UserCheck,
    CheckCircle,
    XCircle,
    Clock,
    AlertCircle,
+   FileEdit,
+   UserCheck,
 } from "lucide-react";
 import { AdminContext } from "../../context/AdminContext";
 
 const AdminDashboard = () => {
    const [stats, setStats] = useState({
-      totalUsers: 0,
-      totalSubmissions: 0,
-      totalReviewers: 0,
-      activeReviewers: 0,
       pendingSubmissions: 0,
       underReviewSubmissions: 0,
       acceptedSubmissions: 0,
       rejectedSubmissions: 0,
+      revisionRequestedSubmissions: 0,
+      unassignedSubmissions: 0,
    });
    const [recentSubmissions, setRecentSubmissions] = useState([]);
    const [loading, setLoading] = useState(true);
@@ -56,10 +53,6 @@ const AdminDashboard = () => {
             const reviewers = reviewersRes.data.reviewers || [];
 
             setStats({
-               totalUsers: users.length,
-               totalSubmissions: submissions.length,
-               totalReviewers: reviewers.length,
-               activeReviewers: reviewers.filter((r) => r.isActive).length,
                pendingSubmissions: submissions.filter(
                   (s) => s.status === "Pending",
                ).length,
@@ -71,6 +64,12 @@ const AdminDashboard = () => {
                ).length,
                rejectedSubmissions: submissions.filter(
                   (s) => s.status === "Rejected",
+               ).length,
+               revisionRequestedSubmissions: submissions.filter(
+                  (s) => s.status === "Revision Requested",
+               ).length,
+               unassignedSubmissions: submissions.filter(
+                  (s) => !s.reviewers || s.reviewers.length === 0,
                ).length,
             });
 
@@ -91,30 +90,38 @@ const AdminDashboard = () => {
       }
    };
 
-   const StatCard = ({
-      icon,
-      title,
-      value,
-      valueClass,
-      iconClass,
-      bgColor,
-   }) => (
-      <div className="bg-white rounded shadow-[0_18px_45px_rgba(15,23,42,0.06)] p-6 hover:shadow-[0_18px_45px_rgba(15,23,42,0.08)] transition-all border border-slate-200">
-         <div className="flex items-center justify-between">
-            <div>
-               <p className="text-slate-500 text-sm font-medium mb-1">
-                  {title}
-               </p>
-               <p className={`text-3xl font-bold ${valueClass}`}>{value}</p>
-            </div>
-            <div className={`${bgColor} p-4 rounded-full`}>
-               {React.createElement(icon, {
-                  className: `w-8 h-8 ${iconClass}`,
-               })}
-            </div>
-         </div>
-      </div>
-   );
+   const statsData = [
+      {
+         title: "Pending",
+         value: stats.pendingSubmissions,
+         icon: Clock,
+      },
+      {
+         title: "Under Review",
+         value: stats.underReviewSubmissions,
+         icon: AlertCircle,
+      },
+      {
+         title: "Accepted",
+         value: stats.acceptedSubmissions,
+         icon: CheckCircle,
+      },
+      {
+         title: "Rejected",
+         value: stats.rejectedSubmissions,
+         icon: XCircle,
+      },
+      {
+         title: "Revision",
+         value: stats.revisionRequestedSubmissions,
+         icon: FileEdit,
+      },
+      {
+         title: "Unassigned",
+         value: stats.unassignedSubmissions,
+         icon: UserCheck,
+      },
+   ];
 
    if (loading) return <Loading />;
 
@@ -127,54 +134,25 @@ const AdminDashboard = () => {
                </h1>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-               <div className="bg-white border border-slate-200 rounded p-6 hover:shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition-all">
-                  <div className="flex items-center gap-3 mb-2">
-                     <Clock className="w-6 h-6 text-yellow-600" />
-                     <p className="text-sm font-semibold text-yellow-800">
-                        Pending
-                     </p>
-                  </div>
-                  <p className="text-3xl font-bold text-yellow-700">
-                     {stats.pendingSubmissions}
-                  </p>
-               </div>
+            {/* {stat on dashboard} */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
+               {statsData.map((item, index) => (
+                  <div
+                     key={index}
+                     className="bg-gray-100 border border-gray-300 px-4 py-3 hover:bg-gray-200 transition-all duration-200"
+                  >
+                     <div className="flex items-center justify-between">
+                        <div>
+                           <p className="text-xs text-gray-600">{item.title}</p>
+                           <p className="text-xl font-semibold text-gray-900">
+                              {item.value}
+                           </p>
+                        </div>
 
-               <div className="bg-cyan-50 border border-cyan-200 rounded p-6 hover:shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition-all">
-                  <div className="flex items-center gap-3 mb-2">
-                     <AlertCircle className="w-6 h-6 text-cyan-600" />
-                     <p className="text-sm font-semibold text-cyan-700">
-                        Under Review
-                     </p>
+                        <item.icon className="w-4 h-4 text-gray-500" />
+                     </div>
                   </div>
-                  <p className="text-3xl font-bold text-cyan-700">
-                     {stats.underReviewSubmissions}
-                  </p>
-               </div>
-
-               <div className="bg-white border border-slate-200 rounded p-6 hover:shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition-all">
-                  <div className="flex items-center gap-3 mb-2">
-                     <CheckCircle className="w-6 h-6 text-green-600" />
-                     <p className="text-sm font-semibold text-green-800">
-                        Accepted
-                     </p>
-                  </div>
-                  <p className="text-3xl font-bold text-green-700">
-                     {stats.acceptedSubmissions}
-                  </p>
-               </div>
-
-               <div className="bg-white border border-slate-200 rounded p-6 hover:shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition-all">
-                  <div className="flex items-center gap-3 mb-2">
-                     <XCircle className="w-6 h-6 text-red-600" />
-                     <p className="text-sm font-semibold text-red-800">
-                        Rejected
-                     </p>
-                  </div>
-                  <p className="text-3xl font-bold text-red-700">
-                     {stats.rejectedSubmissions}
-                  </p>
-               </div>
+               ))}
             </div>
 
             <div className="bg-white rounded shadow-[0_18px_45px_rgba(15,23,42,0.06)] border border-slate-200 overflow-hidden">

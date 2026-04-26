@@ -23,12 +23,6 @@ import {
    Tag,
    AlignLeft,
    Calendar,
-   Clock,
-   CheckCircle,
-   XCircle,
-   AlertCircle,
-   FileEdit,
-   UserCheck,
    MessageSquare,
    Bell,
 } from "lucide-react";
@@ -176,24 +170,6 @@ const AdminSubmissions = () => {
 
       setFilteredSubmissions(filtered);
    };
-
-   const getStatistics = () => {
-      return {
-         pending: submissions.filter((s) => s.status === "Pending").length,
-         underReview: submissions.filter((s) => s.status === "Under Review")
-            .length,
-         accepted: submissions.filter((s) => s.status === "Accepted").length,
-         rejected: submissions.filter((s) => s.status === "Rejected").length,
-         revisionRequested: submissions.filter(
-            (s) => s.status === "Revision Requested",
-         ).length,
-         unassigned: submissions.filter(
-            (s) => !s.reviewers || s.reviewers.length === 0,
-         ).length,
-      };
-   };
-
-   const stats = getStatistics();
 
    const handleViewDetails = async (submissionId) => {
       try {
@@ -431,105 +407,6 @@ const AdminSubmissions = () => {
                <h1 className="text-3xl font-bold text-slate-950">
                   Submissions
                </h1>
-            </div>
-
-            {/* Statistics Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-               <div className="bg-white border border-slate-200 rounded p-6 hover:shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition-all">
-                  <div className="flex items-center justify-between">
-                     <div>
-                        <p className="text-sm font-medium text-slate-500 mb-1">
-                           Pending
-                        </p>
-                        <p className="text-3xl font-bold text-slate-950">
-                           {stats.pending}
-                        </p>
-                     </div>
-                     <div className="bg-amber-100 p-4 rounded-full">
-                        <Clock className="w-8 h-8 text-yellow-600" />
-                     </div>
-                  </div>
-               </div>
-
-               <div className="bg-cyan-50 border border-cyan-200 rounded p-6 hover:shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition-all">
-                  <div className="flex items-center justify-between">
-                     <div>
-                        <p className="text-sm font-medium text-slate-500 mb-1">
-                           Under Review
-                        </p>
-                        <p className="text-3xl font-bold text-slate-950">
-                           {stats.underReview}
-                        </p>
-                     </div>
-                     <div className="bg-cyan-100 p-4 rounded-full">
-                        <FileEdit className="w-8 h-8 text-cyan-600" />
-                     </div>
-                  </div>
-               </div>
-
-               <div className="bg-white border border-slate-200 rounded p-6 hover:shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition-all">
-                  <div className="flex items-center justify-between">
-                     <div>
-                        <p className="text-sm font-medium text-slate-500 mb-1">
-                           Accepted
-                        </p>
-                        <p className="text-3xl font-bold text-slate-950">
-                           {stats.accepted}
-                        </p>
-                     </div>
-                     <div className="bg-green-100 p-4 rounded-full">
-                        <CheckCircle className="w-8 h-8 text-green-600" />
-                     </div>
-                  </div>
-               </div>
-
-               <div className="bg-white border border-slate-200 rounded p-6 hover:shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition-all">
-                  <div className="flex items-center justify-between">
-                     <div>
-                        <p className="text-sm font-medium text-slate-500 mb-1">
-                           Rejected
-                        </p>
-                        <p className="text-3xl font-bold text-slate-950">
-                           {stats.rejected}
-                        </p>
-                     </div>
-                     <div className="bg-red-100 p-4 rounded-full">
-                        <XCircle className="w-8 h-8 text-red-600" />
-                     </div>
-                  </div>
-               </div>
-
-               <div className="bg-white border border-slate-200 rounded p-6 hover:shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition-all">
-                  <div className="flex items-center justify-between">
-                     <div>
-                        <p className="text-sm font-medium text-slate-500 mb-1">
-                           Revision Req
-                        </p>
-                        <p className="text-3xl font-bold text-slate-950">
-                           {stats.revisionRequested}
-                        </p>
-                     </div>
-                     <div className="bg-orange-100 p-4 rounded-full">
-                        <AlertCircle className="w-8 h-8 text-orange-600" />
-                     </div>
-                  </div>
-               </div>
-
-               <div className="bg-white border border-slate-200 rounded p-6 hover:shadow-[0_18px_45px_rgba(15,23,42,0.06)] transition-all">
-                  <div className="flex items-center justify-between">
-                     <div>
-                        <p className="text-sm font-medium text-slate-500 mb-1">
-                           Unassigned
-                        </p>
-                        <p className="text-3xl font-bold text-slate-950">
-                           {stats.unassigned}
-                        </p>
-                     </div>
-                     <div className="bg-purple-100 p-4 rounded-full">
-                        <UserCheck className="w-8 h-8 text-purple-600" />
-                     </div>
-                  </div>
-               </div>
             </div>
 
             {/* Search and Filter */}

@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
 import { AdminContext } from "../context/AdminContext";
 import { ReviewerContext } from "../context/ReviewerContext";
+import Loading from "../components/Loading";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -11,11 +12,13 @@ const Login = () => {
 
    const [email, setEmail] = useState("");
    const [password, setPassword] = useState("");
+   const [isSubmitting, setIsSubmitting] = useState(false);
 
    // const adminUrl = import.meta.env.VITE_CLIENT_URL + "login"; // URL for author login (client app)
 
    const onSubmitHandler = async (event) => {
       event.preventDefault();
+      setIsSubmitting(true);
       try {
          if (state === "Admin") {
             const { data } = await axios.post(backendUrl + "/api/admin/login", {
@@ -44,8 +47,12 @@ const Login = () => {
       } catch (error) {
          console.error(error);
          toast.error("Login failed. Please try again.");
+      } finally {
+         setIsSubmitting(false);
       }
    };
+
+   if (isSubmitting) return <Loading />;
 
    return (
       <div className="min-h-screen flex items-center justify-center">

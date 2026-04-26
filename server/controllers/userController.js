@@ -69,7 +69,7 @@ export const signup = async (req, res) => {
       try {
          await sendEmail({
             email,
-            subject: "IPDIMS - Verify Your Account",
+            subject: "Your IPDIMS Verification Code",
             message,
             html: htmlContent,
          });

@@ -27,7 +27,7 @@ const sendEmail = async (options) => {
    });
 
    const mailOptions = {
-      from: `IPDIMS <${emailUser}>`,
+      from: `"IPDIMS Support Team" <${emailUser}>`,
       to: options.email,
       subject: options.subject,
       text: options.message,

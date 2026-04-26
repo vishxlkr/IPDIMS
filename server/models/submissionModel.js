@@ -1,5 +1,26 @@
 import mongoose from "mongoose";
 
+const dedupeFeedbackByReviewer = (feedbackList = []) => {
+   const seenReviewerIds = new Set();
+
+   return feedbackList.filter((feedback) => {
+      const reviewerId = feedback?.reviewer;
+
+      if (!reviewerId) {
+         return true;
+      }
+
+      const reviewerKey = String(reviewerId);
+
+      if (seenReviewerIds.has(reviewerKey)) {
+         return false;
+      }
+
+      seenReviewerIds.add(reviewerKey);
+      return true;
+   });
+};
+
 /* -----------------------------------------
    COUNTER SCHEMA (used to auto-increment paperId)
 -------------------------------------------- */
@@ -128,6 +149,10 @@ const submissionSchema = new mongoose.Schema(
    AUTO-INCREMENT LOGIC FOR paperId
 -------------------------------------------- */
 submissionSchema.pre("save", async function (next) {
+   if (Array.isArray(this.feedback) && this.feedback.length > 1) {
+      this.feedback = dedupeFeedbackByReviewer(this.feedback);
+   }
+
    if (this.paperId) return next(); // prevents reassignment if updating document
 
    try {

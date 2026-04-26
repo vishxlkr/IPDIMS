@@ -518,6 +518,16 @@ export const changeSubmissionStatus = async (req, res) => {
    try {
       const { submissionId, status, notify, customMessage } = req.body;
 
+      // Default to notifying authors unless explicitly disabled.
+      const shouldNotify =
+         typeof notify === "boolean"
+            ? notify
+            : notify === "true"
+              ? true
+              : notify === "false"
+                ? false
+                : true;
+
       if (!submissionId || !status) {
          return res.status(400).json({
             success: false,
@@ -552,38 +562,56 @@ export const changeSubmissionStatus = async (req, res) => {
 
       console.log("✅ Status updated to:", status);
 
+      let emailSent = false;
+      let emailSkipReason = "";
+
       //  Only send email if notify = true
-      if (notify) {
-         const userEmail = submission.authorEmail || submission.author.email;
-         const userName = submission.authorName || submission.author.name;
+      if (shouldNotify) {
+         const userEmail = submission.authorEmail || submission.author?.email;
+         const userName = submission.authorName || submission.author?.name;
+
+         if (!userEmail) {
+            emailSkipReason = "Author email not found for this submission";
+            console.warn("⚠️", emailSkipReason, submissionId);
+         }
 
          const subject = `Your Paper Status Updated - ${status}`;
          const message = `Paper submission status updated to ${status}.`;
          const htmlContent = getStatusUpdateEmail(
-            userName,
+            userName || "Author",
             submission,
             status,
             customMessage,
          );
 
-         try {
-            await sendEmail({
-               email: userEmail,
-               subject,
-               message,
-               html: htmlContent,
-            });
-            console.log("📧 Email sent to:", userEmail);
-         } catch (emailErr) {
-            console.error("❌ Email sending failed:", emailErr.message);
+         if (userEmail) {
+            try {
+               await sendEmail({
+                  email: userEmail,
+                  subject,
+                  message,
+                  html: htmlContent,
+               });
+               emailSent = true;
+               console.log("📧 Email sent to:", userEmail);
+            } catch (emailErr) {
+               emailSkipReason = emailErr.message;
+               console.error("❌ Email sending failed:", emailErr);
+            }
          }
+      } else {
+         emailSkipReason = "Notification disabled by request";
       }
 
       res.status(200).json({
          success: true,
-         message: notify
-            ? "Status updated successfully & user notified"
+         message: shouldNotify
+            ? emailSent
+               ? "Status updated successfully & user notified"
+               : "Status updated successfully, but notification email was not sent"
             : "Status updated successfully (no notification sent)",
+         emailSent,
+         emailSkipReason,
          submission,
       });
    } catch (error) {

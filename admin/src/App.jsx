@@ -1,5 +1,5 @@
-import React, { useContext } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import React, { useContext, useEffect } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -24,13 +24,24 @@ import ReviewerSubmissions from "./pages/reviewer/ReviewerSubmissions";
 import ReviewerProfile from "./pages/reviewer/ReviewerProfile";
 import ReviewerAccess from "./pages/reviewer/ReviewerAccess";
 
-import AdminAccess from "./pages/admin/AdminAccess";
-
 const App = () => {
-   const { aToken } = useContext(AdminContext);
+   const { aToken, setAToken } = useContext(AdminContext);
    const { rToken } = useContext(ReviewerContext);
+   const location = useLocation();
 
-   const isAdmin = Boolean(aToken);
+   const params = new URLSearchParams(location.search);
+   const magicAdminToken = params.get("token");
+   const hasMagicAdminToken =
+      location.pathname === "/admin/submissions" && Boolean(magicAdminToken);
+
+   useEffect(() => {
+      if (hasMagicAdminToken && magicAdminToken) {
+         localStorage.setItem("aToken", magicAdminToken);
+         setAToken(magicAdminToken);
+      }
+   }, [hasMagicAdminToken, magicAdminToken, setAToken]);
+
+   const isAdmin = Boolean(aToken || hasMagicAdminToken);
    const isReviewer = Boolean(rToken);
    const isAuthenticated = isAdmin || isReviewer;
 
@@ -42,9 +53,6 @@ const App = () => {
          <ToastContainer />
 
          <Routes>
-            {/* Admin Magic Link Access - Public/Open */}
-            <Route path="/admin-access" element={<AdminAccess />} />
-
             {/* Reviewer Magic Link Access - Public/Open */}
             <Route path="/reviewer-access" element={<ReviewerAccess />} />
 

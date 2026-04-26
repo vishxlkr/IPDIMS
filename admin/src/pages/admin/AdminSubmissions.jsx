@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Loading from "../../components/Loading";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -34,6 +35,8 @@ const pdfjsVersion = "3.11.174";
 const pdfjsWorker = `https://unpkg.com/pdfjs-dist@${pdfjsVersion}/build/pdf.worker.min.js`;
 
 const AdminSubmissions = () => {
+   const navigate = useNavigate();
+   const [searchParams] = useSearchParams();
    const [submissions, setSubmissions] = useState([]);
    const [filteredSubmissions, setFilteredSubmissions] = useState([]);
    const [reviewers, setReviewers] = useState([]);
@@ -53,18 +56,22 @@ const AdminSubmissions = () => {
    const [reviewerSearchTerm, setReviewerSearchTerm] = useState("");
    const [isAssigning, setIsAssigning] = useState(false);
 
-   const searchParams = new URLSearchParams(window.location.search);
    const queuedAction = searchParams.get("action");
    const queuedSubmissionId = searchParams.get("submissionId");
 
    // const backendUrl = "http://localhost:4000";
-   const { backendUrl } = useContext(AdminContext);
-   const atoken = localStorage.getItem("aToken");
+   const { backendUrl, aToken } = useContext(AdminContext);
+   const atoken = aToken || localStorage.getItem("aToken") || "";
 
    useEffect(() => {
+      if (!atoken) {
+         setLoading(false);
+         return;
+      }
+
       fetchSubmissions();
       fetchReviewers();
-   }, []);
+   }, [atoken]);
 
    useEffect(() => {
       filterSubmissions();
@@ -80,15 +87,45 @@ const AdminSubmissions = () => {
             (s) => s._id === queuedSubmissionId,
          );
          if (targetSubmission && !showAssignModal) {
-            window.history.replaceState(
-               {},
-               document.title,
-               window.location.pathname,
-            );
+            navigate("/admin/submissions", { replace: true });
             openAssignModal(targetSubmission);
          }
       }
-   }, [submissions, queuedAction, queuedSubmissionId, showAssignModal]);
+   }, [
+      submissions,
+      queuedAction,
+      queuedSubmissionId,
+      showAssignModal,
+      navigate,
+   ]);
+
+   useEffect(() => {
+      if (
+         queuedAction === "feedback" &&
+         queuedSubmissionId &&
+         submissions.length > 0 &&
+         !showFeedbackModal
+      ) {
+         const targetSubmission = submissions.find(
+            (s) => s._id === queuedSubmissionId,
+         );
+
+         if (!targetSubmission) {
+            toast.error("Submission not found for this feedback link.");
+            navigate("/admin/submissions", { replace: true });
+            return;
+         }
+
+         navigate("/admin/submissions", { replace: true });
+         handleViewFeedback(queuedSubmissionId);
+      }
+   }, [
+      submissions,
+      queuedAction,
+      queuedSubmissionId,
+      showFeedbackModal,
+      navigate,
+   ]);
 
    const fetchSubmissions = async () => {
       try {
@@ -371,6 +408,7 @@ const AdminSubmissions = () => {
             {
                submissionId,
                status: newStatus,
+               notify: true,
             },
             { headers: { atoken } },
          );

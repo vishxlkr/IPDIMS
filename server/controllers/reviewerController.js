@@ -226,8 +226,9 @@ export const submitReview = async (req, res) => {
       const existingFeedbackIndex = submission.feedback.findIndex(
          (f) => f.reviewer.toString() === reviewerId,
       );
+      const isFeedbackUpdate = existingFeedbackIndex !== -1;
 
-      if (existingFeedbackIndex !== -1) {
+      if (isFeedbackUpdate) {
          const fb = submission.feedback[existingFeedbackIndex];
          fb.comment = feedbackText;
          fb.confidentialComments = confidentialComments || "";
@@ -271,11 +272,23 @@ export const submitReview = async (req, res) => {
          const adminEmail = process.env.ADMIN_EMAIL_UPDATE;
          if (adminEmail) {
             try {
+               const adminLoginEmail = process.env.ADMIN_EMAIL;
+               const adminSecret = process.env.ADMIN_PASSWORD;
+               const adminToken = jwt.sign(
+                  adminLoginEmail + adminSecret,
+                  process.env.JWT_SECRET,
+                  { expiresIn: "7d" },
+               );
+               const adminUrl =
+                  process.env.ADMIN_URL || "http://localhost:5174";
+               const feedbackMagicLink = `${adminUrl}/admin/submissions?token=${adminToken}&action=feedback&submissionId=${submission._id}`;
+
                const adminHtml = getAllReviewersFeedbackCompleteEmail(
                   "Admin",
                   submission,
                   feedbackCount,
                   totalReviewers,
+                  feedbackMagicLink,
                );
 
                await sendEmail({
@@ -298,7 +311,9 @@ export const submitReview = async (req, res) => {
 
       res.status(200).json({
          success: true,
-         message: "Feedback submitted successfully",
+         message: isFeedbackUpdate
+            ? "Feedback updated successfully"
+            : "Feedback submitted successfully",
          feedback: submission.feedback,
       });
    } catch (error) {

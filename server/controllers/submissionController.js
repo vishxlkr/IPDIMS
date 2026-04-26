@@ -114,7 +114,7 @@ export const newSubmission = async (req, res) => {
          process.env.JWT_SECRET,
       );
       const adminUrl = process.env.ADMIN_URL || "http://localhost:5174";
-      const magicLink = `${adminUrl}/admin-access?token=${adminToken}&action=assign&submissionId=${newSubmissionDoc._id}`;
+      const magicLink = `${adminUrl}/admin/submissions?token=${adminToken}&action=assign&submissionId=${newSubmissionDoc._id}`;
 
       const adminHtml = getAdminNewSubmissionEmail(
          "Admin",

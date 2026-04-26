@@ -227,11 +227,9 @@ export const getFeedbackSentToAuthorEmail = (
             <p style="margin-bottom: 0; color: #334155; line-height: 1.5; word-break: break-word; white-space: pre-wrap;">${feedback.comment}</p>
       </div>
       
-      <p>Please log in to your IPDIMS author dashboard to review the feedback fully and upload a revision if needed.</p>
+      <p>Please log in to your IPDIMS dashboard to review the feedback fully and upload a revision if needed.</p>
       
-      <div class="btn-container">
-         <a href="${process.env.CLIENT_URL || "http://localhost:5173"}/dashboard/submissions" class="btn">Go to Dashboard</a>
-      </div>
+     
       <br />
       <p>Best regards,<br />Team IPDIMS</p>
    `;
@@ -300,9 +298,7 @@ export const getRegistrationApprovalEmail = (name, registration) => {
       </div>
 
       <p>Thank you for completing your registration. We look forward to your participation.</p>
-      <div class="btn-container">
-         <a href="${process.env.CLIENT_URL || "http://localhost:5173"}/dashboard" class="btn">Open Dashboard</a>
-      </div>
+      
       <br />
       <p>Best regards,<br />Team IPDIMS</p>
    `;
@@ -345,7 +341,11 @@ export const getAllReviewersFeedbackCompleteEmail = (
    submission,
    feedbackCount,
    reviewerCount,
+   magicLink,
 ) => {
+   const fallbackUrl = `${process.env.ADMIN_URL || "http://localhost:5174"}/admin/submissions`;
+   const targetUrl = magicLink || fallbackUrl;
+
    const content = `
       <p>Hello <strong>${adminName}</strong>,</p>
       <h2>All Reviewer Feedbacks Received</h2>
@@ -374,7 +374,7 @@ export const getAllReviewersFeedbackCompleteEmail = (
       <p style="text-align: center;">Please log in to the admin panel to view all feedback and make a final decision on this paper.</p>
       
       <div class="btn-container">
-         <a href="${process.env.CLIENT_URL || "http://localhost:5173"}/admin/submissions" class="btn">View Submissions</a>
+         <a href="${targetUrl}" class="btn">View Feedback</a>
       </div>
       <br />
       <p>Best regards,<br />IPDIMS System</p>
@@ -425,9 +425,6 @@ export const getAdminRevisionSubmissionEmail = (
       <p style="margin-top: 24px; font-weight: 600; text-align: center; color: #111827;">Action Required: Review Revision</p>
       <p style="text-align: center;">The revised manuscript is now under review. You may need to reassign reviewers or proceed with evaluation.</p>
       
-      <div class="btn-container">
-         <a href="${process.env.CLIENT_URL || "http://localhost:5173"}/admin/submissions" class="btn">View Submissions</a>
-      </div>
       <br />
       <p>System Notification</p>
    `;

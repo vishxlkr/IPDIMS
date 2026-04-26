@@ -265,8 +265,7 @@ export const baseEmailTemplate = (title, content) => `
             ${content}
         </div>
         <div class="footer">
-            <p>IPDIMS - International Proceedings of Data & Information Management Systems</p>
-            <p style="margin-top: 8px; font-size: 11px;">This is an automated email. Please do not reply directly.</p>
+            <p>IPDIMS </p>
         </div>
     </div>
 </body>

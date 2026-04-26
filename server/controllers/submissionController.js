@@ -5,6 +5,7 @@ import sendEmail from "../config/email.js";
 import {
    getAuthorSubmissionSuccessEmail,
    getAdminNewSubmissionEmail,
+   getAdminRevisionSubmissionEmail,
 } from "../config/emailTemplates/templates.js";
 import path from "path";
 import jwt from "jsonwebtoken";
@@ -104,7 +105,8 @@ export const newSubmission = async (req, res) => {
       console.log(" Submission saved successfully");
 
       //  Send email notification to admin
-      const adminEmail = process.env.ADMIN_EMAIL; // from .env
+      const adminEmail = process.env.ADMIN_EMAIL; // from .env for login
+      const adminNotificationEmail = process.env.ADMIN_EMAIL_UPDATE; // for notifications
       const adminSecret = process.env.ADMIN_PASSWORD; // To sign the admin JWT
 
       const adminToken = jwt.sign(
@@ -124,7 +126,7 @@ export const newSubmission = async (req, res) => {
 
       try {
          await sendEmail({
-            email: adminEmail,
+            email: adminNotificationEmail,
             subject: `IPDIMS - Action Required: Assing Reviewers`,
             message: `New submission: ${title} by ${user.name}`,
             html: adminHtml,
@@ -207,6 +209,14 @@ export const updateSubmission = async (req, res) => {
          });
       }
 
+      // Find user from DB
+      const user = await userModel.findById(userId);
+      if (!user) {
+         return res.json({ success: false, message: "User not found" });
+      }
+
+      const previousStatus = submission.status; // Store previous status
+
       if (title) submission.title = title;
       if (description) submission.description = description;
       if (keywords)
@@ -248,6 +258,34 @@ export const updateSubmission = async (req, res) => {
       submission.needsReviewerAction = true;
 
       await submission.save();
+
+      // Send email to admin if this was a revision submission
+      if (previousStatus === "Revision Requested") {
+         const adminNotificationEmail = process.env.ADMIN_EMAIL_UPDATE;
+         if (adminNotificationEmail) {
+            try {
+               const adminHtml = getAdminRevisionSubmissionEmail(
+                  "Admin",
+                  user,
+                  submission,
+                  submission.attachment.downloadUrl,
+               );
+
+               await sendEmail({
+                  email: adminNotificationEmail,
+                  subject: `IPDIMS - Revised Manuscript Submitted for Paper #${submission.paperId}`,
+                  message: `Revised submission: ${submission.title} by ${user.name}`,
+                  html: adminHtml,
+               });
+               console.log("✅ Admin notified: Revised manuscript submitted");
+            } catch (emailErr) {
+               console.error(
+                  "❌ Failed to send admin notification:",
+                  emailErr.message,
+               );
+            }
+         }
+      }
 
       res.json({
          success: true,

@@ -2,6 +2,8 @@ import reviewerModel from "../models/reviewerModel.js";
 import submissionModel from "../models/submissionModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import sendEmail from "../config/email.js";
+import { getAllReviewersFeedbackCompleteEmail } from "../config/emailTemplates/templates.js";
 
 // api to login reviewer
 export const loginReviewer = async (req, res) => {
@@ -249,6 +251,42 @@ export const submitReview = async (req, res) => {
 
       submission.updatedAt = new Date();
       await submission.save();
+
+      // Check if all reviewers have submitted feedback
+      const totalReviewers = submission.reviewers.length;
+      const feedbackCount = submission.feedback.filter(
+         (f) => f.reviewer,
+      ).length;
+
+      if (totalReviewers > 0 && feedbackCount === totalReviewers) {
+         // All reviewers have submitted feedback, send email to admin
+         const adminEmail = process.env.ADMIN_EMAIL_UPDATE;
+         if (adminEmail) {
+            try {
+               const adminHtml = getAllReviewersFeedbackCompleteEmail(
+                  "Admin",
+                  submission,
+                  feedbackCount,
+                  totalReviewers,
+               );
+
+               await sendEmail({
+                  email: adminEmail,
+                  subject: `IPDIMS - All Reviewer Feedbacks Complete for Paper #${submission.paperId}`,
+                  message: `All ${totalReviewers} reviewers have submitted feedback for paper "${submission.title}"`,
+                  html: adminHtml,
+               });
+               console.log(
+                  "✅ Admin notified: All reviewer feedbacks complete",
+               );
+            } catch (emailErr) {
+               console.error(
+                  "❌ Failed to send admin notification:",
+                  emailErr.message,
+               );
+            }
+         }
+      }
 
       res.status(200).json({
          success: true,

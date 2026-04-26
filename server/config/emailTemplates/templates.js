@@ -345,3 +345,97 @@ export const getRegistrationRejectionEmail = (name, registration, reason) => {
 
    return baseEmailTemplate("Conference Registration Update", content);
 };
+
+export const getAllReviewersFeedbackCompleteEmail = (
+   adminName,
+   submission,
+   feedbackCount,
+   reviewerCount,
+) => {
+   const content = `
+      <p>Hello <strong>${adminName}</strong>,</p>
+      <h2>All Reviewer Feedbacks Received</h2>
+      <p>All assigned reviewers have submitted their feedback for the following paper. You can now review the evaluations and make a final decision.</p>
+      
+      <div class="info-box">
+         <div class="info-row">
+            <span class="info-label">Paper ID:</span>
+            <span class="info-value">#${submission.paperId}</span>
+         </div>
+         <div class="info-row">
+            <span class="info-label">Title:</span>
+            <span class="info-value font-semibold">${submission.title}</span>
+         </div>
+         <div class="info-row">
+            <span class="info-label">Author:</span>
+            <span class="info-value">${submission.authorName} (${submission.authorEmail})</span>
+         </div>
+         <div class="info-row">
+            <span class="info-label">Feedback Status:</span>
+            <span class="info-value font-bold" style="color: #16a34a;">${feedbackCount}/${reviewerCount} Complete</span>
+         </div>
+      </div>
+
+      <p style="margin-top: 24px; font-weight: 600; text-align: center; color: #111827;">Action Required: Review Feedback & Decide</p>
+      <p style="text-align: center;">Please log in to the admin panel to view all feedback and make a final decision on this paper.</p>
+      
+      <div class="btn-container">
+         <a href="${process.env.CLIENT_URL || "http://localhost:5173"}/admin/submissions" class="btn">View Submissions</a>
+      </div>
+      <br />
+      <p>Best regards,<br />IPDIMS System</p>
+   `;
+   return baseEmailTemplate("All Reviewer Feedbacks Complete", content);
+};
+
+export const getAdminRevisionSubmissionEmail = (
+   adminName,
+   user,
+   submission,
+   downloadUrl,
+) => {
+   const content = `
+      <p>Hello <strong>${adminName}</strong>,</p>
+      <h2>Revised Manuscript Submitted</h2>
+      <p>The author has submitted a revised version of their paper following the revision request.</p>
+      
+      <div class="info-box">
+         <div class="info-row">
+            <span class="info-label">Author:</span>
+            <span class="info-value">${user.name} (${user.email})</span>
+         </div>
+         <div class="info-row">
+            <span class="info-label">Affiliation:</span>
+            <span class="info-value">${user.organization || "N/A"}</span>
+         </div>
+         <div class="divider"></div>
+         <div class="info-row">
+            <span class="info-label">Paper ID:</span>
+            <span class="info-value">#${submission.paperId}</span>
+         </div>
+         <div class="info-row">
+            <span class="info-label">Title:</span>
+            <span class="info-value font-semibold">${submission.title}</span>
+         </div>
+         <div class="info-row">
+            <span class="info-label">Event:</span>
+            <span class="info-value">${submission.eventName}</span>
+         </div>
+         <div class="divider"></div>
+         <div class="info-row">
+            <span class="info-label">Attachment:</span>
+            <span class="info-value">${downloadUrl ? `<a href="${downloadUrl}" style="color: #2563eb; text-decoration: underline;">Download Revised PDF</a>` : "No attachment"}</span>
+         </div>
+      </div>
+
+      <p style="margin-top: 24px; font-weight: 600; text-align: center; color: #111827;">Action Required: Review Revision</p>
+      <p style="text-align: center;">The revised manuscript is now under review. You may need to reassign reviewers or proceed with evaluation.</p>
+      
+      <div class="btn-container">
+         <a href="${process.env.CLIENT_URL || "http://localhost:5173"}/admin/submissions" class="btn">View Submissions</a>
+      </div>
+      <br />
+      <p>System Notification</p>
+   `;
+   return baseEmailTemplate("Revised Manuscript Submitted", content);
+};

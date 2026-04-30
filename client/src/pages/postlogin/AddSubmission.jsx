@@ -23,8 +23,40 @@ const AddSubmission = () => {
    const [authorOrganization, setAuthorOrganization] = useState("");
    const [eventName, setEventName] = useState("IPDIMS 2025");
    const [attachment, setAttachment] = useState(null);
+   const [fileError, setFileError] = useState("");
 
    const fileInputRef = useRef(null);
+
+   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+   const ALLOWED_FILE_TYPES = ["application/pdf"];
+
+   const handleFileChange = (e) => {
+      const file = e.target.files[0];
+      setFileError(""); // Clear previous errors
+
+      if (!file) {
+         setAttachment(null);
+         return;
+      }
+
+      // Check file type
+      if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+         setFileError("Only PDF files are accepted");
+         setAttachment(null);
+         e.target.value = ""; // Clear the file input
+         return;
+      }
+
+      // Check file size
+      if (file.size > MAX_FILE_SIZE) {
+         setFileError("File size should be less than 5 MB");
+         setAttachment(null);
+         e.target.value = ""; // Clear the file input
+         return;
+      }
+
+      setAttachment(file);
+   };
 
    useEffect(() => {
       if (!token || !userData) {
@@ -35,6 +67,20 @@ const AddSubmission = () => {
    const handleSubmit = async (e) => {
       e.preventDefault();
       setLoading(true);
+
+      // Validate file if present
+      if (attachment) {
+         if (!ALLOWED_FILE_TYPES.includes(attachment.type)) {
+            toast.error("Only PDF files are accepted");
+            setLoading(false);
+            return;
+         }
+         if (attachment.size > MAX_FILE_SIZE) {
+            toast.error("File size should be less than 5 MB");
+            setLoading(false);
+            return;
+         }
+      }
 
       try {
          const formData = new FormData();
@@ -141,16 +187,25 @@ const AddSubmission = () => {
                      <h4 className="text-lg font-bold text-indigo-300 mb-4">
                         Attachments
                      </h4>
+                     <p className="text-sm text-gray-400 mb-2">
+                        Only PDF file accepted (Max size: 5 MB)
+                     </p>
                      <input
                         ref={fileInputRef}
                         type="file"
-                        onChange={(e) => setAttachment(e.target.files[0])}
-                        accept=".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.zip,.txt,.rtf,.jpg,.png"
+                        onChange={handleFileChange}
+                        accept=".pdf"
                         className="w-full border border-gray-600 bg-black/30 rounded-lg px-4 py-2 "
                      />
-                     {attachment && (
-                        <p className="mt-2 text-sm text-gray-400">
-                           Selected File: {attachment.name}
+                     {fileError && (
+                        <p className="mt-2 text-sm text-red-500">
+                           ⚠ {fileError}
+                        </p>
+                     )}
+                     {attachment && !fileError && (
+                        <p className="mt-2 text-sm text-green-400">
+                           ✓ Selected File: {attachment.name} (
+                           {(attachment.size / 1024 / 1024).toFixed(2)} MB)
                         </p>
                      )}
                   </div>

@@ -346,11 +346,6 @@ export const getSubmissionById = async (req, res) => {
 export const assignSubmission = async (req, res) => {
    try {
       const { submissionId, reviewerIds } = req.body;
-      console.log("Received reviewerIds:", reviewerIds);
-      console.log(
-         "ReviewerIds types:",
-         reviewerIds.map((r) => typeof r),
-      );
 
       if (!submissionId || !reviewerIds || !Array.isArray(reviewerIds)) {
          return res.status(400).json({
@@ -358,6 +353,16 @@ export const assignSubmission = async (req, res) => {
             message: "Submission ID and Reviewer IDs (array) are required",
          });
       }
+
+      const normalizedReviewerIds = reviewerIds
+         .map((reviewerId) => reviewerId?.toString().trim())
+         .filter(Boolean);
+
+      console.log("Received reviewerIds:", normalizedReviewerIds);
+      console.log(
+         "ReviewerIds types:",
+         normalizedReviewerIds.map((r) => typeof r),
+      );
 
       const submission = await submissionModel.findById(submissionId);
 
@@ -387,6 +392,12 @@ export const assignSubmission = async (req, res) => {
             return idStr.trim();
          })
          .filter((id) => id); // Remove empty strings
+
+      const newReviewers = Array.from(new Set(normalizedReviewerIds));
+      const addedReviewers = newReviewers.filter(
+         (reviewerId) => !oldReviewers.includes(reviewerId),
+      );
+
       console.log("Old reviewers:", oldReviewers);
       console.log("New reviewers:", newReviewers);
       console.log("Added reviewers:", addedReviewers);
@@ -438,23 +449,25 @@ export const assignSubmission = async (req, res) => {
       }
 
       // Step 5: Update DB
-      submission.reviewers = reviewerIds;
+      submission.reviewers = newReviewers;
 
       // Remove feedbacks from reviewers no longer assigned
       submission.feedback = submission.feedback.filter((f) =>
-         reviewerIds.some((r) => r.toString() === f.reviewer.toString()),
+         newReviewers.some(
+            (reviewerId) => reviewerId === f.reviewer.toString(),
+         ),
       );
 
-      if (submission.status === "Pending" && reviewerIds.length > 0) {
+      if (submission.status === "Pending" && newReviewers.length > 0) {
          submission.status = "Under Review";
       } else if (
-         reviewerIds.length === 0 &&
+         newReviewers.length === 0 &&
          submission.status === "Under Review"
       ) {
          submission.status = "Pending";
       }
 
-      if (reviewerIds.length > 0) {
+      if (newReviewers.length > 0) {
          submission.needsReviewerAction = true;
          submission.needsAdminAction = false;
          submission.needsAuthorAction = false;
@@ -474,9 +487,9 @@ export const assignSubmission = async (req, res) => {
       );
 
       // 2. Add to selected reviewers
-      if (reviewerIds.length > 0) {
+      if (newReviewers.length > 0) {
          await reviewerModel.updateMany(
-            { _id: { $in: reviewerIds } },
+            { _id: { $in: newReviewers } },
             {
                $addToSet: { assignedSubmissions: submissionId },
                $set: { lastAssignedAt: new Date() },
@@ -495,12 +508,6 @@ export const assignSubmission = async (req, res) => {
             addedReviewers.length > 0
                ? `Reviewers assigned successfully. ${addedReviewers.length} new reviewer(s) notified.`
                : "Reviewers assigned successfully. No new notifications sent.",
-         submission: populatedSubmission,
-      });
-
-      res.status(200).json({
-         success: true,
-         message: "Reviewers assigned successfully",
          submission: populatedSubmission,
       });
    } catch (error) {

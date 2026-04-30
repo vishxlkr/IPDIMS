@@ -1,11 +1,13 @@
 import submissionModel from "../models/submissionModel.js";
 import userModel from "../models/userModel.js";
+import reviewerModel from "../models/reviewerModel.js";
 import { v2 as cloudinary } from "cloudinary";
 import sendEmail from "../config/email.js";
 import {
    getAuthorSubmissionSuccessEmail,
    getAdminNewSubmissionEmail,
    getAdminRevisionSubmissionEmail,
+   getReviewerAssignmentEmail,
 } from "../config/emailTemplates/templates.js";
 import path from "path";
 import jwt from "jsonwebtoken";
@@ -259,7 +261,7 @@ export const updateSubmission = async (req, res) => {
 
       await submission.save();
 
-      // Send email to admin if this was a revision submission
+      // Send email to admin and notify assigned reviewers if this was a revision submission
       if (previousStatus === "Revision Requested") {
          const adminNotificationEmail = process.env.ADMIN_EMAIL_UPDATE;
          if (adminNotificationEmail) {
@@ -284,6 +286,62 @@ export const updateSubmission = async (req, res) => {
                   emailErr.message,
                );
             }
+         }
+
+         // Notify all already-assigned reviewers to re-review the revised paper
+         try {
+            if (submission.reviewers && submission.reviewers.length > 0) {
+               const reviewersToNotify = await reviewerModel.find({
+                  _id: { $in: submission.reviewers },
+               });
+
+               const adminUrl =
+                  process.env.ADMIN_URL || "http://localhost:5174";
+
+               for (const reviewer of reviewersToNotify) {
+                  try {
+                     const token = jwt.sign(
+                        { id: reviewer._id, role: "reviewer" },
+                        process.env.JWT_SECRET,
+                        { expiresIn: "7d" },
+                     );
+
+                     const magicLink = `${adminUrl}/reviewer-access?token=${token}&submissionId=${submission._id}`;
+
+                     const subject = `IPDIMS - Revised Paper Ready For Re-Review (#${submission.paperId})`;
+                     const message = `Revised paper submitted: ${submission.title}`;
+                     const htmlContent = getReviewerAssignmentEmail(
+                        reviewer.name,
+                        submission,
+                        magicLink,
+                     );
+
+                     await sendEmail({
+                        email: reviewer.email,
+                        subject,
+                        message,
+                        html: htmlContent,
+                     });
+
+                     console.log(
+                        "📧 Notified reviewer about revised paper:",
+                        reviewer.email,
+                     );
+                  } catch (revEmailErr) {
+                     console.error(
+                        `Failed to notify reviewer ${reviewer.email}:`,
+                        revEmailErr.message,
+                     );
+                  }
+               }
+            } else {
+               console.log("No assigned reviewers to notify for this revision");
+            }
+         } catch (err) {
+            console.error(
+               "Error while notifying reviewers for revision:",
+               err.message,
+            );
          }
       }
 

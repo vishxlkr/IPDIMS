@@ -16,25 +16,54 @@ const sendEmail = async (options) => {
    // Gmail app passwords are often copied with spaces; normalize to avoid auth failures.
    const emailPass = rawEmailPass.replace(/\s+/g, "").trim();
 
-   const transporter = nodemailer.createTransport({
-      host: emailHost, // smtp.gmail.com
-      port: emailPort,
-      secure: emailPort === 465,
-      auth: {
-         user: emailUser,
-         pass: emailPass,
+   const transportOptions = [
+      {
+         host: emailHost,
+         port: emailPort,
+         secure: emailPort === 465,
       },
-   });
+   ];
 
-   const mailOptions = {
-      from: `"IPDIMS Support Team" <${emailUser}>`,
-      to: options.email,
-      subject: options.subject,
-      text: options.message,
-      html: options.html,
-   };
+   if (emailPort !== 465) {
+      transportOptions.push({
+         host: emailHost,
+         port: 465,
+         secure: true,
+      });
+   }
 
-   await transporter.sendMail(mailOptions);
+   let lastError;
+
+   for (const transportOption of transportOptions) {
+      const transporter = nodemailer.createTransport({
+         ...transportOption,
+         family: 4,
+         auth: {
+            user: emailUser,
+            pass: emailPass,
+         },
+         connectionTimeout: 15000,
+         greetingTimeout: 15000,
+         socketTimeout: 30000,
+      });
+
+      const mailOptions = {
+         from: `"IPDIMS Support Team" <${emailUser}>`,
+         to: options.email,
+         subject: options.subject,
+         text: options.message,
+         html: options.html,
+      };
+
+      try {
+         await transporter.sendMail(mailOptions);
+         return;
+      } catch (error) {
+         lastError = error;
+      }
+   }
+
+   throw lastError || new Error("Failed to send email");
 };
 
 export default sendEmail;

@@ -402,52 +402,6 @@ export const assignSubmission = async (req, res) => {
       console.log("New reviewers:", newReviewers);
       console.log("Added reviewers:", addedReviewers);
 
-      // Step 4: Send email ONLY to added ones (if any)
-      if (addedReviewers.length > 0) {
-         const reviewersToNotify = await reviewerModel.find({
-            _id: { $in: addedReviewers },
-         });
-
-         for (const reviewer of reviewersToNotify) {
-            try {
-               const token = jwt.sign(
-                  { id: reviewer._id, role: "reviewer" },
-                  process.env.JWT_SECRET,
-                  { expiresIn: "7d" },
-               );
-
-               const adminUrl =
-                  process.env.ADMIN_URL || "http://localhost:5174";
-               const magicLink = `${adminUrl}/reviewer-access?token=${token}&submissionId=${submissionId}`;
-
-               const subject = "IPDIMS - New Paper Assigned For Review";
-               const message = `New Paper Assigned: ${submission.title}`;
-               const htmlContent = getReviewerAssignmentEmail(
-                  reviewer.name,
-                  submission,
-                  magicLink,
-               );
-
-               await sendEmail({
-                  email: reviewer.email,
-                  subject: subject,
-                  message: message,
-                  html: htmlContent,
-               });
-
-               console.log(
-                  "Email sent to newly added reviewer:",
-                  reviewer.email,
-               );
-            } catch (emailErr) {
-               console.error(
-                  `Failed to send reviewer email to ${reviewer.email}:`,
-                  emailErr.message,
-               );
-            }
-         }
-      }
-
       // Step 5: Update DB
       submission.reviewers = newReviewers;
 
@@ -495,6 +449,58 @@ export const assignSubmission = async (req, res) => {
                $set: { lastAssignedAt: new Date() },
             },
          );
+      }
+
+      if (addedReviewers.length > 0) {
+         void (async () => {
+            const reviewersToNotify = await reviewerModel.find({
+               _id: { $in: addedReviewers },
+            });
+
+            for (const reviewer of reviewersToNotify) {
+               try {
+                  const token = jwt.sign(
+                     { id: reviewer._id, role: "reviewer" },
+                     process.env.JWT_SECRET,
+                     { expiresIn: "7d" },
+                  );
+
+                  const adminUrl =
+                     process.env.ADMIN_URL || "http://localhost:5174";
+                  const magicLink = `${adminUrl}/reviewer-access?token=${token}&submissionId=${submissionId}`;
+
+                  const subject = "IPDIMS - New Paper Assigned For Review";
+                  const message = `New Paper Assigned: ${submission.title}`;
+                  const htmlContent = getReviewerAssignmentEmail(
+                     reviewer.name,
+                     submission,
+                     magicLink,
+                  );
+
+                  await sendEmail({
+                     email: reviewer.email,
+                     subject: subject,
+                     message: message,
+                     html: htmlContent,
+                  });
+
+                  console.log(
+                     "Email sent to newly added reviewer:",
+                     reviewer.email,
+                  );
+               } catch (emailErr) {
+                  console.error(
+                     `Failed to send reviewer email to ${reviewer.email}:`,
+                     emailErr.message,
+                  );
+               }
+            }
+         })().catch((backgroundErr) => {
+            console.error(
+               "Failed to process reviewer assignment emails:",
+               backgroundErr.message,
+            );
+         });
       }
 
       const populatedSubmission = await submissionModel
